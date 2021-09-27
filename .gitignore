@@ -1,2 +1,5 @@
+etc
 html
 data
+src/__pycache__/
+src/test/__pycache__/

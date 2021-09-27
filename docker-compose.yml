@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./env/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./html:/var/www/html
+    ports:
+      - 8081:80
+    restart: always
