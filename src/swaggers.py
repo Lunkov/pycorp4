@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+from pathlib import Path
 from .basic import Basic
 from .swagger import Swagger
 
@@ -13,31 +15,26 @@ class Swaggers(Basic):
     self.verbose = verbose
 
   def load(self, swaggerpath):
+    fp = os.path.abspath(swaggerpath)
     if self.verbose:
-      print("LOG: Swaggers: Scaning folder '%s'..." % swaggerpath)
-    lstDir = ''
+      print("LOG: Swaggers: Scaning folder '%s'..." % fp)
     try:
-      lstDir = os.listdir(swaggerpath)
+      sw = Swagger()
+      for path in Path(fp).rglob('*.yaml'):
+        fullPath = os.path.join(fp, path.name)
+        if not os.path.isdir(fullPath):
+          sw.load(os.path.join(fullPath, '.yaml'))
+
+          prop = {}
+          prop['version'] = sw.getVersion()
+          prop['service'] = sw.getName()
+          prop['swagger-data'] = sw.get()
+          prop['plan'] = False
+          prop['fact'] = True
+          key = self.genId(prop)
+          prop['id'] = key
+          
+          if key != '':
+            self.addItem(key, prop)
     except:
-      print("FATAL: Folder Not Found: %s" % (swaggerpath))
-
-    sw = Swagger()
-    for curDir in lstDir:
-      if self.verbose:
-        print("DBG: scan subfolder: %s" % curDir)
-      fullPath = os.path.join(swaggerpath, curDir)
-      if os.path.isdir(fullPath):
-        sw.load(os.path.join(fullPath, '.yaml'))
-
-        prop = {}
-        prop['version'] = sw.getVersion()
-        prop['service'] = sw.getName()
-        prop['swagger-data'] = sw.get()
-        prop['plan'] = False
-        prop['fact'] = True
-        key = self.genId(prop)
-        prop['id'] = key
-        
-        if key != '':
-          self.addItem(key, prop)
-
+      print("FATAL: Folder Not Found: %s" % (fp))
