@@ -46,8 +46,8 @@ class Swagger():
   def save(self, dt):
     filename = ''
     try:
-      os.makedirs("html/swagger/%s" % (self.getName()))
-      filename = "html/swagger/%s/%s-%s.yaml" % (self.getName(), dt, self.getVersion())
+      os.makedirs("data/swaggers/%s" % (self.getName()))
+      filename = "data/swaggers/%s/%s-%s.yaml" % (self.getName(), dt, self.getVersion())
       re.sub('[^\w\-_\. ]', '_', filename)
       file = codecs.open(filename, 'w', 'utf-8')
       yaml.dump(self.data, file)
@@ -62,7 +62,7 @@ class Swagger():
         break
     return {}, ()
     
-  def load(self, url):
+  def upload(self, url):
     self.data = {}
     x = None
     contentType =  ''
@@ -75,15 +75,28 @@ class Swagger():
     
     ok = False
     if (not x is None) and (x.status_code == 200):
-      self.data, ok = self.parse(url, contentType, x.text)
+      self.data, ok = self.parseUpload(url, contentType, x.text)
 
     if not ok:
       print("ERR: Swagger parse '%s': %s" % (url, x))
       
     return self.data, ok
+
+  def upload(self, filename):
+    self.data = {}
+    
+    with open(filename, 'r') as stream:
+      try:
+        self.data = yaml.safe_load(stream)
+
+      except yaml.YAMLError as exc:
+        print("ERR: Bad format in %s: %s" % (filename, exc))        
+        return {}, False
+
+    return self.data, ok
   
   
-  def parse(self, url, contentType, content):
+  def parseUpload(self, url, contentType, content):
     data = {}
     contentType =  ''
     ok = False
@@ -112,31 +125,35 @@ class Swagger():
     
     d = swg.get()
     c['path_new'] = {}
-    for k, v in self.data['paths'].items():
-      if not k in d['paths']:
-        c['path_new'][k] = v
-      else:
-        for kp, vp in v.items():
-          if not kp in d['paths'][k]:
-            c['path_new'][k] = v
+    if 'paths' in self.data:
+      for k, v in self.data['paths'].items():
+        if not k in d['paths']:
+          c['path_new'][k] = v
+        else:
+          for kp, vp in v.items():
+            if not kp in d['paths'][k]:
+              c['path_new'][k] = v
           
     c['path_depricated'] = {}
-    for k, v in d['paths'].items():
-      if not k in self.data['paths']:
-        c['path_depricated'][k] = v
-      else:
-        for kp, vp in v.items():
-          if not kp in self.data['paths'][k]:
-            c['path_depricated'][k] = v
+    if 'paths' in d:
+      for k, v in d['paths'].items():
+        if not k in self.data['paths']:
+          c['path_depricated'][k] = v
+        else:
+          for kp, vp in v.items():
+            if not kp in self.data['paths'][k]:
+              c['path_depricated'][k] = v
     
     c['components_new'] = {}
-    for k, v in self.data['components']['schemas'].items():
-      if not k in d['components']['schemas']:
-        c['components_new'][k] = v
+    if 'components' in self.data:
+      for k, v in self.data['components']['schemas'].items():
+        if not k in d['components']['schemas']:
+          c['components_new'][k] = v
     c['components_depricated'] = {}
-    for k, v in d['components']['schemas'].items():
-      if not k in self.data['components']['schemas']:
-        c['components_depricated'][k] = v
+    if 'components' in d:
+      for k, v in d['components']['schemas'].items():
+        if not k in self.data['components']['schemas']:
+          c['components_depricated'][k] = v
     return c
 
   def htmlCompare(self, c):

@@ -164,13 +164,17 @@ class Basic():
         if c == 'id':
           key = value[c]
       if key == '' and len(self.ids) > 0:
-        for j in self.ids:
-          key = key + '*' + value.get(j, '')
-        key = hashlib.md5(key.encode('utf-8')).hexdigest()
+        key = self.genId(value)
       if key != '':
         self.addItem(key, value)
       else:
         print("ERR: id not set for %s" % worksheet)
+
+  def genId(self, properties):
+    key = ''
+    for j in self.ids:
+      key = key + '*' + properties.get(j, '')
+    return hashlib.md5(key.encode('utf-8')).hexdigest()
 
   def writeXLS(self, xls, worksheet):
     columns = {}

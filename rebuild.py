@@ -19,6 +19,11 @@ class CommandArgs(object):
                            help="show this help message and exit",
                            dest="help"
                           )
+    self.parser.add_option('-p', '--path',
+                           type="string",
+                           help="Data path",
+                           dest="path"
+                          )
     self.parser.add_option('-x', '--xls',
                            type="string",
                            help="load data from XLS",
@@ -28,6 +33,12 @@ class CommandArgs(object):
                            help="Load/update online data",
                            action="store_true",
                            dest="update",
+                           default=False
+                          )
+    self.parser.add_option('-a', '--analyze',
+                           help="Analyze data",
+                           action="store_true",
+                           dest="analyze",
                            default=False
                           )
     self.parser.add_option('-o', '--out',
@@ -61,12 +72,18 @@ class CommandArgs(object):
 
 def main(options):
   ''' Main Function '''
-  arc = Architector(options.verbose)
+  arc = Architector(options.path, options.verbose)
   if options.xls:
     arc.readXLS(options.xls)
-  
+
   if options.update:
     arc.updateOnlineData()
+  
+  if options.path:
+    arc.loadData()
+  
+  if options.analyze:
+    arc.analyze()
 
   if options.out:
     arc.makeAll(options.out)

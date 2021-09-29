@@ -23,8 +23,10 @@
       <div class="card shadow mb-4">
 		<ul>
 		  <li><a href="#about">О сервисе</a></li>
+		  <li><a href="#fsd">Функциональные требования</a></li>
 		  <li><a href="#input">Источники данных</a></li>
 		  <li><a href="#output">Потребители данных</a></li>
+		  <li><a href="#swaggers">Swaggers</a></li>
 		  <li><a href="#api">API сервиса</a></li>
 		  <li><a href="#schemaiframe">Схема</a></li>
 		</ul>
@@ -75,11 +77,69 @@
 <script>
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
+  $('#dataTableFSD').DataTable();
   $('#dataTableIN').DataTable();
   $('#dataTableOUT').DataTable();
   $('#dataTableAPI').DataTable();
 });
 </script>
+
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary" id="fsd">FSDs</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTableFSD" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Tags</th>
+                                            <th>Services</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Tags</th>
+                                            <th>Services</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+{% for i, item in prop['fsd'] %}
+                                        <tr>
+                                            <td>{{ item.id }}</td>
+                                            <td>{{ item.name }}</td>
+                                            <td>{{ item.date }}</td>
+                                            <td>{{ item.descripton }}</td>
+                                            <td>{{ item.status }}</td>
+                                            <td>{{ item.tags }}</td>
+                                            <td>{{ item.services }}</td>
+                                            {% if item.link|length %}
+                                              <td><a href="{{ item.link }}" target=_blank>Link</a></td>
+                                            {% else %}
+                                              <td>&#128533;</td>
+                                            {% endif %}
+                                        </tr>
+{% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                    </div>
+              </div>
+            </div>
+
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary" id="input">Источники данных</h6>
@@ -170,6 +230,50 @@ $(document).ready(function() {
 										{% else %}
 										  <td>&#128533;</td>
 										{% endif %}
+                                        </tr>
+{% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                    </div>
+              </div>
+            </div>
+
+
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary" id="swaggers">Swaggers</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Version</th>
+                                            <th>Plan</th>
+                                            <th>Fact</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Version</th>
+                                            <th>Plan</th>
+                                            <th>Fact</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+{% for i, item in prop['swaggers'] %}
+                                        <tr>
+                                            <td><a href="/swaggers/{{ item.id }}.html">{{ item.service }}</a></td>
+                                            <td>{{ item.version }}</td>
+                                            <td>{{ item.plan }}</td>
+                                            <td>{{ item.fact }}</td>
+                                            <td>{{ item.link }}</td>
                                         </tr>
 {% endfor %}
                                         

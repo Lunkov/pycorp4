@@ -16,6 +16,9 @@ from .services import Services
 from .api import API
 from .links import Links
 from .tags import Tags
+from .fsd import FSD
+from .swaggers import Swaggers
+from .update import Updates
 from .servicelinks import ServiceLinks
 from .mermaid import Mermaid
 from .elog import ELog
@@ -34,14 +37,18 @@ from diagrams import Diagram
 
 
 class Architector():
-  def __init__ (self, verbose):
-    self.verbose = verbose;
+  def __init__ (self, datapath, verbose):
+    self.datapath = datapath
+    self.verbose = verbose
     self.domains = Domains()
     self.api = API()
     self.services = Services(self.api)
     self.srvlinks = ServiceLinks()
     self.links = Links()
     self.tags = Tags()
+    self.fsd = FSD()
+    self.swaggers = Swaggers(verbose)
+    self.updates = Updates(verbose)
     
   def loadServices(self, fileServices):
     columns = {}
@@ -89,11 +96,16 @@ class Architector():
     today = date.today()
     return today.strftime("%Y-%m-%d")
   
+  def loadData(self):
+    self.swaggers.load(os.path.join(self.datapath, 'swaggers'))
+    self.updates.load(os.path.join(self.datapath, 'updates'))
+    
   def readXLS(self, filename):
     if self.verbose:
       print("LOG: Reading '%s'..." % filename)
     db = xl.readxl(fn=filename)
     self.domains.readXLS(db, 'DOMAINS')
+    self.fsd.readXLS(db, 'FSD')
     self.services.readXLS(db, 'SERVICES')
     self.srvlinks.readXLS(db, 'SERVICE.LINKS')
     self.api.readXLS(db, 'API')
@@ -102,6 +114,13 @@ class Architector():
     self.srvlinks.calc(self.services)
     if self.verbose:
       print("LOG: Read '%s' - OK" % filename)
+
+  def analyze(self):
+    srv = Services(self.api)
+    for j, fsd in self.fsd.getItems():
+      fsd_services = self.services.filter('tags', fsd.get('tags', ''))
+      srv.set(fsd_services)
+      self.fsd.m[j]['services'] = srv.getVariants('id')
     
   def updateOnlineData(self):
     if self.verbose:
@@ -114,6 +133,7 @@ class Architector():
     db = xl.Database()
     self.domains.writeXLS(db, 'DOMAINS')
     self.services.writeXLS(db, 'SERVICES')
+    self.fsd.writeXLS(db, 'FSD')
     self.srvlinks.writeXLS(db, 'SERVICE.LINKS')
     self.api.writeXLS(db, 'API')
     self.links.writeXLS(db, 'LINKS')
@@ -174,9 +194,9 @@ class Architector():
 
     return D.finish()
 
-  def graphTag(self, tag):
+  def graphTag(self, name, tag):
     D = Mermaid()
-    D.new('flowLR', tag)
+    D.new('flowLR', name)
     
     srv = self.services.filter('tags', tag)
     services = Services(self.api)
@@ -216,9 +236,9 @@ class Architector():
 
     return D.finish()
 
-  def graphService(self, service):
+  def graphService(self, name, service):
     D = Mermaid()
-    D.new('flowLR', service)
+    D.new('flowLR', name)
     
     srv = self.services.filter('id', service)
     services = Services(self.api)
@@ -297,7 +317,7 @@ class Architector():
 
     if self.verbose:
       print("LOG: Syncing HTML...")
-    for p in ['data', 'service', 'domain', 'tag', 'dia', 'dia/service', 'dia/tag', 'dia/domain', 'swagger', 'api']:
+    for p in ['data', 'service', 'domain', 'tag', 'fsd', 'dia', 'dia/service', 'dia/tag', 'dia/fsd', 'dia/domain', 'swagger', 'api']:
       os.makedirs('%s/%s' % (htmlPath, p), exist_ok=True)
 
     for p in ['js', 'css', 'img', 'scss', 'vendor']:
@@ -309,10 +329,21 @@ class Architector():
                    options = ['-a'],
                    verbose = self.verbose)
 
+    for p in ['updates', 'swaggers']:
+      if os.name != 'nt':
+        sysrsync.run(source = 'data/%s' % p,
+                   destination = '%s/%s' % (htmlPath, p),
+                   sync_source_contents = True,
+                   exclusions = ['.~*', 'Thumbs.db:encryptable'],
+                   options = ['-a'],
+                   verbose = self.verbose)
+
     self.htmlRender('index.html',    '%s/index.html'    % htmlPath)
     self.htmlRender('domains.html',  '%s/domains.html'  % htmlPath)
     self.htmlRender('services.html', '%s/services.html' % htmlPath)
     self.htmlRender('tags.html',     '%s/tags.html'     % htmlPath)
+    self.htmlRender('fsds.html',     '%s/fsds.html'     % htmlPath, prop = {'fsd': self.fsd.getItems()})
+    self.htmlRender('swaggers.html', '%s/swaggers.html'     % htmlPath, prop = {'swaggers': self.swaggers.getItems()})
     self.htmlRender('apis.html',     '%s/apis.html'     % htmlPath, prop = {'api': self.api.getItems()})
     self.htmlRender('errors.html',   '%s/errors.html'   % htmlPath, prop = {'errors': elog.getItems()})
 
@@ -340,27 +371,33 @@ class Architector():
     if self.verbose:
       print("LOG: Rebuilding HTML for Tags (%d)..." % self.tags.getCount())
     for j, tag in self.tags.getItems():
-      text = self.graphTag(j)
+      text = self.graphTag(j, j)
       text_file = codecs.open('%s/dia/tag/%s.html' % (htmlPath, j), 'w', 'utf-8')
       text_file.write(text)
       text_file.close()
       tag_services = self.services.filter('tags', j)    
+      tag_fsd = self.fsd.filter('tags', j)
       self.htmlRender('tag.html', '%s/tag/%s.html' % (htmlPath, j),
                        prop = {'tag': tag,
+                               'fsd': tag_fsd.items(),
                                'tag_services': tag_services.items()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Services (%d)..." % self.services.getCount())
     for j, service in self.services.getItems():
-      text = self.graphService(j)
+      text = self.graphService(j, j)
       text_file = codecs.open('%s/dia/service/%s.html' % (htmlPath, j.replace('/', '-')), 'w', 'utf-8')
       text_file.write(text)
       text_file.close()
       linksFrom = self.srvlinks.filter('service_from', j)
       linksTo = self.srvlinks.filter('service_to', j)
       service_api = self.api.filter('service', j)
+      service_fsd = self.fsd.filter('services', j)
+      service_swaggers = self.swaggers.filter('service', j)
       self.htmlRender('service.html', '%s/service/%s.html' % (htmlPath, j.replace('/', '-')),
                        prop = {'service': service,
+                               'fsd': service_fsd.items(),
+                               'swaggers': service_swaggers.items(),
                                'service_api': service_api.items(),
                                'links_from': linksFrom.items(),
                                'links_to': linksTo.items()})
@@ -370,6 +407,19 @@ class Architector():
     for j, api in self.api.getItems():
       self.htmlRender('api.html', '%s/api/%s.html' % (htmlPath, api.get('linkin', 'undef')),
                        prop = {'api': api})
+
+    if self.verbose:
+      print("LOG: Rebuilding HTML for FSDs (%d)..." % self.fsd.getCount())
+    
+    for j, fsd in self.fsd.getItems():
+      text = self.graphTag(j, fsd.get('tags', ''))
+      text_file = codecs.open('%s/dia/fsd/%s.html' % (htmlPath, j), 'w', 'utf-8')
+      text_file.write(text)
+      text_file.close()
+      fsd_services = self.services.filter('tags', fsd.get('tags', ''))
+      self.htmlRender('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
+                       prop = {'fsd': fsd,
+                               'fsd_services': fsd_services.items()})
 
     if self.verbose:
       print("LOG: Rebuild HTML - OK")

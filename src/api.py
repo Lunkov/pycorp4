@@ -11,7 +11,7 @@ class API(Basic):
     self.fields = ['id', 'name', 'title', 'service', 'method', 'api', 'status', 'description', 'link', 'linkin']
 
   def addItem(self, name, properties):
-    properties['linkin'] = hashlib.md5(("%s.%s.%s" % (properties['service'], properties['method'], properties['api'])).encode('utf-8')).hexdigest()
+    properties['linkin'] = hashlib.md5(("%s.%s.%s" % (properties.get('service', ''), properties.get('method', ''), properties.get('api', ''))).encode('utf-8')).hexdigest()
     super(API, self).addItem(name, properties)
   
   def graphWULF(self, G):
