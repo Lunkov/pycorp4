@@ -45,8 +45,8 @@ class Services(Basic):
       print("SWAGGER NOT FOUND for %s" % (service['name']))
       return False
 
-    print("DBG: Load swagger: %s -> %s" % (service['name'], service['swagger']))
-    data, ok = sw.load(service['swagger'])
+    print("DBG: Upload swagger: %s -> %s" % (service['name'], service['swagger']))
+    data, ok = sw.upload(service['swagger'])
     if not ok:
       print("ERR: Load swagger: %s -> %s" % (service['name'], service['swagger']))
       elog = ELog()
