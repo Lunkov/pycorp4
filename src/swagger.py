@@ -82,7 +82,7 @@ class Swagger():
       
     return self.data, ok
 
-  def upload(self, filename):
+  def load(self, filename):
     self.data = {}
     
     with open(filename, 'r') as stream:
