@@ -22,7 +22,7 @@ class Swaggers(Basic):
     try:
       sw = Swagger()
       for path in Path(fp).rglob('*.yaml'):
-        fullPath = os.path.join(fp, path.name)
+        fullPath = os.path.join(fp, path.parent, path.name)
         if not os.path.isdir(fullPath):
           sw.load(fullPath)
 
