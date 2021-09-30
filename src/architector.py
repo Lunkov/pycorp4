@@ -42,7 +42,7 @@ class Architector():
     self.verbose = verbose
     self.domains = Domains()
     self.api = API()
-    self.services = Services(self.api)
+    self.services = Services()
     self.srvlinks = ServiceLinks()
     self.links = Links()
     self.tags = Tags()
@@ -98,7 +98,53 @@ class Architector():
   
   def loadData(self):
     self.swaggers.load(os.path.join(self.datapath, 'swaggers'))
+    for i, sw in self.swaggers.getItems():
+      if not 'swagger-data' in sw:
+        pprint(sw)
+        continue
+      if not 'info' in sw['swagger-data']:
+        continue
+      description = ''
+      service = ''
+      version = ''
+      if 'description' in sw['swagger-data']['info']:
+        description = sw['swagger-data']['info']['description']
+      if 'title' in sw['swagger-data']['info']:
+        service = sw['swagger-data']['info']['title']
+      if 'version' in sw['swagger-data']['info']:
+        version = sw['swagger-data']['info']['version']
+      for path, va in  sw['swagger-data']['paths'].items():
+        for method, vm in  va.items():
+          desc = description
+          if 'description' in vm:
+            desc = vm['description']
+          ida = service + '.' + version + '.' + method.upper() + '.' + path
+          title = method.upper() + ' ' + path
+          self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'fact', 'method': method.upper(), 'url': path, 'description': desc} )
+
     self.updates.load(os.path.join(self.datapath, 'updates'))
+    res = self.updates.makeSwaggers()
+    for i, sw in res.items():
+      if not 'info' in sw:
+        continue
+      description = ''
+      service = ''
+      version = ''
+      if 'description' in sw['info']:
+        description = sw['info']['description']
+      if 'title' in sw['info']:
+        service = sw['info']['title']
+      if 'version' in sw['info']:
+        version = sw['info']['version']
+      for path, va in  sw['paths'].items():
+        for method, vm in  va.items():
+          desc = description
+          if 'description' in vm:
+            desc = vm['description']
+          ida = service + '.' + version + '.' + method.upper() + '.' + path
+          title = method.upper() + ' ' + path
+          self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'plan', 'method': method.upper(), 'url': path, 'description': desc} )
+
     
   def readXLS(self, filename):
     if self.verbose:
@@ -125,7 +171,11 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    self.services.updateSwaggerAll(self.nowDate())
+    uploader = Uploader('%s/swaggers' % datapath)
+    for i, service in self.services.getItems():
+      if 'swagger' in service:
+        uploader.updateSwagger(service['swagger'])
+    
     if self.verbose:
       print("LOG: Update online data - OK")
 
@@ -199,7 +249,7 @@ class Architector():
     D.new('flowLR', name)
     
     srv = self.services.filter('tags', tag)
-    services = Services(self.api)
+    services = Services()
     services.set(srv)
     
     lsrv = services.getVariants('id')
@@ -241,7 +291,7 @@ class Architector():
     D.new('flowLR', name)
     
     srv = self.services.filter('id', service)
-    services = Services(self.api)
+    services = Services()
     services.set(srv)
     
     srvlinks = ServiceLinks()
@@ -278,7 +328,7 @@ class Architector():
     D.new('flowLR', domain)
     
     srv = self.services.filter('domain', domain)
-    services = Services(self.api)
+    services = Services()
     services.set(srv)
     srvs = services.getVariants('id')
     

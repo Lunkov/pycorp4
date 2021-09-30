@@ -8,6 +8,7 @@ import logging
 import requests
 import json
 import yaml
+import hashlib
 from csv import reader
 from urllib.parse import urlencode, quote
 from pprint import pprint
@@ -17,14 +18,6 @@ from .elog import ELog
 class Swagger():
   def __init__ (self):
     self.data = {}
-    self.etc = {}
-    fileconfig = 'etc/swagger_auth.yaml'
-    if os.path.isfile(fileconfig):
-      with open(fileconfig, 'r') as stream:
-        try:
-          self.etc = yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-          print("ERR: Bad format in %s: %s" % (fileconfig, exc))
 
   def get(self):
     return self.data
@@ -43,44 +36,8 @@ class Swagger():
       return '' 
     return self.data['info']['title']
 
-  def save(self, dt):
-    filename = ''
-    try:
-      os.makedirs("data/swaggers/%s" % (self.getName()))
-      filename = "data/swaggers/%s/%s-%s.yaml" % (self.getName(), dt, self.getVersion())
-      re.sub('[^\w\-_\. ]', '_', filename)
-      file = codecs.open(filename, 'w', 'utf-8')
-      yaml.dump(self.data, file)
-      file.close()
-    except Exception as e:
-      print("ERR: Write File: %s: %s" % (filename, str(e)))
-
-  def auth(self, url):
-    for key, value in self.etc.items():
-      if key in url:
-        return value['header'], value['auth']
-        break
-    return {}, ()
-    
-  def upload(self, url):
-    self.data = {}
-    x = None
-    contentType =  ''
-    try:
-      header, auth = self.auth(url)
-      x = requests.get(url = url, headers = header, auth = auth)
-      contentType = x.headers['content-type']
-    except Exception as e:
-      print("ERR: HTTP '%s' (type='%s'): %s" % (url, contentType, str(e)))
-    
-    ok = False
-    if (not x is None) and (x.status_code == 200):
-      self.data, ok = self.parseUpload(url, contentType, x.text)
-
-    if not ok:
-      print("ERR: Swagger parse '%s': %s" % (url, x))
-      
-    return self.data, ok
+  def hash(self):
+    return hashlib.md5(json.dumps(self.data, sort_keys=True).encode('utf-8')).hexdigest()
 
   def load(self, filename):
     self.data = {}
@@ -94,30 +51,7 @@ class Swagger():
         return {}, False
 
     return self.data, True
-  
-  
-  def parseUpload(self, url, contentType, content):
-    data = {}
-    contentType =  ''
-    ok = False
-    try:
-      print(contentType)
-      if ('application/octet-stream' in contentType) or ('.yaml' in url) or ('.yml' in url): 
-        data = yaml.safe_load(content)
-        ok = True
-    except Exception as e:
-      print("ERR: Swagger parse '%s' (type='%s'/yaml): %s" % (url, contentType, str(e)))
 
-    try:
-      if (len(data) < 1) and (('application/json' in contentType) or ('.json' in url)):
-        data = json.loads(content)
-        ok = True
-    except Exception as e:
-      print("ERR: Swagger parse '%s' (type='%s'/json): %s" % (url, contentType, str(e)))
-    if ok:
-      print("LOG: Swagger parse '%s' OK" % (url))
-    return data, ok
-    
   def compare(self, swg):
     c = {}
     if self.getVersion() != swg.getVersion():

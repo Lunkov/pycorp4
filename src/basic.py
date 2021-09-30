@@ -15,10 +15,15 @@ class Basic():
     self.dia = {}
     self.ids = []
     self.fields = []
-    
-  def addItem(self, name, properties):
-    if name == '':
-      return
+  
+  def updateItem(self, name, properties):
+    if name in self.m:
+      prop = self.m[name]
+      properties.update(self.normProp(prop))
+
+    self.addItem(name, properties)
+
+  def normProp(self, properties):
     for c in self.fields:
       if not c in properties:
         properties[c] = ''
@@ -26,9 +31,13 @@ class Basic():
     if ('tags' in properties) and (type(properties['tags']) is str):
       properties['tags'] = np.array(properties['tags'].split(',')).tolist()
       properties['tags'] = list(filter(None, properties['tags']))
+    return properties
 
+  def addItem(self, name, properties):
+    if name == '':
+      return
     self.dia[name] = None
-    self.m[name] = properties
+    self.m[name] = self.normProp(properties)
   
   def getItem(self, name):
     if name in self.m:

@@ -40,3 +40,28 @@ class Swaggers(Basic):
 
     except Exception as err:
       print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))
+
+  def updateSwagger(self, service, sw):
+    if service['swagger'] == '':
+      print("SWAGGER NOT FOUND for %s" % (service['name']))
+      return False
+
+    print("DBG: Upload swagger: %s -> %s" % (service['name'], service['swagger']))
+    data, ok = sw.upload(service['swagger'])
+    if not ok:
+      print("ERR: Load swagger: %s -> %s" % (service['name'], service['swagger']))
+      elog = ELog()
+      elog.log("HTTP_ERROR", ("ERR: Load swagger: %s -> %s" % (service['name'], service['swagger'])), service['name'], service['swagger'])
+      return False
+    description = ''
+    if 'description' in data['info']:
+      description = data['info']['description']
+    for path, va in  data['paths'].items():
+      for method, vm in  va.items():
+        desc = description
+        if 'description' in vm:
+          desc = vm['description']
+        ida = service['name'] + '.' + method.upper() + '.' + path
+        title = method.upper() + ' ' + path
+        self.api.addItem(ida, { 'title': title, 'service': service['name'], 'method': method.upper(), 'url': path, 'description': desc} )
+    return True

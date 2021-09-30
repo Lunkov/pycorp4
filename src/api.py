@@ -8,7 +8,7 @@ class API(Basic):
   def __init__ (self):
     super(API, self).__init__()
     self.name = 'api'
-    self.fields = ['id', 'name', 'title', 'service', 'method', 'api', 'status', 'description', 'link', 'linkin']
+    self.fields = ['id', 'name', 'title', 'service', 'method', 'api', 'version', 'status', 'description', 'link', 'linkin']
 
   def addItem(self, name, properties):
     properties['linkin'] = hashlib.md5(("%s.%s.%s" % (properties.get('service', ''), properties.get('method', ''), properties.get('api', ''))).encode('utf-8')).hexdigest()
