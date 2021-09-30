@@ -93,7 +93,7 @@ class Swagger():
         print("ERR: Bad format in %s: %s" % (filename, exc))        
         return {}, False
 
-    return self.data, ok
+    return self.data, True
   
   
   def parseUpload(self, url, contentType, content):
