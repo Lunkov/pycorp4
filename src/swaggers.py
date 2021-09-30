@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import yaml
 from pathlib import Path
 from .basic import Basic
 from .swagger import Swagger
@@ -23,7 +24,7 @@ class Swaggers(Basic):
       for path in Path(fp).rglob('*.yaml'):
         fullPath = os.path.join(fp, path.name)
         if not os.path.isdir(fullPath):
-          sw.load(os.path.join(fullPath, '.yaml'))
+          sw.load(fullPath)
 
           prop = {}
           prop['version'] = sw.getVersion()
@@ -36,5 +37,6 @@ class Swaggers(Basic):
           
           if key != '':
             self.addItem(key, prop)
-    except:
-      print("FATAL: Folder Not Found: %s" % (fp))
+
+    except Exception as err:
+      print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))

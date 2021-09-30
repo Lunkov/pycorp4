@@ -1,15 +1,15 @@
-{% include "header.html" %}
+{% include "base/header.html" %}
 
 <div id="wrapper">
 
-	{% include "menu.html" %}
+	{% include "base/menu.html" %}
 
 	<!-- Content Wrapper -->
 	<div id="content-wrapper" class="d-flex flex-column">
 
 		<!-- Main Content -->
 		<div id="content">
-		{% include "navbar.html" %}
+		{% include "base/navbar.html" %}
 
 <div class="container-fluid">
 
@@ -139,6 +139,7 @@ $(document).ready(function() {
                     </div>
               </div>
             </div>
+
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -328,7 +329,7 @@ $(document).ready(function() {
 
             
 {% with dia_path='service', dia_id=prop['service'].id, dia_name=prop['service'].name %}
-  {% include "diagram.html" %}
+  {% include "components/diagram.html" %}
 {% endwith %}
 		</div>
 
@@ -342,4 +343,4 @@ $(document).ready(function() {
 </div>
 <!-- End of Page Wrapper -->
 
-{% include "footer.html" %}
+{% include "base/footer.html" %}

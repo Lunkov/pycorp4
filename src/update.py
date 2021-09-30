@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import yaml
 from pathlib import Path
 from .basic import Basic
 
@@ -23,16 +24,16 @@ class Updates(Basic):
         fullPath = os.path.join(fp, path.name)
         if not os.path.isdir(fullPath):
           if self.verbose:
-            print("DBG: scan subfolder: %s" % curDir)
-          with open(os.path.join(fullPath, ".yaml"), 'r') as stream:
+            print("DBG: Scan: %s" % fullPath)
+          with open(fullPath, 'r') as stream:
             try:
               prop = yaml.safe_load(stream)
               key = self.genId(prop)
               if key != '':
                 self.addItem(key, prop)
 
-            except yaml.YAMLError as exc:
-              print("ERR: Bad format in %s: %s" % (fullPath, exc))    
+            except yaml.YAMLError as err:
+              print("ERR: Bad format in %s: %s" % (fullPath, str(err)))    
 
-    except:
-      print("FATAL: Folder Not Found: %s" % (fp))
+    except Exception as err:
+      print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))

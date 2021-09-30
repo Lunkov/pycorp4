@@ -343,7 +343,6 @@ class Architector():
     self.htmlRender('services.html', '%s/services.html' % htmlPath)
     self.htmlRender('tags.html',     '%s/tags.html'     % htmlPath)
     self.htmlRender('fsds.html',     '%s/fsds.html'     % htmlPath, prop = {'fsd': self.fsd.getItems()})
-    self.htmlRender('swaggers.html', '%s/swaggers.html'     % htmlPath, prop = {'swaggers': self.swaggers.getItems()})
     self.htmlRender('apis.html',     '%s/apis.html'     % htmlPath, prop = {'api': self.api.getItems()})
     self.htmlRender('errors.html',   '%s/errors.html'   % htmlPath, prop = {'errors': elog.getItems()})
 
@@ -420,6 +419,10 @@ class Architector():
       self.htmlRender('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
                        prop = {'fsd': fsd,
                                'fsd_services': fsd_services.items()})
+
+    if self.verbose:
+      print("LOG: Rebuilding HTML for Swaggers (%d)..." % self.swaggers.getCount())
+    self.htmlRender('swaggers.html', '%s/swaggers.html'     % htmlPath, prop = {'swaggers': self.swaggers.getItems()})
 
     if self.verbose:
       print("LOG: Rebuild HTML - OK")

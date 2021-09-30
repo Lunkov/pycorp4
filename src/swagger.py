@@ -7,10 +7,10 @@ import re
 import logging
 import requests
 import json
+import yaml
 from csv import reader
 from urllib.parse import urlencode, quote
 from pprint import pprint
-import yaml
 
 from .elog import ELog
 

@@ -1,8 +1,8 @@
-{% include "header.html" %}
+{% include "base/header.html" %}
 
 <div id="wrapper">
 
-	{% include "menu.html" %}
+	{% include "base/menu.html" %}
 
 	<!-- Content Wrapper -->
 	<div id="content-wrapper" class="d-flex flex-column">
@@ -10,7 +10,7 @@
 		<!-- Main Content -->
 		<div id="content">
 
-		{% include "navbar.html" %}
+		{% include "base/navbar.html" %}
 
 <div class="container-fluid">
 
@@ -61,65 +61,14 @@
    </div>
 </div>
 
-<script>
-// Call the dataTables jQuery plugin
-$(document).ready(function() {
-  $('#dataTableServices').DataTable();
-});
-</script>
 
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary" id="services">Сервисы домена</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTableServices" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Service</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Tags</th>
-                                            <th>Wiki</th>
-                                            <th>Swagger</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Service</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Tags</th>
-                                            <th>Wiki</th>
-                                            <th>Swagger</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-{% for i, item in prop['domain_services'] %}
-                                        <tr>
-                                            <td>{{ item.name }}</td>
-                                            <td>{{ item.description }}</td>
-                                            <td>{{ item.status }}</td>
-                                            <td>{{ item.tags }}</td>
-                                            <td><a href="{{ item.link }}" target=_blank>Wiki</a></td>
-										{% if item.swagger|length %}
-										  <td><a href="{{ item.swagger }}" target=_blank>Swagger</a></td>
-										{% else %}
-										  <td>&#128533;</td>
-										{% endif %}
-                                            
-                                        </tr>
-{% endfor %}
-                                        
-                                    </tbody>
-                                </table>
-                    </div>
-              </div>
-            </div>
+{% with table_title='Сервисы домена', table_id='services', table_rows=prop['domain_services'] %}
+  {% include "components/table_service.html" %}
+{% endwith %}
+
 
 {% with dia_path='domain', dia_id=prop['domain'].id, dia_name=prop['domain'].name %}
-  {% include "diagram.html" %}
+  {% include "components/diagram.html" %}
 {% endwith %}
 
 </div>
@@ -133,4 +82,4 @@ $(document).ready(function() {
 </div>
 <!-- End of Page Wrapper -->
 
-{% include "footer.html" %}
+{% include "base/footer.html" %}

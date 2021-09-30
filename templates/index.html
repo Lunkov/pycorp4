@@ -1,8 +1,8 @@
-{% include "header.html" %}
+{% include "base/header.html" %}
 
 <div id="wrapper">
 
-	{% include "menu.html" %}
+	{% include "base/menu.html" %}
 
 	<!-- Content Wrapper -->
 	<div id="content-wrapper" class="d-flex flex-column">
@@ -10,12 +10,12 @@
 		<!-- Main Content -->
 		<div id="content">
 
-		{% include "navbar.html" %}
+		{% include "base/navbar.html" %}
 
 <div class="container-fluid">
 
 {% with dia_path='', dia_id='index', dia_name='Вся схема' %}
-  {% include "diagram.html" %}
+  {% include "components/diagram.html" %}
 {% endwith %}
 		</div>
 
@@ -28,4 +28,4 @@
 </div>
 <!-- End of Page Wrapper -->
 
-{% include "footer.html" %}
+{% include "base/footer.html" %}

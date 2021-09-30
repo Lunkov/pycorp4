@@ -13,17 +13,73 @@
 
 <div class="container-fluid">
 
-<h1>Функциональное требование: {{ prop['fsd'].name }}</h1>
+<h1>{{ prop['tag'].name }}</h1>
 
-<p>{{ prop['fsd'].description }}</p>
+<p>{{ prop['tag'].description }}</p>
 
 <!-- DataTales  -->
 <script>
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
-  $('#dataTableSRV').DataTable();
+  $('#dataTableIN').DataTable();
+  $('#dataTableFSD').DataTable();
 });
 </script>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary" id="fsd">Функциональные требования</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTableFSD" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Tags</th>
+                                            <th>Services</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Tags</th>
+                                            <th>Services</th>
+                                            <th>Link</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+{% for i, item in prop['fsd'] %}
+                                        <tr>
+                                            <td>{{ item.id }}</td>
+                                            <td>{{ item.name }}</td>
+                                            <td>{{ item.date }}</td>
+                                            <td>{{ item.descripton }}</td>
+                                            <td>{{ item.status }}</td>
+                                            <td>{{ item.tags }}</td>
+                                            <td>{{ item.services }}</td>
+                                            {% if item.link|length %}
+                                              <td><a href="{{ item.link }}" target=_blank>Link</a></td>
+                                            {% else %}
+                                              <td>&#128533;</td>
+                                            {% endif %}
+                                        </tr>
+{% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                    </div>
+              </div>
+            </div>
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -31,7 +87,7 @@ $(document).ready(function() {
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTableSRV" width="100%" cellspacing="0">
+                                <table class="table table-bordered" id="dataTableIN" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -59,7 +115,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['fsd_services'] %}
+{% for i, item in prop['tag_services'] %}
                                         <tr>
                                             <td>{{ item.id }}</td>
                                             <td>{{ item.domain }}</td>
@@ -84,8 +140,8 @@ $(document).ready(function() {
               </div>
             </div>
 
-{% with dia_path='fsd', dia_id=prop['fsd'].id, dia_name=prop['fsd'].name %}
-  {% include "components/diagram.html" %}
+{% with dia_path='tag', dia_id=prop['tag'].id, dia_name=prop['tag'].name %}
+  {% include "diagram.html" %}
 {% endwith %}
 
 		</div>
