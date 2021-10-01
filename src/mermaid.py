@@ -53,6 +53,7 @@ class Mermaid():
     self.typeLinksDefault = 'o--o'
     self.typeLinks = {
      'deprecated':   'x-.-x',
+     'plan':         '-.-',
      'dev':          '-.->',
      'ok':           'o-->',
     }
@@ -112,7 +113,7 @@ class Mermaid():
                 $("#block-name").html(services.get(id_service).name);
                 $("#block-description").html("Описание: " + services.get(id_service).description);
                 $("#block-dialink").html("<a href=\\"/dia/service/"+id_service+".html\\" target=_blank>Схема сервиса</a>");
-                $("#block-link").html("<a href=\\"/service/"+id_service+".html\\" target=_blank>О сервисе</a>");
+                $("#block-link").html("<a href=\\"/service/"+id_service+".html\\" target=_blank>"+services.get(id_service).name+"</a>");
                 $("#block-linkwiki").html("<a href=\\""+services.get(id_service).link+"\\" target=_blank>Wiki</a>");
                 $("#block-swagger").html("<a href=\\""+services.get(id_service).swagger+"\\" target=_blank>Swagger</a>");
               }
