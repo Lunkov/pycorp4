@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import yaml
+from pprint import pprint
 from pathlib import Path
 from .basic import Basic
 
@@ -9,8 +10,8 @@ class Updates(Basic):
   def __init__ (self, verbose):
     super(Updates, self).__init__()
     self.name = 'update'
-    self.ids = ['id', 'name', 'service', 'version']
-    self.fields = ['id', 'name', 'service', 'plan', 'version', 'sequence', 'swagger']
+    self.ids = ['name', 'service', 'version', 'plan']
+    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'swagger']
     self.verbose = verbose
 
   def load(self, updatepath):
@@ -28,6 +29,8 @@ class Updates(Basic):
             try:
               prop = yaml.safe_load(stream)
               key = self.genId(prop)
+              prop['id'] = key
+              prop['code'] = self.genCode(prop)
               if key != '':
                 self.updateItem(key, prop)
 
@@ -72,3 +75,20 @@ class Updates(Basic):
         item['definitions'].update(up['swagger']['definitions'])
       res[k] = item
     return res
+
+  def graphSequence(self, D, seq, services):
+    if hasattr(seq['sequence'], "__len__"):
+      for v in seq['sequence']:
+        pprint(v)
+        '''
+        service = services.getItem(v.get('from', 'undef'))
+        if service:
+          D.node(service.get('id', 'xz'),
+                 service.get('name', 'xz'),
+                 'main', 
+                 service.get('type', 'service'),
+                 service.get('status', 'undef'),
+                 service.get('link', ''),
+                 service.get('description', ''))
+        '''
+        D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', 'undef'), v.get('type', 'ok'))

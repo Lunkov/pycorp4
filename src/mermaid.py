@@ -212,7 +212,7 @@ class Mermaid():
     
     self.gNodes[group] = G
 
-  def sequence(self, service_from, service_to, group = '-', ntype = '', status = '', text = ''):
+  def sequence(self, group, service_from, service_to, api = '', ntype = ''):
     if not group in self.gNodes:
       self.gNodes[group] = ''
     
@@ -221,13 +221,14 @@ class Mermaid():
     idn1 = hashlib.md5(service_from.encode('utf-8')).hexdigest()
     idn2 = hashlib.md5(service_to.encode('utf-8')).hexdigest()
     linktext = ''
-    if len(text) > 0:
-      linktext = "|%s|" % text.replace('"', '\'')
+    if api and len(api) > 0:
+      linktext = api.replace('"', '\'')
     if ntype in self.typeLinks:
-      G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinks[ntype], linktext, idn2))
+      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeLinks[ntype], idn2, linktext))
     else:
-      G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinksDefault, linktext, idn2))
+      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeLinksDefault, idn2, linktext))
     
+    pprint(G)
     self.gNodes[group] = G
     
   def finish(self):
@@ -236,12 +237,19 @@ class Mermaid():
     if self.typeDia == 'flowLR':
       G = G + "\nflowchart LR\n"
 
-    for i in self.gNodes:
-      if i in self.gGroups:
-        G = G + self.gGroups[i]
-      G = G + self.gNodes[i]
-      if i in self.gGroups:
-        G = G + self.tab + 'end\n'
+    if self.typeDia == 'sequence':
+      G = G + "\nsequenceDiagram\n"
+
+    if self.typeDia == 'sequence':
+      for i, v in self.gGroups.items():
+        G = G + v
+    else:
+      for i in self.gNodes:
+        if i in self.gGroups:
+          G = G + self.gGroups[i]
+        G = G + self.gNodes[i]
+        if i in self.gGroups:
+          G = G + self.tab + 'end\n'
         
     G = G + '</div>\n</body>\n'
 

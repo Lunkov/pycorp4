@@ -185,6 +185,12 @@ class Basic():
       key = key + '*' + properties.get(j, '')
     return hashlib.md5(key.encode('utf-8')).hexdigest()
 
+  def genCode(self, properties):
+    key = ''
+    for j in self.ids:
+      key = key + '.' + properties.get(j, '')
+    return key
+
   def writeXLS(self, xls, worksheet):
     columns = {}
     xls.add_ws(ws = worksheet)

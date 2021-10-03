@@ -360,6 +360,14 @@ class Architector():
 
     return D.finish()
 
+
+  def graphSequence(self, seq):
+    D = Mermaid()
+    D.new('sequence', seq)
+    
+    self.updates.graphSequence(D, seq, self.services)
+    return D.finish()
+
   def makeAll(self, htmlPath):
     elog = ELog()
     if self.verbose:
@@ -367,7 +375,9 @@ class Architector():
 
     if self.verbose:
       print("LOG: Syncing HTML...")
-    for p in ['data', 'service', 'domain', 'tag', 'fsd', 'dia', 'dia/service', 'dia/tag', 'dia/fsd', 'dia/domain', 'swagger', 'api']:
+    for p in ['data', 'service', 'domain', 'tag', 'fsd',
+              'up', 'dia', 'swagger', 'api',
+              'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain']:
       os.makedirs('%s/%s' % (htmlPath, p), exist_ok=True)
 
     for p in ['js', 'css', 'img', 'scss', 'vendor']:
@@ -475,7 +485,21 @@ class Architector():
     self.htmlRender('swaggers.html', '%s/swaggers.html'     % htmlPath, prop = {'swaggers': self.swaggers.getItems()})
 
     if self.verbose:
+      print("LOG: Rebuilding HTML for Updates (%d)..." % self.updates.getCount())
+    self.htmlRender('ups.html',      '%s/ups.html'      % htmlPath, prop = {'ups': self.updates.getItems()})
+    
+    if self.verbose:
       print("LOG: Rebuild HTML - OK")
+
+    for j, up in self.updates.getItems():
+      text = self.graphSequence(up)
+      text_file = codecs.open('%s/dia/up/%s.html' % (htmlPath, j), 'w', 'utf-8')
+      text_file.write(text)
+      text_file.close()
+      #pprint(text)
+      self.htmlRender('up.html', '%s/up/%s.html' % (htmlPath, up.get('code', '')),
+                       prop = {'up': up})
+
 
   def htmlRender(self, tmplfile, dstfile, prop = {}):
     #text = self.graph()
