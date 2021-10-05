@@ -35,6 +35,12 @@ class CommandArgs(object):
                            dest="update",
                            default=False
                           )
+    self.parser.add_option('-t', '--templates',
+                           help="Path to templates",
+                           type="string",
+                           dest="templates",
+                           default="templates"
+                          )
     self.parser.add_option('-a', '--analyze',
                            help="Analyze data",
                            action="store_true",
@@ -86,7 +92,7 @@ def main(options):
     arc.analyze()
 
   if options.out:
-    arc.makeAll(options.out)
+    arc.makeAll(options.templates, options.out)
 
 if __name__ == '__main__':
   ARGS = CommandArgs(os.path.basename(__file__))

@@ -37,7 +37,8 @@ from diagrams import Diagram
 
 class Architector():
   def __init__ (self, datapath, verbose):
-    self.datapath = datapath
+    self.datapath = os.path.realpath(datapath)
+    self.templatesPath = 'templates'
     self.verbose = verbose
     self.domains = Domains()
     self.api = API()
@@ -49,26 +50,6 @@ class Architector():
     self.swaggers = Swaggers(verbose)
     self.updates = Updates(verbose)
     self.fs = FS(verbose)
-
-  def md5File(self, fname):
-    hash_md5 = hashlib.md5()
-    with open(fname, "rb") as f:
-      for chunk in iter(lambda: f.read(4096), b""):
-        hash_md5.update(chunk)
-    return hash_md5.hexdigest()
-
-  def md5String(self, data):
-    return hashlib.md5(data.encode('utf-8')).hexdigest()
-
-  def writeFile(self, fname, data):
-    self.cnt_files = self.cnt_files + 1
-    if self.md5String(data) == self.md5File(fname):
-      return False
-    text_file = codecs.open(fname, 'w', 'utf-8')
-    text_file.write(data)
-    text_file.close()
-    self.cnt_writes = self.cnt_writes + 1
-    return True
 
   def loadServices(self, fileServices):
     columns = {}
@@ -387,9 +368,12 @@ class Architector():
     self.updates.graphSequence(D, seq, self.services)
     return D.finish()
 
-  def makeAll(self, htmlPath):
+  def makeAll(self, templatesPath, htmlPath):
     self.cnt_files = 0
     self.cnt_writes = 0
+    
+    self.templatesPath = os.path.realpath(templatesPath)
+    htmlPath = os.path.realpath(htmlPath)
 
     elog = ELog()
     if self.verbose:
@@ -403,8 +387,8 @@ class Architector():
                     'up', 'dia', 'swagger', 'api',
                     'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain'])
 
-    self.fs.rsync('templates/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
-    self.fs.rsync('data/%s', htmlPath + '/%s', ['updates', 'swaggers'])
+    self.fs.rsync(templatesPath + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
+    self.fs.rsync(self.datapath + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
     self.htmlRender('index.html',    '%s/index.html'    % htmlPath)
     self.htmlRender('domains.html',  '%s/domains.html'  % htmlPath)
@@ -501,7 +485,7 @@ class Architector():
   def htmlRender(self, tmplfile, dstfile, prop = {}):
     #text = self.graph()
     
-    templateLoader = jinja2.FileSystemLoader(searchpath="./templates/")
+    templateLoader = jinja2.FileSystemLoader(searchpath=self.templatesPath)
     templateEnv = jinja2.Environment(loader=templateLoader)
     template = templateEnv.get_template(tmplfile)
     outputText = template.render(domains = self.domains.getItems(), tags = self.tags.getItems(), services = self.services.getItems(), prop = prop) #, schema = text)
