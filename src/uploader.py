@@ -30,7 +30,7 @@ class Uploader():
         except yaml.YAMLError as exc:
           print("ERR: Bad format in %s: %s" % (fileconfig, exc))
 
-  def updateSwagger(self, url):
+  def updateSwagger(self, service):
     data, ok = self.upload(service['swagger'])
     if not ok:
       return False

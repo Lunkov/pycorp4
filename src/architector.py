@@ -18,6 +18,7 @@ from .tags import Tags
 from .fsd import FSD
 from .swaggers import Swaggers
 from .update import Updates
+from .uploader import Uploader
 from .servicelinks import ServiceLinks
 from .mermaid import Mermaid
 from .elog import ELog
@@ -173,10 +174,10 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    uploader = Uploader('%s/swaggers' % datapath, self.verbose)
+    uploader = Uploader('%s/swaggers' % self.datapath, self.verbose)
     for i, service in self.services.getItems():
       if 'swagger' in service:
-        uploader.updateSwagger(service['swagger'])
+        uploader.updateSwagger(service)
     
     if self.verbose:
       print("LOG: Update online data - OK")
