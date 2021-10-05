@@ -38,6 +38,7 @@ class Mermaid():
     self.dia = {}
     self.gNodes = {}
     self.gGroups = {}
+    self.gLinks = {}
     self.typeNodesDef = ['[', ']']
     self.typeNodes = {
      'default':   ['[', ']'],
@@ -50,6 +51,14 @@ class Mermaid():
      'storage':   ['[(', ')]'],
      'bff':       ['[/', '\]'],
     }
+    self.typeSeqLinksDefault = '->>'
+    self.typeSeqLinks = {
+     'deprecated':   '-->>',
+     'plan':         '-->>',
+     'dev':          '-->>',
+     'ok':           '-->',
+    }
+
     self.typeLinksDefault = 'o--o'
     self.typeLinks = {
      'deprecated':   'x-.-x',
@@ -147,7 +156,9 @@ class Mermaid():
     self.name = name
     self.typeDia = typeDia
     self.dia = {}
+    self.gGroups = {}
     self.gNodes = {}
+    self.gLinks = {}
 
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
     if self.typeDia == 'dia':
@@ -213,44 +224,87 @@ class Mermaid():
     self.gNodes[group] = G
 
   def sequence(self, group, service_from, service_to, api = '', ntype = ''):
-    if not group in self.gNodes:
-      self.gNodes[group] = ''
-    
-    G = self.gNodes[group]
 
     idn1 = hashlib.md5(service_from.encode('utf-8')).hexdigest()
     idn2 = hashlib.md5(service_to.encode('utf-8')).hexdigest()
+
+    if not idn1 in self.gNodes:
+      self.gNodes[idn1] = '%sparticipant %s as %s\n' % (self.tab, idn1, service_from)
+    if not idn2 in self.gNodes:
+      self.gNodes[idn2] = '%sparticipant %s as %s\n' % (self.tab, idn2, service_to)
+    
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+
+    G = self.gLinks[group]
+
     linktext = ''
     if api and len(api) > 0:
       linktext = api.replace('"', '\'')
     if ntype in self.typeLinks:
-      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeLinks[ntype], idn2, linktext))
+      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeSeqLinks[ntype], idn2, linktext))
     else:
-      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeLinksDefault, idn2, linktext))
+      G = G + ("%s%s%s%s: %s\n" % (self.tab, idn1, self.typeSeqLinksDefault, idn2, linktext))
     
-    pprint(G)
-    self.gNodes[group] = G
+    self.gLinks[group] = G
+
+  def activate(self, group, service):
+
+    idn1 = hashlib.md5(service.encode('utf-8')).hexdigest()
+
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+    G = self.gLinks[group]
+    
+    if not idn1 in self.gNodes:
+      self.gNodes[idn1] = '%sparticipant %s as %s\n' % (self.tab, idn1, service)
+
+    G = G + '%sactivate %s\n' % (self.tab, idn1)
+    
+    self.gLinks[group] = G
+
+  def deactivate(self, group, service):
+
+    idn1 = hashlib.md5(service.encode('utf-8')).hexdigest()
+
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+    G = self.gLinks[group]
+    
+    if not idn1 in self.gNodes:
+      self.gNodes[idn1] = '%sparticipant %s as %s\n' % (self.tab, idn1, service)
+
+    G = G + '%sdeactivate %s\n' % (self.tab, idn1)
+    
+    self.gLinks[group] = G
+
+  def drawFlow(self, G):
+    G = G + "\nflowchart LR\n"
+    for i in self.gNodes:
+      if i in self.gGroups:
+        G = G + self.gGroups[i]
+      G = G + self.gNodes[i]
+      if i in self.gGroups:
+        G = G + self.tab + 'end\n'
+    return G
+  
+  def drawSequence(self, G):
+    G = G + "\nsequenceDiagram\n%sautonumber\n" % self.tab
+    for i, v in self.gNodes.items():
+      G = G + v
+    for i, v in self.gLinks.items():
+      G = G + v
+    return G
     
   def finish(self):
     G = self.header
     G = G + ("<div class=\"mermaid\" id=\"%s\">" % self.name)
     if self.typeDia == 'flowLR':
-      G = G + "\nflowchart LR\n"
+      G = self.drawFlow(G)
 
     if self.typeDia == 'sequence':
-      G = G + "\nsequenceDiagram\n"
+      G = self.drawSequence(G)
 
-    if self.typeDia == 'sequence':
-      for i, v in self.gGroups.items():
-        G = G + v
-    else:
-      for i in self.gNodes:
-        if i in self.gGroups:
-          G = G + self.gGroups[i]
-        G = G + self.gNodes[i]
-        if i in self.gGroups:
-          G = G + self.tab + 'end\n'
-        
     G = G + '</div>\n</body>\n'
 
     return G

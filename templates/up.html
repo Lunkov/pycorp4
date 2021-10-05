@@ -17,7 +17,7 @@
 
 <p>{{ prop['up'].description }}</p>
 
-{% with dia_path='up', dia_id=prop['up'].code, dia_name=prop['up'].name %}
+{% with dia_path='up', dia_id=prop['up'].id, dia_name=prop['up'].name %}
   {% include "components/diagram.html" %}
 {% endwith %}
 

@@ -79,16 +79,10 @@ class Updates(Basic):
   def graphSequence(self, D, seq, services):
     if hasattr(seq['sequence'], "__len__"):
       for v in seq['sequence']:
-        pprint(v)
-        '''
-        service = services.getItem(v.get('from', 'undef'))
-        if service:
-          D.node(service.get('id', 'xz'),
-                 service.get('name', 'xz'),
-                 'main', 
-                 service.get('type', 'service'),
-                 service.get('status', 'undef'),
-                 service.get('link', ''),
-                 service.get('description', ''))
-        '''
-        D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', 'undef'), v.get('type', 'ok'))
+        #pprint(v)
+        if 'from' in v:
+          D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', v.get('answer', '')), v.get('type', 'ok'))
+        if 'activate' in v:
+          D.activate('main', v['activate'])
+        if 'deactivate' in v:
+          D.deactivate('main', v['deactivate'])

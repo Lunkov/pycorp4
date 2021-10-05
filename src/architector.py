@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import codecs
 import logging
 import os
 import yaml
@@ -22,11 +21,11 @@ from .update import Updates
 from .servicelinks import ServiceLinks
 from .mermaid import Mermaid
 from .elog import ELog
+from .fs import FS
 
 import re
 import hashlib
 import jinja2
-import sysrsync
 
 import graphviz
 import networkx as nx
@@ -49,7 +48,28 @@ class Architector():
     self.fsd = FSD()
     self.swaggers = Swaggers(verbose)
     self.updates = Updates(verbose)
-    
+    self.fs = FS(verbose)
+
+  def md5File(self, fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+      for chunk in iter(lambda: f.read(4096), b""):
+        hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+  def md5String(self, data):
+    return hashlib.md5(data.encode('utf-8')).hexdigest()
+
+  def writeFile(self, fname, data):
+    self.cnt_files = self.cnt_files + 1
+    if self.md5String(data) == self.md5File(fname):
+      return False
+    text_file = codecs.open(fname, 'w', 'utf-8')
+    text_file.write(data)
+    text_file.close()
+    self.cnt_writes = self.cnt_writes + 1
+    return True
+
   def loadServices(self, fileServices):
     columns = {}
     i = 0
@@ -360,43 +380,31 @@ class Architector():
 
     return D.finish()
 
-
   def graphSequence(self, seq):
     D = Mermaid()
-    D.new('sequence', seq)
+    D.new('sequence', seq.get('name', ''))
     
     self.updates.graphSequence(D, seq, self.services)
     return D.finish()
 
   def makeAll(self, htmlPath):
+    self.cnt_files = 0
+    self.cnt_writes = 0
+
     elog = ELog()
     if self.verbose:
       print("LOG: Rebuilding HTML...")
 
     if self.verbose:
       print("LOG: Syncing HTML...")
-    for p in ['data', 'service', 'domain', 'tag', 'fsd',
-              'up', 'dia', 'swagger', 'api',
-              'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain']:
-      os.makedirs('%s/%s' % (htmlPath, p), exist_ok=True)
+    
+    self.fs.mkDir(htmlPath + '/%s',
+                   ['data', 'service', 'domain', 'tag', 'fsd',
+                    'up', 'dia', 'swagger', 'api',
+                    'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain'])
 
-    for p in ['js', 'css', 'img', 'scss', 'vendor']:
-      if os.name != 'nt':
-        sysrsync.run(source = 'templates/%s' % p,
-                   destination = '%s/%s' % (htmlPath, p),
-                   sync_source_contents = True,
-                   exclusions = ['.~*', 'Thumbs.db:encryptable'],
-                   options = ['-a'],
-                   verbose = self.verbose)
-
-    for p in ['updates', 'swaggers']:
-      if os.name != 'nt':
-        sysrsync.run(source = 'data/%s' % p,
-                   destination = '%s/%s' % (htmlPath, p),
-                   sync_source_contents = True,
-                   exclusions = ['.~*', 'Thumbs.db:encryptable'],
-                   options = ['-a'],
-                   verbose = self.verbose)
+    self.fs.rsync('templates/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
+    self.fs.rsync('data/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
     self.htmlRender('index.html',    '%s/index.html'    % htmlPath)
     self.htmlRender('domains.html',  '%s/domains.html'  % htmlPath)
@@ -411,17 +419,13 @@ class Architector():
     self.services.writeJSON('%s/data/services.json'  % htmlPath)
 
     text = self.graph()
-    text_file = codecs.open('%s/dia/index.html' % htmlPath, 'w', 'utf-8')
-    text_file.write(text)
-    text_file.close()
+    self.fs.writeFile('%s/dia/index.html' % htmlPath, text)
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Domains (%d)..." % self.domains.getCount())
     for j, domain in self.domains.getItems():
       text = self.graphDomain(j)
-      text_file = codecs.open('%s/dia/domain/%s.html' % (htmlPath, j.replace('/', '-')), 'w', 'utf-8')
-      text_file.write(text)
-      text_file.close()
+      self.fs.writeFile('%s/dia/domain/%s.html' % (htmlPath, j.replace('/', '-')), text)
       domain_services = self.services.filter('domain', j)    
       self.htmlRender('domain.html', '%s/domain/%s.html' % (htmlPath, j),
                        prop = {'domain': domain,
@@ -431,9 +435,7 @@ class Architector():
       print("LOG: Rebuilding HTML for Tags (%d)..." % self.tags.getCount())
     for j, tag in self.tags.getItems():
       text = self.graphTag(j, j)
-      text_file = codecs.open('%s/dia/tag/%s.html' % (htmlPath, j), 'w', 'utf-8')
-      text_file.write(text)
-      text_file.close()
+      self.fs.writeFile('%s/dia/tag/%s.html' % (htmlPath, j), text)
       tag_services = self.services.filter('tags', j)    
       tag_fsd = self.fsd.filter('tags', j)
       self.htmlRender('tag.html', '%s/tag/%s.html' % (htmlPath, j),
@@ -445,9 +447,7 @@ class Architector():
       print("LOG: Rebuilding HTML for Services (%d)..." % self.services.getCount())
     for j, service in self.services.getItems():
       text = self.graphService(j, j)
-      text_file = codecs.open('%s/dia/service/%s.html' % (htmlPath, j.replace('/', '-')), 'w', 'utf-8')
-      text_file.write(text)
-      text_file.close()
+      self.fs.writeFile('%s/dia/service/%s.html' % (htmlPath, j.replace('/', '-')), text)
       linksFrom = self.srvlinks.filter('service_from', j)
       linksTo = self.srvlinks.filter('service_to', j)
       service_api = self.api.filter('service', j)
@@ -472,9 +472,7 @@ class Architector():
     
     for j, fsd in self.fsd.getItems():
       text = self.graphTag(j, fsd.get('tags', ''))
-      text_file = codecs.open('%s/dia/fsd/%s.html' % (htmlPath, j), 'w', 'utf-8')
-      text_file.write(text)
-      text_file.close()
+      self.fs.writeFile('%s/dia/fsd/%s.html' % (htmlPath, j), text)
       fsd_services = self.services.filter('tags', fsd.get('tags', ''))
       self.htmlRender('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
                        prop = {'fsd': fsd,
@@ -493,13 +491,13 @@ class Architector():
 
     for j, up in self.updates.getItems():
       text = self.graphSequence(up)
-      text_file = codecs.open('%s/dia/up/%s.html' % (htmlPath, j), 'w', 'utf-8')
-      text_file.write(text)
-      text_file.close()
+      self.fs.writeFile('%s/dia/up/%s.html' % (htmlPath, j), text)
       #pprint(text)
-      self.htmlRender('up.html', '%s/up/%s.html' % (htmlPath, up.get('code', '')),
+      self.htmlRender('up.html', '%s/up/%s.html' % (htmlPath, j),
                        prop = {'up': up})
-
+    
+    self.fs.printStats()
+    
 
   def htmlRender(self, tmplfile, dstfile, prop = {}):
     #text = self.graph()
@@ -508,6 +506,4 @@ class Architector():
     templateEnv = jinja2.Environment(loader=templateLoader)
     template = templateEnv.get_template(tmplfile)
     outputText = template.render(domains = self.domains.getItems(), tags = self.tags.getItems(), services = self.services.getItems(), prop = prop) #, schema = text)
-    text_file = codecs.open(dstfile, 'w', 'utf-8')
-    text_file.write(outputText)
-    text_file.close()
+    self.fs.writeFile(dstfile, outputText)
