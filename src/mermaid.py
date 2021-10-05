@@ -278,6 +278,36 @@ class Mermaid():
     
     self.gLinks[group] = G
 
+  def parallelStart(self, group, text):
+
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+    G = self.gLinks[group]
+    
+    G = G + '%spar %s\n' % (self.tab, text)
+    
+    self.gLinks[group] = G
+
+  def parallelAnd(self, group, text):
+
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+    G = self.gLinks[group]
+    
+    G = G + '%sand %s\n' % (self.tab, text)
+    
+    self.gLinks[group] = G
+
+  def parallelFinish(self, group, text):
+
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+    G = self.gLinks[group]
+    
+    G = G + '%send\n' % (self.tab)
+    
+    self.gLinks[group] = G
+
   def drawFlow(self, G):
     G = G + "\nflowchart LR\n"
     for i in self.gNodes:

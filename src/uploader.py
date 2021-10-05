@@ -13,12 +13,15 @@ from csv import reader
 from urllib.parse import urlencode, quote
 from pprint import pprint
 
+from .fs import FS
 from .elog import ELog
 
 class Uploader():
-  def __init__ (self, savepath):
+  def __init__ (self, savepath, verbose):
+    self.verbose = verbose
     self.savepath = savepath
     self.etc = {}
+    self.fs = FS(verbose)
     fileconfig = 'etc/swagger_auth.yaml'
     if os.path.isfile(fileconfig):
       with open(fileconfig, 'r') as stream:
@@ -56,9 +59,8 @@ class Uploader():
       os.makedirs("%s/%s" % (self.savepath, self.getName(data)))
       filename = "%s/%s/%s.yaml" % (self.savepath, self.getName(data), self.getVersion(data))
       re.sub('[^\w\-_\. ]', '_', filename)
-      file = codecs.open(filename, 'w', 'utf-8')
-      yaml.dump(data, file)
-      file.close()
+      
+      self.fs.writeFile(filename, yaml.dump(data))
     except Exception as e:
       print("ERR: Write File: %s: %s" % (filename, str(e)))
       return False

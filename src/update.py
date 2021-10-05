@@ -11,8 +11,23 @@ class Updates(Basic):
     super(Updates, self).__init__()
     self.name = 'update'
     self.ids = ['name', 'service', 'version', 'plan']
-    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'swagger']
+    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'swagger', 'swagger-api', 'swagger-api-method', 'swagger-api-parameters', 'swagger-api-response', 'swagger-api-description']
     self.verbose = verbose
+
+  def updateProp(self, prop):
+    if 'swagger' in prop:
+      if 'paths' in prop['swagger']:
+        if len(prop['swagger']['paths']) > 0:
+          prop['swagger-api'] = next(iter(prop['swagger']['paths']))
+          if len(prop['swagger']['paths'][prop['swagger-api']]) > 0:
+            prop['swagger-api-method'] = next(iter(prop['swagger']['paths'][prop['swagger-api']]))
+            if 'description' in prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]:
+              prop['swagger-api-description'] = prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]['description']
+            if 'parameters' in prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]:
+              prop['swagger-api-parameters'] = prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]['parameters']
+            if 'responses' in prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]:
+              prop['swagger-api-responses'] = prop['swagger']['paths'][prop['swagger-api']][prop['swagger-api-method']]['responses']
+    return prop
 
   def load(self, updatepath):
     fp = os.path.abspath(updatepath)
@@ -32,7 +47,7 @@ class Updates(Basic):
               prop['id'] = key
               prop['code'] = self.genCode(prop)
               if key != '':
-                self.updateItem(key, prop)
+                self.updateItem(key, self.updateProp(prop))
 
             except yaml.YAMLError as err:
               print("ERR: Bad format in %s: %s" % (fullPath, str(err)))    
@@ -43,7 +58,7 @@ class Updates(Basic):
   def makeSwaggers(self):
     res = {}
     for j, up in self.getItems():
-      if not 'swagger' in up:
+      if not up or not 'swagger' in up:
         continue
       k = up.get('service', ''), up.get('version', '')
       if not k in res:
@@ -79,10 +94,15 @@ class Updates(Basic):
   def graphSequence(self, D, seq, services):
     if hasattr(seq['sequence'], "__len__"):
       for v in seq['sequence']:
-        #pprint(v)
+        if 'parallel-start' in v:
+          D.parallelStart('main', v['parallel-start'])
+        if 'parallel-and' in v:
+          D.parallelAnd('main', v['parallel-and'])
         if 'from' in v:
           D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', v.get('answer', '')), v.get('type', 'ok'))
         if 'activate' in v:
           D.activate('main', v['activate'])
         if 'deactivate' in v:
           D.deactivate('main', v['deactivate'])
+        if 'parallel-finish' in v:
+          D.parallelFinish('main', v['parallel-finish'])

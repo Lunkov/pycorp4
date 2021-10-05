@@ -13,12 +13,63 @@
 
 <div class="container-fluid">
 
-<h1>{{ prop['up'].name }}</h1>
 
-<p>{{ prop['up'].description }}</p>
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary" id="about">{{ prop['up'].name }}</h6>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+
+<table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Параметр</th>
+			<th>Значение</th>
+		</tr>
+	</thead>
+<tbody>
+	<tr>
+		<td>Наименование доработки</td>
+		<td>{{ prop['up'].name }}</td>
+	</tr>
+	<tr>
+		<td>Описание</td>
+		<td>{{ prop['up'].description }}</td>
+	</tr>
+	<tr>
+		<td>API</td>
+		<td>{{ prop['up']['swagger-api'] }}</td>
+	</tr>
+	<tr>
+		<td>Метод</td>
+		<td>{{ prop['up']['swagger-api-method'] }}</td>
+	</tr>
+	<tr>
+		<td>Описание API</td>
+		<td>{{ prop['up']['swagger-api-description'] }}</td>
+	</tr>
+</tbody>
+</table>
+     
+     </div>
+   </div>
+</div>
+
+{% with table_title='Входные параметры', table_id='api-parameters', table_rows=prop['up']['swagger-api-parameters'] %}
+  {% include "components/table_up_api_parameters.html" %}
+{% endwith %}
+
+{% with table_title='Выходные данные', table_id='api-responses', table_rows=prop['up']['swagger-api-responses'] %}
+  {% include "components/table_up_api_response.html" %}
+{% endwith %}
 
 {% with dia_path='up', dia_id=prop['up'].id, dia_name=prop['up'].name %}
   {% include "components/diagram.html" %}
+{% endwith %}
+
+{% with table_title='Последовательность действий', table_id='sequence', table_rows=prop['up']['sequence'] %}
+  {% include "components/table_sequence.html" %}
 {% endwith %}
 
 		</div>

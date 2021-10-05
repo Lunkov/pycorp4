@@ -191,7 +191,7 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    uploader = Uploader('%s/swaggers' % datapath)
+    uploader = Uploader('%s/swaggers' % datapath, self.verbose)
     for i, service in self.services.getItems():
       if 'swagger' in service:
         uploader.updateSwagger(service['swagger'])
@@ -492,7 +492,6 @@ class Architector():
     for j, up in self.updates.getItems():
       text = self.graphSequence(up)
       self.fs.writeFile('%s/dia/up/%s.html' % (htmlPath, j), text)
-      #pprint(text)
       self.htmlRender('up.html', '%s/up/%s.html' % (htmlPath, j),
                        prop = {'up': up})
     

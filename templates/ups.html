@@ -31,6 +31,8 @@ $(document).ready(function() {
                                         <tr>
                                             <th>Наименование</th>
                                             <th>Сервис</th>
+                                            <th>Версия</th>
+                                            <th>План</th>
                                             <th>ФТ</th>
                                         </tr>
                                     </thead>
@@ -38,6 +40,8 @@ $(document).ready(function() {
                                         <tr>
                                             <th>Наименование</th>
                                             <th>Сервис</th>
+                                            <th>Версия</th>
+                                            <th>План</th>
                                             <th>ФТ</th>
                                         </tr>
                                     </tfoot>
@@ -46,6 +50,8 @@ $(document).ready(function() {
                                         <tr>
                                             <td><a href="/up/{{ item.id }}.html">{{ item.name }}</a></td>
                                             <td><a href="/service/{{ item.service }}.html">{{ item.service }}</a></td>
+                                            <td>{{ item.version }}</td>
+                                            <td>{{ item.plan }}</td>
                                             <td><a href="/fsd/{{ item.fsd }}.html">{{ item.fsd }}</a></td>
                                         </tr>
 {% endfor %}
