@@ -124,6 +124,7 @@ class Architector():
           self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'fact', 'method': method.upper(), 'url': path, 'description': desc} )
 
     self.updates.load(os.path.join(self.datapath, 'updates'))
+    self.updates.calc(self.services)
     res = self.updates.makeSwaggers()
     for i, sw in res.items():
       if not 'info' in sw:

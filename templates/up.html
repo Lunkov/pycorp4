@@ -49,6 +49,26 @@
 		<td>Описание API</td>
 		<td>{{ prop['up']['swagger-api-description'] }}</td>
 	</tr>
+	<tr>
+		<td>Максимальное количество запросов в секунду</td>
+		<td>{{ prop['up']['max-rps'] }} / {{ prop['up']['max-rps-calc'] }}</td>
+	</tr>
+	<tr>
+		<td>Максимально допустимое количество запросов в секунду</td>
+		<td>{{ prop['up']['max-rps-high'] }} / {{ prop['up']['max-rps-high-calc'] }}</td>
+	</tr>
+	<tr>
+		<td>Пиковое время ответа для 99% запросов, мс</td>
+		<td>{{ prop['up']['rt99'] }} / {{ prop['up']['rt99-calc'] }}</td>
+	</tr>
+	<tr>
+		<td>Пиковое время ответа для 95% запросов, мс</td>
+		<td>{{ prop['up']['rt95'] }} / {{ prop['up']['rt95-calc'] }}</td>
+	</tr>
+	<tr>
+		<td>Доля запросов выполненных с ошибками 5xx, %</td>
+		<td>{{ prop['up']['5xx'] }} / {{ prop['up']['5xx-calc'] }}</td>
+	</tr>
 </tbody>
 </table>
      

@@ -11,7 +11,7 @@ class Updates(Basic):
     super(Updates, self).__init__()
     self.name = 'update'
     self.ids = ['name', 'service', 'version', 'plan']
-    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'swagger', 'swagger-api', 'swagger-api-method', 'swagger-api-parameters', 'swagger-api-response', 'swagger-api-description']
+    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'status', 'swagger', 'swagger-api', 'swagger-api-method', 'swagger-api-parameters', 'swagger-api-response', 'swagger-api-description']
     self.verbose = verbose
 
   def updateProp(self, prop):
@@ -106,3 +106,55 @@ class Updates(Basic):
           D.deactivate('main', v['deactivate'])
         if 'parallel-finish' in v:
           D.parallelFinish('main', v['parallel-finish'])
+
+  def calc(self, services):
+    res = {}
+    for j, up in self.getItems():
+      if not up or not 'sequence' in up:
+        continue
+      if not 'service' in up:
+        continue
+      s = up['service']
+      self.m[j]['max-rps-calc'] = 9999999999
+      self.m[j]['max-rps-high-calc'] = 9999999999
+      self.m[j]['rt99-calc'] = 0
+      self.m[j]['rt95-calc'] = 0
+      self.m[j]['5xx-calc'] = 0
+      for k, v in enumerate(up['sequence']):
+        if not 'status' in v:
+          v['status'] = ''
+        status = v['status']
+        srv1 = services.getItem(v.get('from', ''))
+        srv2 = services.getItem(v.get('to', ''))
+        if not srv1:
+          status = status + ('Сервис "%s" не  найден' % v.get('from', ''))
+        if not srv2:
+          status = status + ('Сервис "%s" не  найден' % v.get('to', ''))
+        if srv1 and srv2:
+          if s == v.get('from', ''):
+            maxrps = 0
+            try:
+              maxrps = int(srv2.get('max_rps', '0'))
+            except ValueError:
+              pass
+            if self.m[j]['max-rps-calc'] > maxrps:
+              self.m[j]['max-rps-calc'] = maxrps
+            maxrps = 0
+            try:
+              maxrps = int(srv2.get('max_rps_high', '0'))
+            except ValueError:
+              pass
+            if self.m[j]['max-rps-high-calc'] > maxrps:
+              self.m[j]['max-rps-high-calc'] = maxrps
+            try:
+              rt99 = int(srv2.get('rt_99', '0'))
+              self.m[j]['rt99-calc'] = self.m[j]['rt99-calc'] + rt99
+            except ValueError:
+              pass
+            try:
+              rt95 = int(srv2.get('rt_95', '0'))
+              self.m[j]['rt95-calc'] = self.m[j]['rt95-calc'] + rt95
+            except ValueError:
+              pass
+
+        self.m[j]['sequence'][k]['status'] = status

@@ -23,6 +23,7 @@
 						<th>Вызываемое API</th>
 						<th>Ответ</th>
 						<th>Параллельное выполнение</th>
+						<th>Статус</th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -34,6 +35,7 @@
 						<th>Вызываемое API</th>
 						<th>Ответ</th>
 						<th>Параллельное выполнение</th>
+						<th>Статус</th>
 					</tr>
 				</tfoot>
 				<tbody>
@@ -46,6 +48,7 @@
 						<td>{{ item.api }}</td>
 						<td>{{ item.answer }}</td>
 						<td>{{ item['parallel-start'] }}{{ item['parallel-and'] }}</td>
+						<td>{{ item.status }}</td>
 					</tr>
 {% endfor %}
 					
