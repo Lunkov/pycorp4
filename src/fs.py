@@ -18,9 +18,12 @@ class FS():
 
   def md5File(self, fname):
     hash_md5 = hashlib.md5()
-    with open(fname, "rb") as f:
-      for chunk in iter(lambda: f.read(4096), b""):
-        hash_md5.update(chunk)
+    try:
+      with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+          hash_md5.update(chunk)
+    except:
+      return '-'
     return hash_md5.hexdigest()
 
   def md5String(self, data):
@@ -30,6 +33,8 @@ class FS():
     self.cnt_files = self.cnt_files + 1
     if self.md5String(data) == self.md5File(fname):
       return False
+    if self.verbose:
+      print("LOG: Write file: %s" % fname)
     text_file = codecs.open(fname, 'w', 'utf-8')
     text_file.write(data)
     text_file.close()

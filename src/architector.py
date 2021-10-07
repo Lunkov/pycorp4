@@ -21,6 +21,7 @@ from .update import Updates
 from .uploader import Uploader
 from .servicelinks import ServiceLinks
 from .mermaid import Mermaid
+from .dia import Dia
 from .elog import ELog
 from .fs import FS
 
@@ -228,8 +229,9 @@ class Architector():
     html.save(name, template.render({'domains': self.domains.getItems(), 'services': self.services.getItems(), }))
 
   def graphDia(self):
+    D = Mermaid()
+    D.new('dia', 'all')
     for i, service in self.services.getItems():
-      D = Diagram(i, show=False)
       self.service.graphDia(D, i)
 
   def graph(self):
@@ -247,10 +249,7 @@ class Architector():
 
     return D.finish()
 
-  def graphTag(self, name, tag):
-    D = Mermaid()
-    D.new('flowLR', name)
-    
+  def filterTag(self, name, tag):
     srv = self.services.filter('tags', tag)
     services = Services()
     services.set(srv)
@@ -263,8 +262,10 @@ class Architector():
     linksTo = self.srvlinks.filter('service_to', lsrv)
     srvlinks.append(linksTo)
     
-    links = srvlinks.filter('tags', tag)
-    srvlinks.set(links)
+    #links = srvlinks.filter('tags', tag)
+    #srvlinks.set(links)
+    links = self.srvlinks.filter('service_from', lsrv)
+    srvlinks.append(links)
     
     srvsTo = srvlinks.getVariants('service_to')
     srvs1 = self.services.filter('id', srvsTo)
@@ -277,6 +278,11 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
+    return domains, services, srvlinks
+    
+  def drawDiagrams(self, name, domains, services, srvlinks, filename):
+    D = Mermaid()
+    D.new('flowLR', name)
     
     for j, domain in domains.items():
       self.domains.graph(D, domain)
@@ -287,12 +293,24 @@ class Architector():
     for i, link in srvlinks.getItems():
       srvlinks.graph(D, link)
 
-    return D.finish()
+    dia = D.finish()
+    self.fs.writeFile(filename + '.html', dia)
 
-  def graphService(self, name, service):
-    D = Mermaid()
-    D.new('flowLR', name)
+    D = Dia()
+    D.new('dia', name)
     
+    for j, domain in domains.items():
+      self.domains.graph(D, domain)
+      
+    for i, service in services.getItems():
+      services.graph(D, service)
+
+    for i, link in srvlinks.getItems():
+      srvlinks.graph(D, link)
+
+    D.finish(filename)
+
+  def filterService(self, name, service):
     srv = self.services.filter('id', service)
     services = Services()
     services.set(srv)
@@ -314,22 +332,9 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    
-    for j, domain in domains.items():
-      self.domains.graph(D, domain)
-      
-    for i, service in services.getItems():
-      services.graph(D, service)
+    return domains, services, srvlinks
 
-    for i, link in srvlinks.getItems():
-      srvlinks.graph(D, link)
-
-    return D.finish()
-
-  def graphDomain(self, domain):
-    D = Mermaid()
-    D.new('flowLR', domain)
-    
+  def filterDomain(self, domain):
     srv = self.services.filter('domain', domain)
     services = Services()
     services.set(srv)
@@ -352,16 +357,7 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    for j, domain in domains.items():
-      self.domains.graph(D, domain)
-      
-    for i, service in services.getItems():
-      services.graph(D, service)
-
-    for i, link in srvlinks.getItems():
-      srvlinks.graph(D, link)
-
-    return D.finish()
+    return domains, services, srvlinks
 
   def graphSequence(self, seq):
     D = Mermaid()
@@ -410,30 +406,29 @@ class Architector():
     if self.verbose:
       print("LOG: Rebuilding HTML for Domains (%d)..." % self.domains.getCount())
     for j, domain in self.domains.getItems():
-      text = self.graphDomain(j)
-      self.fs.writeFile('%s/dia/domain/%s.html' % (htmlPath, j.replace('/', '-')), text)
-      domain_services = self.services.filter('domain', j)    
+      domains, services, srvlinks = self.filterDomain(j)
+      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/domain/%s' % (htmlPath, j.replace('/', '-')))
       self.htmlRender('domain.html', '%s/domain/%s.html' % (htmlPath, j),
                        prop = {'domain': domain,
-                               'domain_services': domain_services.items()})
+                               'domain_services': services.getItems()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Tags (%d)..." % self.tags.getCount())
     for j, tag in self.tags.getItems():
-      text = self.graphTag(j, j)
-      self.fs.writeFile('%s/dia/tag/%s.html' % (htmlPath, j), text)
-      tag_services = self.services.filter('tags', j)    
+      domains, services, srvlinks = self.filterTag(j, j)
+      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/tag/%s' % (htmlPath, j.replace('/', '-')))
       tag_fsd = self.fsd.filter('tags', j)
       self.htmlRender('tag.html', '%s/tag/%s.html' % (htmlPath, j),
                        prop = {'tag': tag,
                                'fsd': tag_fsd.items(),
-                               'tag_services': tag_services.items()})
+                               'tag_services': services.getItems()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Services (%d)..." % self.services.getCount())
     for j, service in self.services.getItems():
-      text = self.graphService(j, j)
-      self.fs.writeFile('%s/dia/service/%s.html' % (htmlPath, j.replace('/', '-')), text)
+      domains, services, srvlinks = self.filterService(j, j)
+      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/service/%s' % (htmlPath, j.replace('/', '.')))
+
       linksFrom = self.srvlinks.filter('service_from', j)
       linksTo = self.srvlinks.filter('service_to', j)
       service_api = self.api.filter('service', j)
@@ -457,12 +452,11 @@ class Architector():
       print("LOG: Rebuilding HTML for FSDs (%d)..." % self.fsd.getCount())
     
     for j, fsd in self.fsd.getItems():
-      text = self.graphTag(j, fsd.get('tags', ''))
-      self.fs.writeFile('%s/dia/fsd/%s.html' % (htmlPath, j), text)
-      fsd_services = self.services.filter('tags', fsd.get('tags', ''))
+      domains, services, srvlinks = self.filterTag(j, fsd.get('tags', ''))
+      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/fsd/%s' % (htmlPath, j))
       self.htmlRender('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
                        prop = {'fsd': fsd,
-                               'fsd_services': fsd_services.items()})
+                               'fsd_services': services.getItems()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Swaggers (%d)..." % self.swaggers.getCount())

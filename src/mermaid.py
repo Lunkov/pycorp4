@@ -11,31 +11,12 @@ from urllib.parse import urlencode, quote
 from pprint import pprint
 from datetime import date
 
-from .domains import Domains
-from .services import Services
-from .api import API
-from .links import Links
-from .servicelinks import ServiceLinks
-
 import hashlib
-
-import graphviz
-import networkx as nx
-from netwulf import visualize
-from pyvis.network import Network
-from diagrams import Diagram
-
-
-from diagrams.gcp.compute import Functions
-from diagrams.aws.integration import SQS
-from diagrams.aws.network import ELB
-from diagrams.aws.database import RDS
 
 class Mermaid():
   def __init__ (self):
     self.tab = '    '
     self.typeDia = ''
-    self.dia = {}
     self.gNodes = {}
     self.gGroups = {}
     self.gLinks = {}
@@ -155,23 +136,11 @@ class Mermaid():
   def new(self, typeDia, name):
     self.name = name
     self.typeDia = typeDia
-    self.dia = {}
     self.gGroups = {}
     self.gNodes = {}
     self.gLinks = {}
 
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
-    if self.typeDia == 'dia':
-      if (not name in self.dia) or (self.dia[name] == None):
-        if ntype == 'service':
-          self.dia[name] = Functions(name)
-        if ntype == 'kafka':
-          self.dia[name] = SQS(name)
-        if ntype == 'bff':
-          self.dia[name] = ELB(name)
-        if ntype == 'db':
-          self.dia[name] = RDS(name)
-      return
     if not group in self.gNodes:
       self.gNodes[group] = ''
     G = self.gNodes[group]
@@ -325,7 +294,7 @@ class Mermaid():
     for i, v in self.gLinks.items():
       G = G + v
     return G
-    
+  
   def finish(self):
     G = self.header
     G = G + ("<div class=\"mermaid\" id=\"%s\">" % self.name)
@@ -339,7 +308,3 @@ class Mermaid():
 
     return G
 
-  def save(self, filename):
-    text_file = codecs.open(filename, 'w', 'utf-8')
-    text_file.write(self.G)
-    text_file.close()

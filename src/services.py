@@ -29,29 +29,6 @@ class Services(Basic):
     self.name = 'services'
     self.fields = ['id', 'name', 'title', 'domain', 'type', 'status', 'layer', 'tags', 'description', 'link', 'git', 'version', 'swagger', 'swagger_date', 'swagger_status', 'max_rps', 'max_rps_high', 'rt_99', 'rt_95', '5xx']
 
-  def updateSwaggerAll(self, dt):
-    sw = Swagger()
-    for key, service in self.m.items():
-      ok = self.updateSwagger(service, sw)
-      if ok:
-        self.m[key]['version'] = sw.getVersion()
-        self.m[key]['swagger_status'] = 'ok'
-        self.m[key]['swagger_date'] = dt
-        sw.save(dt)
-    
-  def graphWULF(self, G):
-    for i, v in self.m.items():
-      G.add_node(i)
-      G.add_edge(i, v['domain'])
-    for n, data in G.nodes(data=True):
-      if n in self.m:
-        data['size'] = 0.5
-
-  def graphVIZ(self, G):
-    for i, v in self.m.items():
-      G.add_node(i, label = i, color = '#005f02', size = 10, shape = 'diamond', group = v['domain'])      
-      G.add_edge(i, v['domain'])
-
   def graph(self, D, service):
     D.node(service.get('id', 'xz'),
            service.get('name', 'xz'),
