@@ -159,7 +159,6 @@ class Architector():
     self.services.readXLS(db, 'SERVICES')
     self.srvlinks.readXLS(db, 'SERVICE.LINKS')
     self.api.readXLS(db, 'API')
-    self.links.readXLS(db, 'SEQUENCES')
     self.tags.readXLS(db, 'TAGS')
     self.srvlinks.calc(self.services)
     if self.verbose:
