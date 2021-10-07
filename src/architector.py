@@ -317,7 +317,7 @@ class Architector():
       linkstmp = ServiceLinks()
       linkstmp.set(linksFrom)
       service_to = linkstmp.getVariants('service_to')
-      self.findSources(srvlinks, service_to):
+      self.findSources(srvlinks, service_to)
   
   def filterService(self, name, service):
     srv = self.services.filter('id', service)
