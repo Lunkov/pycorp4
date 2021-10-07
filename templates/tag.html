@@ -13,9 +13,50 @@
 
 <div class="container-fluid">
 
-<h1>{{ prop['tag'].name }}</h1>
+<h1>Тэг: {{ prop['tag'].name }}</h1>
 
-<p>{{ prop['tag'].description }}</p>
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+		<ul>
+		  <li><a href="#about">О теге</a></li>
+		  <li><a href="#fsd">Функциональные требования</a></li>
+		  <li><a href="#dataTableIN">Перечень сервисов</a></li>
+		  <li><a href="#schemaiframe">Схема</a></li>
+		</ul>
+	  </div>
+   </div>
+</div>
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary" id="about">О теге</h6>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+
+<table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Параметр</th>
+			<th>Значение</th>
+		</tr>
+	</thead>
+<tbody>
+	<tr>
+		<td>Описание тега</td>
+		<td>{{ prop['tag'].description }}</td>
+	</tr>
+</tbody>
+</table>
+     
+     </div>
+   </div>
+</div>
+
 
 <!-- DataTales  -->
 <script>
@@ -140,7 +181,7 @@ $(document).ready(function() {
               </div>
             </div>
 
-{% with dia_path='tag', dia_id=prop['tag'].id, dia_name=prop['tag'].name %}
+{% with dia_path='tag', dia_id=prop['tag'].id, dia_name=prop['tag'].name, print_png=true %}
   {% include "components/diagram.html" %}
 {% endwith %}
 

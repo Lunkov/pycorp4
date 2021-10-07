@@ -43,7 +43,7 @@ class Dia():
 
   def link(self, service_from, service_to, group = '-', tags = '', status = '', text = ''):
     idn1 = hashlib.md5(service_from.encode('utf-8') + service_to.encode('utf-8')).hexdigest()
-    self.gLinks[idn1] = {'service_from': service_from, 'service_to': service_to, 'text': text}
+    self.gLinks[idn1] = {'service_from': service_from, 'service_to': service_to, 'text': text, 'status': status}
 
   def finish(self, filename):
     if self.verbose:
@@ -69,7 +69,10 @@ class Dia():
         for k, lnk in self.gLinks.items():
           if lnk['service_from'] in nn and lnk['service_to'] in nn:
             # print("LOG: Edge '%s' => '%s' : %s" % (nn[lnk['service_from']], nn[lnk['service_to']], lnk['text']), flush=True)
-            nn[lnk['service_from']] >> Edge(label=lnk['text']) >> nn[lnk['service_to']]
+            if lnk['status'] == 'ok':
+              nn[lnk['service_from']] >> Edge(label=lnk['text'], style="bold") >> nn[lnk['service_to']]
+            else:
+              nn[lnk['service_from']] >> Edge(label=lnk['text']) >> nn[lnk['service_to']]
     except Exception as e:
       print("ERR: Diagram: %s: %s" % (filename, str(e)))
       return False

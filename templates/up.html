@@ -84,7 +84,7 @@
   {% include "components/table_up_api_response.html" %}
 {% endwith %}
 
-{% with dia_path='up', dia_id=prop['up'].id, dia_name=prop['up'].name %}
+{% with dia_path='up', dia_id=prop['up'].id, dia_name=prop['up'].name, print_png=false %}
   {% include "components/diagram.html" %}
 {% endwith %}
 

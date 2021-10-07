@@ -329,7 +329,7 @@ $(document).ready(function() {
             </div>
 
             
-{% with dia_path='service', dia_id=prop['service'].id, dia_name=prop['service'].name %}
+{% with dia_path='service', dia_id=prop['service'].id, dia_name=prop['service'].name, print_png=true %}
   {% include "components/diagram.html" %}
 {% endwith %}
 		</div>

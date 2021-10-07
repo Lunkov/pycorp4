@@ -166,7 +166,7 @@ class Architector():
       print("LOG: Read '%s' - OK" % filename)
 
   def analyze(self):
-    srv = Services(self.api)
+    srv = Services()
     for j, fsd in self.fsd.getItems():
       fsd_services = self.services.filter('tags', fsd.get('tags', ''))
       srv.set(fsd_services)
