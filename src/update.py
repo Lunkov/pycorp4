@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import yaml
+import codecs
 from pprint import pprint
 from pathlib import Path
 from .basic import Basic
@@ -40,14 +41,14 @@ class Updates(Basic):
         if not os.path.isdir(fullPath):
           if self.verbose:
             print("DBG: Scan: %s" % fullPath)
-          with open(fullPath, 'r') as stream:
             try:
-              prop = yaml.safe_load(stream)
-              key = self.genId(prop)
-              prop['id'] = key
-              prop['code'] = self.genCode(prop)
-              if key != '':
-                self.updateItem(key, self.updateProp(prop))
+              with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
+                prop = yaml.safe_load(stream)
+                key = self.genId(prop)
+                prop['id'] = key
+                prop['code'] = self.genCode(prop)
+                if key != '':
+                  self.updateItem(key, self.updateProp(prop))
 
             except yaml.YAMLError as err:
               print("ERR: Bad format in %s: %s" % (fullPath, str(err)))    

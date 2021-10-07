@@ -293,7 +293,8 @@ class Architector():
       srvlinks.graph(D, link)
 
     dia = D.finish()
-    self.fs.writeFile(filename + '.html', dia)
+    if not self.fs.writeFile(filename + '.html', dia):
+      return
 
     D = Dia(self.verbose)
     D.new('dia', name)
