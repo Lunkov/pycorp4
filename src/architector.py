@@ -296,7 +296,7 @@ class Architector():
     dia = D.finish()
     self.fs.writeFile(filename + '.html', dia)
 
-    D = Dia()
+    D = Dia(self.verbose)
     D.new('dia', name)
     
     for j, domain in domains.items():
@@ -310,6 +310,15 @@ class Architector():
 
     D.finish(filename)
 
+  def findSources(self, srvlinks, service_from):
+    linksFrom = self.srvlinks.filter('service_from', service_from)
+    if len(linksFrom) > 0:
+      srvlinks.append(linksFrom)
+      linkstmp = ServiceLinks()
+      linkstmp.set(linksFrom)
+      service_to = linkstmp.getVariants('service_to')
+      self.findSources(srvlinks, service_to):
+  
   def filterService(self, name, service):
     srv = self.services.filter('id', service)
     services = Services()

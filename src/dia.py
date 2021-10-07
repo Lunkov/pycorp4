@@ -20,7 +20,8 @@ from diagrams.aws.network import ELB
 from diagrams.aws.database import RDS
 
 class Dia():
-  def __init__ (self):
+  def __init__ (self, verbose):
+    self.verbose = verbose
     self.tab = '    '
     self.typeDia = ''
     self.gNodes = {}
@@ -45,25 +46,30 @@ class Dia():
     self.gLinks[idn1] = {'service_from': service_from, 'service_to': service_to, 'text': text}
 
   def finish(self, filename):
-    print('LOG: Make diagram "%s"' % filename)
+    if self.verbose:
+      print('LOG: Make diagram "%s"' % filename)
     nn = {}
-    with Diagram(self.name, show = False, filename = filename, outformat = 'png') as diag:
-      for i, g in self.gGroups.items():
-        gname = g.get('name', 'undef')
-        with Cluster(gname):
-          for j, n in self.gNodes.items():
-            if n.get('group', 'undef') == i:
-              name = n.get('name', 'undef')
-              ntype = n.get('type', 'service')
-              if ntype == 'service':
-                nn[j] = Functions(j)
-              if ntype == 'kafka':
-                nn[j] = SQS(j)
-              if ntype == 'bff':
-                nn[j] = ELB(j)
-              if ntype == 'db':
-                nn[j] = RDS(j)
-      for k, lnk in self.gLinks.items():
-        if lnk['service_from'] in nn and lnk['service_to'] in nn:
-          # print("LOG: Edge '%s' => '%s' : %s" % (nn[lnk['service_from']], nn[lnk['service_to']], lnk['text']), flush=True)
-          nn[lnk['service_from']] >> Edge(label=lnk['text']) >> nn[lnk['service_to']]
+    try:
+      with Diagram(self.name, show = False, filename = filename, outformat = 'png') as diag:
+        for i, g in self.gGroups.items():
+          gname = g.get('name', 'undef')
+          with Cluster(gname):
+            for j, n in self.gNodes.items():
+              if n.get('group', 'undef') == i:
+                name = n.get('name', 'undef')
+                ntype = n.get('type', 'service')
+                if ntype == 'service':
+                  nn[j] = Functions(j)
+                if ntype == 'kafka':
+                  nn[j] = SQS(j)
+                if ntype == 'bff':
+                  nn[j] = ELB(j)
+                if ntype == 'db':
+                  nn[j] = RDS(j)
+        for k, lnk in self.gLinks.items():
+          if lnk['service_from'] in nn and lnk['service_to'] in nn:
+            # print("LOG: Edge '%s' => '%s' : %s" % (nn[lnk['service_from']], nn[lnk['service_to']], lnk['text']), flush=True)
+            nn[lnk['service_from']] >> Edge(label=lnk['text']) >> nn[lnk['service_to']]
+    except Exception as e:
+      print("ERR: Diagram: %s: %s" % (filename, str(e)))
+      return False
