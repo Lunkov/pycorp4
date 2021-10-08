@@ -4,9 +4,6 @@
 import codecs
 import logging
 import os
-import yaml
-import pylightxl as xl
-from urllib.parse import urlencode, quote
 from pprint import pprint
 
 import hashlib

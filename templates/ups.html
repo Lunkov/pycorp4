@@ -46,7 +46,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['ups'] %}
+{% for i, item in ups %}
                                         <tr>
                                             <td><a href="/up/{{ item.id }}.html">{{ item.name }}</a></td>
                                             <td><a href="/service/{{ item.service }}.html">{{ item.service }}</a></td>

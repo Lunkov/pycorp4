@@ -28,20 +28,9 @@
 						<th>Ответ</th>
 						<th>Тип</th>
 						<th>Параллельное выполнение</th>
+						<th>Условие</th>
 					</tr>
 				</thead>
-				<tfoot>
-					<tr>
-						<th>Шаг</th>
-						<th>От сервиса</th>
-						<th>Запрос к сервису</th>
-						<th>Описание</th>
-						<th>Вызываемое API</th>
-						<th>Ответ</th>
-						<th>Тип</th>
-						<th>Параллельное выполнение</th>
-					</tr>
-				</tfoot>
 				<tbody>
 {% for item in table_rows %}
 					<tr>
@@ -52,7 +41,18 @@
 						<td>{{ item.api }}</td>
 						<td>{{ item.answer }}</td>
 						<td>{{ typeReq[item.type] }}</td>
-						<td>{{ item['parallel-start'] }}{{ item['parallel-and'] }}</td>
+						<td>
+							{{ item['parallel-start'] }}
+							{{ item['parallel-and'] }}
+							{{ item['parallel-finish'] }}
+						</td>
+						<td>
+							{{ item['alt-if'] }}
+							{{ item['alt-else'] }}
+							{{ item['alt-end'] }}
+							{{ item['opt-if'] }}
+							{{ item['opt-end'] }}
+						</td>
 					</tr>
 {% endfor %}
 					

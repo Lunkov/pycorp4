@@ -20,10 +20,10 @@ from .swaggers import Swaggers
 from .update import Updates
 from .uploader import Uploader
 from .servicelinks import ServiceLinks
-from .mermaid import Mermaid
-from .dia import Dia
+from .fabricdia import FabricDia
 from .elog import ELog
 from .fs import FS
+from .html import HTML
 
 import re
 import hashlib
@@ -38,9 +38,9 @@ from diagrams import Diagram
 
 
 class Architector():
-  def __init__ (self, datapath, verbose):
-    self.datapath = os.path.realpath(datapath)
-    self.templatesPath = 'templates'
+  def __init__ (self, templatesPath, dataPath, verbose):
+    self.dataPath = os.path.realpath(dataPath)
+    self.templatesPath = os.path.realpath(templatesPath)
     self.verbose = verbose
     self.domains = Domains()
     self.api = API()
@@ -52,6 +52,8 @@ class Architector():
     self.swaggers = Swaggers(verbose)
     self.updates = Updates(verbose)
     self.fs = FS(verbose)
+    self.html = HTML(self.templatesPath, self.fs, verbose)
+    self.dia = FabricDia(self.fs, self.html, verbose)
 
   def loadServices(self, fileServices):
     columns = {}
@@ -71,36 +73,12 @@ class Architector():
         self.services.add(row[columns['name']], {'name': row[columns['name']], 'domain': row[columns['place']], 'description': row[columns['description']], 'link': row[columns['link']], 'swagger': row[columns['swagger']]})
         self.services.reloadSwagger(row[columns['name']], self.api)
   
-  def loadDesign(self, p):
-    for path, subdirs, files in os.walk(p):
-      for name in files:
-        if not os.path.isfile(os.path.join(path, name)):
-          continue
-        if '.seq' in name:
-          filename = os.path.join(path, name)
-          data, ok = self.parseDesign(filename)
-          if ok:
-            pprint(data)
-
-  def parseDesign(self, filename):
-    data = {}
-    ok = False
-    try:
-      f = open(filename, 'r')
-      content = f.read()
-      f.close()
-      data = yaml.safe_load(content)
-      ok = True
-    except Exception as e:
-      print("ERR: File read '%s': %s" % (filename, str(e)))
-    return data, ok
-
   def nowDate(self):
     today = date.today()
     return today.strftime("%Y-%m-%d")
   
   def loadData(self):
-    self.swaggers.load(os.path.join(self.datapath, 'swaggers'))
+    self.swaggers.load(os.path.join(self.dataPath, 'swaggers'))
     for i, sw in self.swaggers.getItems():
       if not 'swagger-data' in sw:
         pprint(sw)
@@ -125,7 +103,7 @@ class Architector():
           title = method.upper() + ' ' + path
           self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'fact', 'method': method.upper(), 'url': path, 'description': desc} )
 
-    self.updates.load(os.path.join(self.datapath, 'updates'))
+    self.updates.load(os.path.join(self.dataPath, 'updates'))
     self.updates.calc(self.services)
     res = self.updates.makeSwaggers()
     for i, sw in res.items():
@@ -174,7 +152,7 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    uploader = Uploader('%s/swaggers' % self.datapath, self.verbose)
+    uploader = Uploader('%s/swaggers' % self.dataPath, self.verbose)
     for i, service in self.services.getItems():
       if 'swagger' in service:
         uploader.updateSwagger(service)
@@ -197,56 +175,6 @@ class Architector():
     self.domains.dumpCSV('data/domains.csv')
     self.services.dumpCSV('data/services.csv')
     self.api.dumpCSV('data/api.csv')
-    
-  def graphWULF(self):
-    G = nx.Graph()
-    labels = {}
-    self.domains.graphWULF(G, labels)
-    self.services.graphWULF(G)
-    self.api.graphWULF(G)
-    # visualize(G)
-    graph = nx.drawing.nx_pydot.to_pydot(G)
-    output_raw_dot = graph.to_string()
-    graph.write_raw('out/schema.dot')    
-    graph.write_png('out/schema.png')
-
-  def graphVIZ(self):
-    G = Network()
-    self.domains.graphVIZ(G)
-    self.services.graphVIZ(G)
-    self.api.graphVIZ(G)
-    self.links.graphVIZ(G)
-    
-    G.show_buttons(filter_=['physics'])
-    # G.enable_physics(True)
-    G.show('mygraph.html')
-
-  def buldPage(self, name):
-    html = open("templates/%s.html" % name).read()
-    template = Template(html)
-    html = HTML()
-    html.save(name, template.render({'domains': self.domains.getItems(), 'services': self.services.getItems(), }))
-
-  def graphDia(self):
-    D = Mermaid()
-    D.new('dia', 'all')
-    for i, service in self.services.getItems():
-      self.service.graphDia(D, i)
-
-  def graph(self):
-    D = Mermaid()
-    D.new('flowLR', 'all')
-
-    for j, domain in self.domains.getItems():
-      self.domains.graph(D, domain)
-      
-    for i, service in self.services.getItems():
-      self.services.graph(D, service)
-
-    for i, link in self.srvlinks.getItems():
-      self.srvlinks.graph(D, link)
-
-    return D.finish()
 
   def filterTag(self, name, tag):
     srv = self.services.filter('tags', tag)
@@ -277,39 +205,8 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    return domains, services, srvlinks
+    return domains, services.get(), srvlinks.get()
     
-  def drawDiagrams(self, name, domains, services, srvlinks, filename):
-    D = Mermaid()
-    D.new('flowLR', name)
-    
-    for j, domain in domains.items():
-      self.domains.graph(D, domain)
-      
-    for i, service in services.getItems():
-      services.graph(D, service)
-
-    for i, link in srvlinks.getItems():
-      srvlinks.graph(D, link)
-
-    dia = D.finish()
-    if not self.fs.writeFile(filename + '.html', dia):
-      return
-
-    D = Dia(self.verbose)
-    D.new('dia', name)
-    
-    for j, domain in domains.items():
-      self.domains.graph(D, domain)
-      
-    for i, service in services.getItems():
-      services.graph(D, service)
-
-    for i, link in srvlinks.getItems():
-      srvlinks.graph(D, link)
-
-    D.finish(filename)
-
   def findSources(self, srvlinks, service_from):
     linksFrom = self.srvlinks.filter('service_from', service_from)
     if len(linksFrom) > 0:
@@ -341,7 +238,7 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    return domains, services, srvlinks
+    return domains, services.get(), srvlinks.get()
 
   def filterDomain(self, domain):
     srv = self.services.filter('domain', domain)
@@ -366,7 +263,7 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    return domains, services, srvlinks
+    return domains, services.get(), srvlinks.get()
 
   def graphSequence(self, seq):
     D = Mermaid()
@@ -375,11 +272,10 @@ class Architector():
     self.updates.graphSequence(D, seq, self.services)
     return D.finish()
 
-  def makeAll(self, templatesPath, htmlPath):
+  def makeAll(self, htmlPath):
     self.cnt_files = 0
     self.cnt_writes = 0
     
-    self.templatesPath = os.path.realpath(templatesPath)
     htmlPath = os.path.realpath(htmlPath)
 
     elog = ELog()
@@ -394,67 +290,67 @@ class Architector():
                     'up', 'dia', 'swagger', 'api',
                     'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain'])
 
-    self.fs.rsync(templatesPath + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
-    self.fs.rsync(self.datapath + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
+    self.fs.rsync(self.templatesPath + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
+    self.fs.rsync(self.dataPath + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
-    self.htmlRender('index.html',    '%s/index.html'    % htmlPath)
-    self.htmlRender('domains.html',  '%s/domains.html'  % htmlPath)
-    self.htmlRender('services.html', '%s/services.html' % htmlPath)
-    self.htmlRender('tags.html',     '%s/tags.html'     % htmlPath)
-    self.htmlRender('fsds.html',     '%s/fsds.html'     % htmlPath, prop = {'fsd': self.fsd.getItems()})
-    self.htmlRender('apis.html',     '%s/apis.html'     % htmlPath, prop = {'api': self.api.getItems()})
-    self.htmlRender('errors.html',   '%s/errors.html'   % htmlPath, prop = {'errors': elog.getItems()})
+    self.html.render('index.html',    '%s/index.html'    % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
+    self.html.render('domains.html',  '%s/domains.html'  % htmlPath, {'domains': self.domains.getItems()})
+    self.html.render('services.html', '%s/services.html' % htmlPath, {'services': self.services.getItems()})
+    self.html.render('tags.html',     '%s/tags.html'     % htmlPath, {'tags': self.tags.getItems(), 'services': self.services.getItems()})
+    self.html.render('fsds.html',     '%s/fsds.html'     % htmlPath, {'fsds': self.fsd.getItems()})
+    self.html.render('apis.html',     '%s/apis.html'     % htmlPath, {'apis': self.api.getItems(), 'services': self.services.getItems()})
+    self.html.render('errors.html',   '%s/errors.html'   % htmlPath, {'errors': elog.getItems()})
 
     self.tags.writeJSON('%s/data/tags.json'          % htmlPath)
     self.domains.writeJSON('%s/data/domains.json'    % htmlPath)
     self.services.writeJSON('%s/data/services.json'  % htmlPath)
 
-    text = self.graph()
-    self.fs.writeFile('%s/dia/index.html' % htmlPath, text)
+    self.dia.drawBlockDiagram('index', self.domains.get(), self.services.get(), self.srvlinks.get(), '%s/dia/index' % (htmlPath))
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Domains (%d)..." % self.domains.getCount())
     for j, domain in self.domains.getItems():
       domains, services, srvlinks = self.filterDomain(j)
-      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/domain/%s' % (htmlPath, j.replace('/', '-')))
-      self.htmlRender('domain.html', '%s/domain/%s.html' % (htmlPath, j),
-                       prop = {'domain': domain,
-                               'domain_services': services.getItems()})
+      self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/domain/%s' % (htmlPath, j.replace('/', '-')))
+      self.html.render('domain.html', '%s/domain/%s.html' % (htmlPath, j),
+                        {'domain': domain,
+                         'domains': domains,
+                         'domain_services': services.items()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Tags (%d)..." % self.tags.getCount())
     for j, tag in self.tags.getItems():
       domains, services, srvlinks = self.filterTag(j, j)
-      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/tag/%s' % (htmlPath, j.replace('/', '-')))
+      self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/tag/%s' % (htmlPath, j.replace('/', '-')))
       tag_fsd = self.fsd.filter('tags', j)
-      self.htmlRender('tag.html', '%s/tag/%s.html' % (htmlPath, j),
-                       prop = {'tag': tag,
-                               'fsd': tag_fsd.items(),
-                               'tag_services': services.getItems()})
+      self.html.render('tag.html', '%s/tag/%s.html' % (htmlPath, j),
+                        {'tag': tag,
+                         'fsd': tag_fsd.items(),
+                         'tag_services': services.items()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Services (%d)..." % self.services.getCount())
     for j, service in self.services.getItems():
       domains, services, srvlinks = self.filterService(j, j)
-      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/service/%s' % (htmlPath, j.replace('/', '.')))
+      self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/service/%s' % (htmlPath, j.replace('/', '.')))
 
       linksFrom = self.srvlinks.filter('service_from', j)
       linksTo = self.srvlinks.filter('service_to', j)
       service_api = self.api.filter('service', j)
       service_fsd = self.fsd.filter('services', j)
       service_swaggers = self.swaggers.filter('service', j)
-      self.htmlRender('service.html', '%s/service/%s.html' % (htmlPath, j.replace('/', '-')),
-                       prop = {'service': service,
-                               'fsd': service_fsd.items(),
-                               'swaggers': service_swaggers.items(),
-                               'service_api': service_api.items(),
-                               'links_from': linksFrom.items(),
-                               'links_to': linksTo.items()})
+      self.html.render('service.html', '%s/service/%s.html' % (htmlPath, j.replace('/', '-')),
+                        {'service': service,
+                         'fsd': service_fsd.items(),
+                         'swaggers': service_swaggers.items(),
+                         'service_api': service_api.items(),
+                         'links_from': linksFrom.items(),
+                         'links_to': linksTo.items()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for APIs (%d)..." % self.api.getCount())
     for j, api in self.api.getItems():
-      self.htmlRender('api.html', '%s/api/%s.html' % (htmlPath, api.get('linkin', 'undef')),
+      self.html.render('api.html', '%s/api/%s.html' % (htmlPath, api.get('linkin', 'undef')),
                        prop = {'api': api})
 
     if self.verbose:
@@ -462,36 +358,27 @@ class Architector():
     
     for j, fsd in self.fsd.getItems():
       domains, services, srvlinks = self.filterTag(j, fsd.get('tags', ''))
-      self.drawDiagrams(j, domains, services, srvlinks, '%s/dia/fsd/%s' % (htmlPath, j))
-      self.htmlRender('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
-                       prop = {'fsd': fsd,
-                               'fsd_services': services.getItems()})
+      self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/fsd/%s' % (htmlPath, j))
+      self.html.render('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
+                       {'fsd': fsd,
+                        'fsd_services': services.items()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Swaggers (%d)..." % self.swaggers.getCount())
-    self.htmlRender('swaggers.html', '%s/swaggers.html'     % htmlPath, prop = {'swaggers': self.swaggers.getItems()})
+    self.html.render('swaggers.html', '%s/swaggers.html'     % htmlPath, {'swaggers': self.swaggers.getItems()})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Updates (%d)..." % self.updates.getCount())
-    self.htmlRender('ups.html',      '%s/ups.html'      % htmlPath, prop = {'ups': self.updates.getItems()})
+    self.html.render('ups.html',      '%s/ups.html'      % htmlPath, {'ups': self.updates.getItems()})
     
     if self.verbose:
       print("LOG: Rebuild HTML - OK")
 
     for j, up in self.updates.getItems():
-      text = self.graphSequence(up)
-      self.fs.writeFile('%s/dia/up/%s.html' % (htmlPath, j), text)
-      self.htmlRender('up.html', '%s/up/%s.html' % (htmlPath, j),
-                       prop = {'up': up})
+      text = self.dia.drawSequenceDiagram(j, up, self.services.get(), '%s/dia/up/%s' % (htmlPath, j))
+      self.html.render('up.html', '%s/up/%s.html' % (htmlPath, j),
+                       {'up': up})
     
     self.fs.printStats()
     
 
-  def htmlRender(self, tmplfile, dstfile, prop = {}):
-    #text = self.graph()
-    
-    templateLoader = jinja2.FileSystemLoader(searchpath=self.templatesPath)
-    templateEnv = jinja2.Environment(loader=templateLoader)
-    template = templateEnv.get_template(tmplfile)
-    outputText = template.render(domains = self.domains.getItems(), tags = self.tags.getItems(), services = self.services.getItems(), prop = prop) #, schema = text)
-    self.fs.writeFile(dstfile, outputText)

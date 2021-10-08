@@ -26,12 +26,3 @@ class ServiceLinks(Basic):
         continue
       if s1.get('domain', 's1') == s2.get('domain', 's2'):
         self.m[i]['domain'] = s1.get('domain', '')
-
-  def graph(self, D, link):
-    D.link(link.get('service_from', 'xz'),
-           link.get('service_to', 'xz'),
-           link.get('domain', ''),
-           link.get('tags', ''),
-           link.get('status', ''),
-           link.get('description', ''))
-

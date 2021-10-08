@@ -16,7 +16,7 @@
 
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
-		<h6 class="m-0 font-weight-bold text-primary" id="about">{{ prop['up'].name }}</h6>
+		<h6 class="m-0 font-weight-bold text-primary" id="about">{{ up.name }}</h6>
 	</div>
 	<div class="card-body">
       <div class="card shadow mb-4">
@@ -31,43 +31,43 @@
 <tbody>
 	<tr>
 		<td>Наименование доработки</td>
-		<td>{{ prop['up'].name }}</td>
+		<td>{{ up.name }}</td>
 	</tr>
 	<tr>
 		<td>Описание</td>
-		<td>{{ prop['up'].description }}</td>
+		<td>{{ up.description }}</td>
 	</tr>
 	<tr>
 		<td>API</td>
-		<td>{{ prop['up']['swagger-api'] }}</td>
+		<td>{{ up['swagger-api'] }}</td>
 	</tr>
 	<tr>
 		<td>Метод</td>
-		<td>{{ prop['up']['swagger-api-method'] }}</td>
+		<td>{{ up['swagger-api-method'] }}</td>
 	</tr>
 	<tr>
 		<td>Описание API</td>
-		<td>{{ prop['up']['swagger-api-description'] }}</td>
+		<td>{{ up['swagger-api-description'] }}</td>
 	</tr>
 	<tr>
 		<td>Максимальное количество запросов в секунду</td>
-		<td>{{ prop['up']['max-rps'] }} / {{ prop['up']['max-rps-calc'] }}</td>
+		<td>{{ up['max-rps'] }} / {{ up['max-rps-calc'] }}</td>
 	</tr>
 	<tr>
 		<td>Максимально допустимое количество запросов в секунду</td>
-		<td>{{ prop['up']['max-rps-high'] }} / {{ prop['up']['max-rps-high-calc'] }}</td>
+		<td>{{ up['max-rps-high'] }} / {{ up['max-rps-high-calc'] }}</td>
 	</tr>
 	<tr>
 		<td>Пиковое время ответа для 99% запросов, мс</td>
-		<td>{{ prop['up']['rt99'] }} / {{ prop['up']['rt99-calc'] }}</td>
+		<td>{{ up['rt99'] }} / {{ up['rt99-calc'] }}</td>
 	</tr>
 	<tr>
 		<td>Пиковое время ответа для 95% запросов, мс</td>
-		<td>{{ prop['up']['rt95'] }} / {{ prop['up']['rt95-calc'] }}</td>
+		<td>{{ up['rt95'] }} / {{ up['rt95-calc'] }}</td>
 	</tr>
 	<tr>
 		<td>Доля запросов выполненных с ошибками 5xx, %</td>
-		<td>{{ prop['up']['5xx'] }} / {{ prop['up']['5xx-calc'] }}</td>
+		<td>{{ up['5xx'] }} / {{ up['5xx-calc'] }}</td>
 	</tr>
 </tbody>
 </table>
@@ -76,19 +76,19 @@
    </div>
 </div>
 
-{% with table_title='Входные параметры', table_id='api-parameters', table_rows=prop['up']['swagger-api-parameters'] %}
+{% with table_title='Входные параметры', table_id='api-parameters', table_rows=up['swagger-api-parameters'] %}
   {% include "components/table_up_api_parameters.html" %}
 {% endwith %}
 
-{% with table_title='Выходные данные', table_id='api-responses', table_rows=prop['up']['swagger-api-responses'] %}
+{% with table_title='Выходные данные', table_id='api-responses', table_rows=up['swagger-api-responses'] %}
   {% include "components/table_up_api_response.html" %}
 {% endwith %}
 
-{% with dia_path='up', dia_id=prop['up'].id, dia_name=prop['up'].name, print_png=false %}
+{% with dia_path='up', dia_id=up.id, dia_name=up.name, print_png=false %}
   {% include "components/diagram.html" %}
 {% endwith %}
 
-{% with table_title='Последовательность действий', table_id='sequence', table_rows=prop['up']['sequence'] %}
+{% with table_title='Последовательность действий', table_id='sequence', table_rows=up['sequence'] %}
   {% include "components/table_sequence.html" %}
 {% endwith %}
 

@@ -50,7 +50,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['api'] %}
+{% for i, item in apis %}
                                         <tr>
                                             <td><a href="/api/{{ item.linkin }}.html">{{ item.id }}</a></td>
                                             <td><a href="/service/{{ item.service }}.html">{{ item.service }}</a></td>

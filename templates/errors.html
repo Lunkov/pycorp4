@@ -45,7 +45,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['errors'] %}
+{% for i, item in errors %}
                                         <tr>
                                             <td>{{ item.msgtype }}</td>
                                             <td><a href="/service/{{ item.id }}.html">{{ item.service }}</a></td>

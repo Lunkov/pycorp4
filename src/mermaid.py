@@ -4,9 +4,7 @@
 import codecs
 import logging
 import os
-import yaml
-from csv import reader
-import pylightxl as xl
+
 from urllib.parse import urlencode, quote
 from pprint import pprint
 from datetime import date
@@ -52,86 +50,6 @@ class Mermaid():
      'deprecated':   "fill:#aaaaaa,stroke:#333,stroke-width:2px",
      'ok':           "fill:#00ee00,stroke-width:2px"
     }
-    self.header = """
-          <head>
-
-              <meta charset="utf-8">
-              <meta http-equiv="X-UA-Compatible" content="IE=edge">
-              <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-              <meta name="description" content="">
-              <meta name="author" content="">
-
-              <title>Schema</title>
-
-              <!-- Custom fonts for this template-->
-              <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-              <link
-                  href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-                  rel="stylesheet">
-
-              <!-- Custom styles for this template-->
-              <link href="/css/sb-admin-2.min.css" rel="stylesheet">
-
-          </head>
-          <body id="page-top">
-           <script src="/vendor/jquery/jquery.min.js"></script>
-           <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-           <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-           
-           <script>
-          var services = {};
-          $.getJSON("/data/services.json", function( json ) {
-            services = new Map(Object.entries(json));
-           });
-           
-            var config = {
-            startOnLoad:true,
-            htmlLabels:true,
-            securityLevel: 'loose',
-            flowchart:{
-                    useMaxWidth:false,
-                }
-           };
-           mermaid.initialize(config);
-           mermaid.parseError = function(err,hash){  console.log(err);};
-           
-           var nodeClick = function(id_service) {
-           console.log("**", services);
-           console.log("**", id_service);
-           console.log("**", services.get(id_service));
-              if(services.get(id_service)) {
-                $("#block-name").html(services.get(id_service).name);
-                $("#block-description").html("Описание: " + services.get(id_service).description);
-                $("#block-dialink").html("<a href=\\"/dia/service/"+id_service+".html\\" target=_blank>Схема сервиса</a>");
-                $("#block-link").html("<a href=\\"/service/"+id_service+".html\\" target=_blank>"+services.get(id_service).name+"</a>");
-                $("#block-linkwiki").html("<a href=\\""+services.get(id_service).link+"\\" target=_blank>Wiki</a>");
-                $("#block-swagger").html("<a href=\\""+services.get(id_service).swagger+"\\" target=_blank>Swagger</a>");
-              }
-              $("#block-dlg").modal();
-           }
-           </script>
-            <div class="modal" tabindex="-1" role="dialog" id="block-dlg">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="block-name"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <p id="block-description"></p>
-                    <p id="block-link"></p>
-                    <p id="block-linkwiki"></p>
-                    <p id="block-swagger"></p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
-                </div>
-              </div>
-            </div>             
-        """
 
   def new(self, typeDia, name):
     self.name = name
@@ -248,26 +166,40 @@ class Mermaid():
     self.gLinks[group] = G
 
   def parallelStart(self, group, text):
-
-    if not group in self.gLinks:
-      self.gLinks[group] = ''
-    G = self.gLinks[group]
-    
-    G = G + '%spar %s\n' % (self.tab, text)
-    
-    self.gLinks[group] = G
+    self.blockStart('%spar %s\n', group, text)
 
   def parallelAnd(self, group, text):
+    self.blockStart('%sand %s\n', group, text)
+
+  def parallelFinish(self, group, text):
+    self.blockFinish(group, text)
+
+  def altIf(self, group, text):
+    self.blockStart('%salt %s\n', group, text)
+
+  def altElse(self, group, text):
+    self.blockStart('%selse %s\n', group, text)
+
+  def altEnd(self, group, text):
+    self.blockFinish(group, text)
+
+  def optIf(self, group, text):
+    self.blockStart('%sopt %s\n', group, text)
+
+  def optEnd(self, group, text):
+    self.blockFinish(group, text)
+    
+  def blockStart(self, block, group, text):
 
     if not group in self.gLinks:
       self.gLinks[group] = ''
     G = self.gLinks[group]
     
-    G = G + '%sand %s\n' % (self.tab, text)
+    G = G + (block % (self.tab, text))
     
     self.gLinks[group] = G
 
-  def parallelFinish(self, group, text):
+  def blockFinish(self, group, text):
 
     if not group in self.gLinks:
       self.gLinks[group] = ''
@@ -277,8 +209,8 @@ class Mermaid():
     
     self.gLinks[group] = G
 
-  def drawFlow(self, G):
-    G = G + "\nflowchart LR\n"
+  def drawFlow(self):
+    G = "flowchart LR\n"
     for i in self.gNodes:
       if i in self.gGroups:
         G = G + self.gGroups[i]
@@ -287,8 +219,8 @@ class Mermaid():
         G = G + self.tab + 'end\n'
     return G
   
-  def drawSequence(self, G):
-    G = G + "\nsequenceDiagram\n%sautonumber\n" % self.tab
+  def drawSequence(self):
+    G = "sequenceDiagram\n%sautonumber\n" % self.tab
     for i, v in self.gNodes.items():
       G = G + v
     for i, v in self.gLinks.items():
@@ -296,15 +228,11 @@ class Mermaid():
     return G
   
   def finish(self):
-    G = self.header
-    G = G + ("<div class=\"mermaid\" id=\"%s\">" % self.name)
     if self.typeDia == 'flowLR':
-      G = self.drawFlow(G)
+      return self.drawFlow()
 
     if self.typeDia == 'sequence':
-      G = self.drawSequence(G)
+      return self.drawSequence()
 
-    G = G + '</div>\n</body>\n'
-
-    return G
+    return ''
 

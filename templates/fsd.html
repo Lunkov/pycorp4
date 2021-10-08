@@ -13,78 +13,15 @@
 
 <div class="container-fluid">
 
-<h1>Функциональное требование: {{ prop['fsd'].name }}</h1>
+<h1>Функциональное требование: {{ fsd.name }}</h1>
 
-<p>{{ prop['fsd'].description }}</p>
+<p>{{ fsd.description }}</p>
 
-<!-- DataTales  -->
-<script>
-// Call the dataTables jQuery plugin
-$(document).ready(function() {
-  $('#dataTableSRV').DataTable();
-});
-</script>
+{% with table_title='Перечень сервисов', table_id='fsd_services', table_rows=fsd_services %}
+  {% include "components/table_service.html" %}
+{% endwith %}
 
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Перечень сервисов</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTableSRV" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Domain</th>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Type</th>
-                                            <th>Layer</th>
-                                            <th>Status</th>
-                                            <th>Wiki</th>
-                                            <th>Swagger</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Domain</th>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Type</th>
-                                            <th>Layer</th>
-                                            <th>Status</th>
-                                            <th>Wiki</th>
-                                            <th>Swagger</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-{% for i, item in prop['fsd_services'] %}
-                                        <tr>
-                                            <td>{{ item.id }}</td>
-                                            <td>{{ item.domain }}</td>
-                                            <td><a href="/service/{{ item.id }}.html">{{ item.name }}</a></td>
-                                            <td>{{ item.description }}</td>
-                                            <td>{{ item.type }}</td>
-                                            <td>{{ item.layer }}</td>
-                                            <td>{{ item.status }}</td>
-                                            <td><a href="{{ item.link }}">Wiki</a></td>
-										{% if item.swagger|length %}
-										  <td><a href="{{ item.swagger }}" target=_blank>Swagger</a></td>
-										{% else %}
-										  <td>&#128533;</td>
-										{% endif %}
-
-                                        </tr>
-{% endfor %}
-                                        
-                                    </tbody>
-                                </table>
-                    </div>
-              </div>
-            </div>
-
-{% with dia_path='fsd', dia_id=prop['fsd'].id, dia_name=prop['fsd'].name %}
+{% with dia_path='fsd', dia_id=fsd.id, dia_name=fsd.name %}
   {% include "components/diagram.html" %}
 {% endwith %}
 

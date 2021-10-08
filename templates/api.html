@@ -13,7 +13,7 @@
 
 <div class="container-fluid">
 
-<h1>{{ prop['api'].service }}: {{ prop['api'].method }} {{ prop['api'].api }}</h1>
+<h1>{{ api.service }}: {{ api.method }} {{ api.api }}</h1>
 
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
@@ -45,16 +45,16 @@
 <tbody>
 	<tr>
 		<td>Описание API</td>
-		<td>{{ prop['api'].description }}</td>
+		<td>{{ api.description }}</td>
 	</tr>
 	<tr>
 		<td>Сервис</td>
-		<td><a href="/service/{{ prop['api'].service }}.html">{{ prop['api'].service }}</a></td>
+		<td><a href="/service/{{ api.service }}.html">{{ api.service }}</a></td>
 	</tr>
 	<tr>
 		<td>Описание API</td>
-		{% if prop['api'].link|length %}
-      	  <td><a href="{{ prop['api'].link }}" target=_blank>Swagger</a></td>
+		{% if api.link|length %}
+      	  <td><a href="{{ api.link }}" target=_blank>Swagger</a></td>
 		{% else %}
 		  <td>&#128533;</td>
 		{% endif %}

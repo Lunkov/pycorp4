@@ -14,7 +14,7 @@
 
 <div class="container-fluid">
 
-<h1>Домен: {{ prop['domain'].name }}</h1>
+<h1>Домен: {{ domain.name }}</h1>
 
 
 <div class="card shadow mb-4">
@@ -49,11 +49,11 @@
 <tbody>
 	<tr>
 		<td>Описание</td>
-		<td>{{ prop['domain'].description }}</td>
+		<td>{{ domain.description }}</td>
 	</tr>
 	<tr>
 		<td>Описание Домена</td>
-		<td><a href="{{ prop['domain'].link }}" target=_blank>Wiki</a></td>
+		<td><a href="{{ domain.link }}" target=_blank>Wiki</a></td>
 	</tr>
 </tbody>
 </table>
@@ -62,12 +62,12 @@
 </div>
 
 
-{% with table_title='Сервисы домена', table_id='services', table_rows=prop['domain_services'] %}
+{% with table_title='Сервисы домена', table_id='services', table_rows=domain_services %}
   {% include "components/table_service.html" %}
 {% endwith %}
 
 
-{% with dia_path='domain', dia_id=prop['domain'].id, dia_name=prop['domain'].name, print_png=true %}
+{% with dia_path='domain', dia_id=domain.id, dia_name=domain.name, print_png=true %}
   {% include "components/diagram.html" %}
 {% endwith %}
 

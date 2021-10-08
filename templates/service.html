@@ -13,7 +13,7 @@
 
 <div class="container-fluid">
 
-<h1>Сервис: {{ prop['service'].name }}</h1>
+<h1>Сервис: {{ service.name }}</h1>
 
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
@@ -51,16 +51,16 @@
 <tbody>
 	<tr>
 		<td>Описание сервиса</td>
-		<td>{{ prop['service'].description }}</td>
+		<td>{{ service.description }}</td>
 	</tr>
 	<tr>
 		<td>Описание сервиса</td>
-		<td><a href="{{ prop['service'].link }}" target=_blank>Wiki</a></td>
+		<td><a href="{{ service.link }}" target=_blank>Wiki</a></td>
 	</tr>
 	<tr>
 		<td>Описание API</td>
-		{% if prop['service'].swagger|length %}
-		  <td><a href="{{ prop['service'].swagger }}" target=_blank>Swagger</a></td>
+		{% if service.swagger|length %}
+		  <td><a href="{{ service.swagger }}" target=_blank>Swagger</a></td>
 		{% else %}
 		  <td>&#128533;</td>
 		{% endif %}
@@ -118,7 +118,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['fsd'] %}
+{% for i, item in fsd %}
                                         <tr>
                                             <td>{{ item.id }}</td>
                                             <td>{{ item.name }}</td>
@@ -170,7 +170,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['links_from'] %}
+{% for i, item in links_from %}
                                         <tr>
                                             <td>{{ item.service_to }}</td>
                                             <td>{{ item.description }}</td>
@@ -220,7 +220,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['links_to'] %}
+{% for i, item in links_to %}
                                         <tr>
                                             <td>{{ item.service_from }}</td>
                                             <td>{{ item.description }}</td>
@@ -269,7 +269,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['swaggers'] %}
+{% for i, item in swaggers %}
                                         <tr>
                                             <td><a href="/swaggers/{{ item.id }}.html">{{ item.service }}</a></td>
                                             <td>{{ item.version }}</td>
@@ -312,7 +312,7 @@ $(document).ready(function() {
                                         </tr>
                                     </tfoot>
                                     <tbody>
-{% for i, item in prop['service_api'] %}
+{% for i, item in service_api %}
                                         <tr>
                                             <td><a href="/api/{{ item.linkin }}.html">{{ item.api }}</a></td>
                                             <td>{{ item.method }}</td>
@@ -329,7 +329,7 @@ $(document).ready(function() {
             </div>
 
             
-{% with dia_path='service', dia_id=prop['service'].id, dia_name=prop['service'].name, print_png=true %}
+{% with dia_path='service', dia_id=service.id, dia_name=service.name, print_png=true %}
   {% include "components/diagram.html" %}
 {% endwith %}
 		</div>

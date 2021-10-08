@@ -78,7 +78,7 @@ class CommandArgs(object):
 
 def main(options):
   ''' Main Function '''
-  arc = Architector(options.path, options.verbose)
+  arc = Architector(options.templates, options.path, options.verbose)
   if options.xls:
     arc.readXLS(options.xls)
 
@@ -92,7 +92,7 @@ def main(options):
     arc.analyze()
 
   if options.out:
-    arc.makeAll(options.templates, options.out)
+    arc.makeAll(options.out)
 
 if __name__ == '__main__':
   ARGS = CommandArgs(os.path.basename(__file__))

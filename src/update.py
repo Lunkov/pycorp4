@@ -97,6 +97,16 @@ class Updates(Basic):
       for v in seq['sequence']:
         if 'parallel-start' in v:
           D.parallelStart('main', v['parallel-start'])
+        if 'alt-if' in v:
+          D.altIf('main', v['alt-if'])
+        if 'alt-else' in v:
+          D.altElse('main', v['alt-else'])
+        if 'alt-end' in v:
+          D.altEnd('main', v['alt-end'])
+        if 'opt-if' in v:
+          D.optIf('main', v['opt-if'])
+        if 'opt-end' in v:
+          D.optIf('main', v['opt-end'])
         if 'parallel-and' in v:
           D.parallelAnd('main', v['parallel-and'])
         if 'from' in v:
