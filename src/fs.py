@@ -15,6 +15,27 @@ class FS():
     self.verbose = verbose
     self.cnt_files = 0
     self.cnt_writes = 0
+    self.pathHTML = ''
+    self.pathData = ''
+    self.pathTemplates = ''
+
+  def setPathHTML(self, p):
+    self.pathHTML = p
+
+  def getPathHTML(self):
+    return self.pathHTML
+
+  def setPathData(self, p):
+    self.pathData = p
+
+  def getPathData(self):
+    return self.pathData
+
+  def setPathTemplates(self, p):
+    self.pathTemplates = p
+
+  def getPathTemplates(self):
+    return self.pathTemplates
 
   def md5File(self, fname):
     hash_md5 = hashlib.md5()

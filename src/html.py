@@ -4,12 +4,11 @@
 import jinja2
 
 class HTML():
-  def __init__ (self, templatesPath, fs, verbose):
+  def __init__ (self, fs, verbose):
     self.verbose = verbose
-    self.templatesPath = templatesPath
     self.fs = fs
     self.templates = {}
-    self.templateLoader = jinja2.FileSystemLoader(searchpath = self.templatesPath)
+    self.templateLoader = jinja2.FileSystemLoader(searchpath = self.fs.getPathTemplates())
     self.templateEnv = jinja2.Environment(loader = self.templateLoader)
 
   def render(self, tmplfile, dstfile, prop = {}):
@@ -18,3 +17,5 @@ class HTML():
 
     self.fs.writeFile(dstfile, self.templates[tmplfile].render(prop))
 
+  def getTemplatePath():
+    return self.templatesPath

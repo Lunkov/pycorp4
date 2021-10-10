@@ -3,8 +3,6 @@
 
 import logging
 import os
-import yaml
-from csv import reader
 import pylightxl as xl
 from urllib.parse import urlencode, quote
 from pprint import pprint
@@ -26,21 +24,12 @@ from .fs import FS
 from .html import HTML
 
 import re
-import hashlib
-import jinja2
-
-import graphviz
-import networkx as nx
-from netwulf import visualize
-from pyvis.network import Network
-from diagrams import Diagram
-
 
 
 class Architector():
-  def __init__ (self, templatesPath, dataPath, verbose):
-    self.dataPath = os.path.realpath(dataPath)
-    self.templatesPath = os.path.realpath(templatesPath)
+  def __init__ (self, fs, verbose):
+    self.fs = fs
+
     self.verbose = verbose
     self.domains = Domains()
     self.api = API()
@@ -51,8 +40,8 @@ class Architector():
     self.fsd = FSD()
     self.swaggers = Swaggers(verbose)
     self.updates = Updates(verbose)
-    self.fs = FS(verbose)
-    self.html = HTML(self.templatesPath, self.fs, verbose)
+
+    self.html = HTML(self.fs, verbose)
     self.dia = FabricDia(self.fs, self.html, verbose)
 
   def loadServices(self, fileServices):
@@ -78,7 +67,7 @@ class Architector():
     return today.strftime("%Y-%m-%d")
   
   def loadData(self):
-    self.swaggers.load(os.path.join(self.dataPath, 'swaggers'))
+    self.swaggers.load(os.path.join(self.fs.getPathData(), 'swaggers'))
     for i, sw in self.swaggers.getItems():
       if not 'swagger-data' in sw:
         pprint(sw)
@@ -103,7 +92,7 @@ class Architector():
           title = method.upper() + ' ' + path
           self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'fact', 'method': method.upper(), 'url': path, 'description': desc} )
 
-    self.updates.load(os.path.join(self.dataPath, 'updates'))
+    self.updates.load(os.path.join(self.fs.getPathData(), 'updates'))
     self.updates.calc(self.services)
     res = self.updates.makeSwaggers()
     for i, sw in res.items():
@@ -152,7 +141,7 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    uploader = Uploader('%s/swaggers' % self.dataPath, self.verbose)
+    uploader = Uploader('%s/swaggers' % self.fs.getPathData(), self.verbose)
     for i, service in self.services.getItems():
       if 'swagger' in service:
         uploader.updateSwagger(service)
@@ -272,11 +261,11 @@ class Architector():
     self.updates.graphSequence(D, seq, self.services)
     return D.finish()
 
-  def makeAll(self, htmlPath):
+  def makeAll(self):
     self.cnt_files = 0
     self.cnt_writes = 0
     
-    htmlPath = os.path.realpath(htmlPath)
+    htmlPath = self.fs.getPathHTML()
 
     elog = ELog()
     if self.verbose:
@@ -290,8 +279,8 @@ class Architector():
                     'up', 'dia', 'swagger', 'api',
                     'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain'])
 
-    self.fs.rsync(self.templatesPath + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
-    self.fs.rsync(self.dataPath + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
+    self.fs.rsync(self.fs.getPathTemplates() + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
+    self.fs.rsync(self.fs.getPathData() + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
     self.html.render('index.html',    '%s/index.html'    % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
     self.html.render('domains.html',  '%s/domains.html'  % htmlPath, {'domains': self.domains.getItems()})

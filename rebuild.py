@@ -4,6 +4,7 @@
 import os
 import optparse
 
+from src.fs import FS
 from src.architector import Architector
 
 
@@ -78,7 +79,16 @@ class CommandArgs(object):
 
 def main(options):
   ''' Main Function '''
-  arc = Architector(options.templates, options.path, options.verbose)
+  fs = FS(options.verbose)
+  
+  if options.path:
+    fs.setPathData(options.path)
+  if options.templates:
+    fs.setPathTemplates(options.templates)
+  if options.out:
+    fs.setPathHTML(options.out)
+
+  arc = Architector(fs, options.verbose)
   if options.xls:
     arc.readXLS(options.xls)
 
@@ -92,7 +102,7 @@ def main(options):
     arc.analyze()
 
   if options.out:
-    arc.makeAll(options.out)
+    arc.makeAll()
 
 if __name__ == '__main__':
   ARGS = CommandArgs(os.path.basename(__file__))

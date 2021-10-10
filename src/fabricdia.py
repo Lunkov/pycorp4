@@ -4,10 +4,7 @@
 import codecs
 import logging
 import os
-import yaml
 from pprint import pprint
-
-import hashlib
 
 from .mermaid import Mermaid
 from .mermaidCLI import MermaidCLI
@@ -52,6 +49,7 @@ class FabricDia():
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
 
+    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
     self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
 
     D = Dia(self.verbose)
@@ -80,7 +78,7 @@ class FabricDia():
              link.get('status', ''),
              link.get('description', ''))
 
-    D.finish(filename)
+    D.finish(filename+'.dia')
 
   def drawSequenceDiagram(self, name, seq, services, filename):
     D = Mermaid()
