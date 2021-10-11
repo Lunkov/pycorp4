@@ -33,15 +33,14 @@ class MermaidCLI():
     # Volumes
     volumes = dict()
     volumes[os.path.abspath(pathDia)] = {'bind': '/data'}
-    pprint(pathDia)
-    pprint(volumes)
 
     try:
       if self.verbose:
         print("LOG: Docker: Run '%s' container. Command: %s" % (self.src, command))
       container = self.docker.containers.run(self.src, command=command, volumes=volumes, detach=False, user='root', auto_remove=True)
       
-      print("LOG: %s" % container)
+      if self.verbose:
+        print("LOG: %s" % container)
 
     except Exception as e:
       print("FATAL: Docker run container '%s': %s" % (self.src, str(e)))

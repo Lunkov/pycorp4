@@ -45,7 +45,8 @@ function zoomFrame(x) {
 		<div class="d-inline">
 		<button type="button" onclick="zoomFrame(1)">- ZOOM OUT</button>
 		<button type="button" onclick="zoomFrame(-1)">+ ZOOM IN</button>
-		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.html')" formtarget="_blank">VIEW</button>
+		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.html')" formtarget="_blank">Просмотр SVG</button>
+		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.mmd.png')" formtarget="_blank">Просмотр PNG</button>
 		</div>
 		<div id="iframe_container">
 		 <iframe border=1 id="schemaiframe" class="" src="/dia/{{ dia_path }}/{{ dia_id }}.html" title="{{ dia_name }}" allowfullscreen style="min-height: 800px; max-width: 100%; width: 100%; height: 100%;"></iframe> 
@@ -62,7 +63,7 @@ function zoomFrame(x) {
 	<div class="card-body">
       <div class="card shadow mb-4">
 		<div id="iframe_container">
-		 <img border=0 src="/dia/{{ dia_path }}/{{ dia_id }}.png" title="{{ dia_name }}" width=100%> 
+		 <img border=0 src="/dia/{{ dia_path }}/{{ dia_id }}.dia.png" title="{{ dia_name }}" width=100%> 
 		</div>
 	  </div>
    </div>

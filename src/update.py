@@ -106,7 +106,7 @@ class Updates(Basic):
         if 'opt-if' in v:
           D.optIf('main', v['opt-if'])
         if 'opt-end' in v:
-          D.optIf('main', v['opt-end'])
+          D.optEnd('main', v['opt-end'])
         if 'parallel-and' in v:
           D.parallelAnd('main', v['parallel-and'])
         if 'from' in v:

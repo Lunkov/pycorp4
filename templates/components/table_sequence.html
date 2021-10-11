@@ -44,14 +44,26 @@
 						<td>
 							{{ item['parallel-start'] }}
 							{{ item['parallel-and'] }}
-							{{ item['parallel-finish'] }}
+							{% if item['parallel-finish'] %}
+							Завершение блока
+							{% endif %}
 						</td>
 						<td>
-							{{ item['alt-if'] }}
-							{{ item['alt-else'] }}
+							{% if item['alt-if']|length %}
+							ЕСЛИ: {{ item['alt-if'] }}
+							{% endif %}
+							{% if item['alt-else']|length %}
+							ИНАЧЕ: {{ item['alt-else'] }}
+							{% endif %}
+							{% if item['alt-end'] %}
 							{{ item['alt-end'] }}
-							{{ item['opt-if'] }}
-							{{ item['opt-end'] }}
+							{% endif %}
+							{% if item['opt-if']|length %}
+							ЕСЛИ: {{ item['opt-if'] }}
+							{% endif %}
+							{% if item['opt-end'] %}
+							Завершение "ЕСЛИ"
+							{% endif %}
 						</td>
 					</tr>
 {% endfor %}
