@@ -22,11 +22,11 @@
 					<tr>
 						<th>Шаг</th>
 						<th>От сервиса</th>
-						<th>Запрос к сервису</th>
+						<th>Тип</th>
+						<th>К сервису</th>
 						<th>Описание</th>
 						<th>Вызываемое API</th>
 						<th>Ответ</th>
-						<th>Тип</th>
 						<th>Параллельное выполнение</th>
 						<th>Условие</th>
 					</tr>
@@ -36,11 +36,11 @@
 					<tr>
 						<td>{{ loop.index }}</td>
 						<td><a href="/service/{{ item.from }}.html">{{ item.from }}</a></td>
+						<td>{{ typeReq[item.type] }}</td>
 						<td><a href="/service/{{ item.to }}.html">{{ item.to }}</a></td>
 						<td>{{ item.description }}</td>
 						<td>{{ item.api }}</td>
 						<td>{{ item.answer }}</td>
-						<td>{{ typeReq[item.type] }}</td>
 						<td>
 							{{ item['parallel-start'] }}
 							{{ item['parallel-and'] }}
