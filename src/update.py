@@ -12,7 +12,7 @@ class Updates(Basic):
     super(Updates, self).__init__()
     self.name = 'update'
     self.ids = ['name', 'service', 'version', 'plan']
-    self.fields = ['id', 'code', 'name', 'service', 'plan', 'version', 'sequence', 'status', 'swagger', 'swagger-api', 'swagger-api-method', 'swagger-api-parameters', 'swagger-api-response', 'swagger-api-description']
+    self.fields = ['id', 'code', 'name', 'service', 'url', 'plan', 'version', 'sequence', 'status', 'swagger', 'swagger-api', 'swagger-api-method', 'swagger-api-parameters', 'swagger-api-response', 'swagger-api-description']
     self.verbose = verbose
 
   def updateProp(self, prop):
