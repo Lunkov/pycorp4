@@ -48,7 +48,7 @@ $(document).ready(function() {
                                     <tbody>
 {% for i, item in swaggers %}
                                         <tr>
-                                            <td><a href="/swaggers/{{ item.id }}.html">{{ item.service }}</a></td>
+                                            <td><a href="/swaggers/{{ item.id }}.html">{{ item.service }}</a>&nbsp;<a href="/service/{{ item.service }}.html">&#11041;</a></td>
                                             <td>{{ item.version }}</td>
                                             <td>{{ item.plan }}</td>
                                             <td>{{ item.fact }}</td>

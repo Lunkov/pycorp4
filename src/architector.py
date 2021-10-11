@@ -227,7 +227,9 @@ class Architector():
     ldmn = services.getVariants('domain')
     domains = self.domains.filter('id', ldmn)
     
-    return domains, services.get(), srvlinks.get()
+    srvsIds = services.getVariants('id')
+    
+    return domains, services.get(), srvlinks.get(), self.updates.filter('service', srvsIds)
 
   def filterDomain(self, domain):
     srv = self.services.filter('domain', domain)
@@ -320,7 +322,7 @@ class Architector():
     if self.verbose:
       print("LOG: Rebuilding HTML for Services (%d)..." % self.services.getCount())
     for j, service in self.services.getItems():
-      domains, services, srvlinks = self.filterService(j, j)
+      domains, services, srvlinks, ups = self.filterService(j, j)
       self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/service/%s' % (htmlPath, j.replace('/', '.')))
 
       linksFrom = self.srvlinks.filter('service_from', j)
@@ -330,6 +332,7 @@ class Architector():
       service_swaggers = self.swaggers.filter('service', j)
       self.html.render('service.html', '%s/service/%s.html' % (htmlPath, j.replace('/', '-')),
                         {'service': service,
+                         'ups': ups.items(),
                          'fsd': service_fsd.items(),
                          'swaggers': service_swaggers.items(),
                          'service_api': service_api.items(),

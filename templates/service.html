@@ -28,6 +28,7 @@
 		  <li><a href="#output">Потребители данных</a></li>
 		  <li><a href="#swaggers">Swaggers</a></li>
 		  <li><a href="#api">API сервиса</a></li>
+		  <li><a href="#ups">КД сервиса</a></li>
 		  <li><a href="#schemaiframe">Схема</a></li>
 		</ul>
 	  </div>
@@ -328,6 +329,9 @@ $(document).ready(function() {
               </div>
             </div>
 
+{% with table_title='Список КД', table_id='ups', table_rows=ups %}
+  {% include "components/table_ups.html" %}
+{% endwith %}
             
 {% with dia_path='service', dia_id=service.id, dia_name=service.name, print_png=true %}
   {% include "components/diagram.html" %}

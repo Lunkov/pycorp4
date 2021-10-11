@@ -112,4 +112,5 @@ class FabricDia():
     dia = D.finish()
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
+    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
     self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})

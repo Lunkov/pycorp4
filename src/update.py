@@ -169,3 +169,14 @@ class Updates(Basic):
               pass
 
         self.m[j]['sequence'][k]['status'] = status
+
+      if self.m[j]['max-rps-calc'] == 9999999999:
+        self.m[j]['max-rps-calc'] = 'не определено'
+      if self.m[j]['max-rps-high-calc'] == 9999999999:
+        self.m[j]['max-rps-high-calc'] = 'не определено'
+      if self.m[j]['rt99-calc'] == 0:
+        self.m[j]['rt99-calc'] = 'не определено'
+      if self.m[j]['rt95-calc'] == 0:
+        self.m[j]['rt95-calc'] = 'не определено'
+      if self.m[j]['5xx-calc'] == 0:
+        self.m[j]['5xx-calc'] = 'не определено'

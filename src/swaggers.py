@@ -12,11 +12,13 @@ class Swaggers(Basic):
     self.m = {}
     self.name = 'swaggers'
     self.ids = ['service', 'version']
-    self.fields = ['id', 'service', 'plan', 'fact', 'version', 'swagger-data']
+    self.fields = ['id', 'service', 'plan', 'fact', 'version', 'swagger-data', 'hash']
     self.verbose = verbose
 
   def load(self, swaggerpath):
     fp = os.path.abspath(swaggerpath)
+    self.readJSON('%s/all.json' % fp)
+    fp
     if self.verbose:
       print("LOG: Swaggers: Scaning folder '%s'..." % fp)
     try:
@@ -32,14 +34,17 @@ class Swaggers(Basic):
           prop['swagger-data'] = sw.get()
           prop['plan'] = False
           prop['fact'] = True
-          key = self.genId(prop)
+          # key = self.genId(prop)
+          key = sw.hash()
           prop['id'] = key
+          prop['hash'] = sw.hash()
           
           if key != '':
             self.addItem(key, prop)
 
     except Exception as err:
       print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))
+    self.writeJSON('%s/all.json' % fp)
 
   def updateSwagger(self, service, sw):
     if service['swagger'] == '':

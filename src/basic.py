@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import codecs
 import json
 import hashlib
@@ -206,5 +207,10 @@ class Basic():
       irow = irow + 1
 
   def writeJSON(self, filename):
-    with open(filename, 'w') as outfile:
+    with codecs.open(filename, 'w', 'utf-8') as outfile:
       json.dump(self.m, outfile)
+
+  def readJSON(self, filename):
+    if os.path.isfile(filename):
+      with codecs.open(filename, 'r', 'utf-8') as infile:
+        self.m = json.load(infile)
