@@ -141,7 +141,7 @@ class Architector():
   def updateOnlineData(self):
     if self.verbose:
       print("LOG: Updating online data...")
-    uploader = Uploader('%s/swaggers' % self.fs.getPathData(), self.verbose)
+    uploader = Uploader(self.fs, '%s/swaggers' % self.fs.getPathData(), self.verbose)
     for i, service in self.services.getItems():
       if 'swagger' in service:
         uploader.updateSwagger(service)

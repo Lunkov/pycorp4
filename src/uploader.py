@@ -17,11 +17,11 @@ from .fs import FS
 from .elog import ELog
 
 class Uploader():
-  def __init__ (self, savepath, verbose):
+  def __init__ (self, fs, savepath, verbose):
     self.verbose = verbose
     self.savepath = savepath
     self.etc = {}
-    self.fs = FS(verbose)
+    self.fs = fs
     fileconfig = 'etc/swagger_auth.yaml'
     if os.path.isfile(fileconfig):
       with open(fileconfig, 'r') as stream:
@@ -31,6 +31,8 @@ class Uploader():
           print("ERR: Bad format in %s: %s" % (fileconfig, exc))
 
   def updateSwagger(self, service):
+    if len(service['swagger']) < 10:
+      return False
     data, ok = self.upload(service['swagger'])
     if not ok:
       return False
@@ -78,19 +80,20 @@ class Uploader():
     x = None
     contentType =  ''
     try:
+      if self.verbose:
+        print("LOG: Download swagger from '%s'" % (url))
       header, auth = self.auth(url)
       x = requests.get(url = url, headers = header, auth = auth)
       contentType = x.headers['content-type']
     except Exception as e:
       print("ERR: HTTP '%s' (type='%s'): %s" % (url, contentType, str(e)))
-    
+
     ok = False
     if (not x is None) and (x.status_code == 200):
       self.data, ok = self.parseUpload(url, contentType, x.text)
+      if not ok:
+        print("ERR: Swagger parse '%s': %s" % (url, x))
 
-    if not ok:
-      print("ERR: Swagger parse '%s': %s" % (url, x))
-      
     return self.data, ok
 
   def parseUpload(self, url, contentType, content):
@@ -98,15 +101,15 @@ class Uploader():
     contentType =  ''
     ok = False
     try:
-      print(contentType)
+      
       if ('application/octet-stream' in contentType) or ('.yaml' in url) or ('.yml' in url): 
         data = yaml.safe_load(content)
-        ok = True
+        return data, True
     except Exception as e:
       print("ERR: Swagger parse '%s' (type='%s'/yaml): %s" % (url, contentType, str(e)))
 
     try:
-      if (len(data) < 1) and (('application/json' in contentType) or ('.json' in url)):
+      if ('application/json' in contentType) or ('.json' in url)  :
         data = json.loads(content)
         ok = True
     except Exception as e:
