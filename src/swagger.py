@@ -16,7 +16,8 @@ from pprint import pprint
 from .elog import ELog
 
 class Swagger():
-  def __init__ (self):
+  def __init__ (self, verbose):
+    self.verbose = verbose
     self.data = {}
 
   def get(self):
@@ -41,8 +42,10 @@ class Swagger():
 
   def load(self, filename):
     self.data = {}
-    
-    with open(filename, 'r') as stream:
+    if self.verbose:
+      print("LOG: Swagger load '%s'..." % filename)
+
+    with codecs.open(filename, 'r', encoding='utf-8') as stream:
       try:
         self.data = yaml.safe_load(stream)
 

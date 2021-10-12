@@ -17,15 +17,17 @@ class Swaggers(Basic):
 
   def load(self, swaggerpath):
     fp = os.path.abspath(swaggerpath)
-    self.readJSON('%s/all.json' % fp)
-    fp
+    fsws = '%s.all.json' % fp
+    if self.verbose:
+      print("LOG: Swaggers read '%s'..." % fsws)
+    self.readJSON(fsws)
     if self.verbose:
       print("LOG: Swaggers: Scaning folder '%s'..." % fp)
     try:
-      sw = Swagger()
+      sw = Swagger(self.verbose)
       for path in Path(fp).rglob('*.yaml'):
         fullPath = os.path.join(fp, path.parent, path.name)
-        if not os.path.isdir(fullPath):
+        if os.path.isfile(fullPath):
           sw.load(fullPath)
 
           prop = {}
@@ -44,7 +46,10 @@ class Swaggers(Basic):
 
     except Exception as err:
       print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))
-    self.writeJSON('%s/all.json' % fp)
+
+    if self.verbose:
+      print("LOG: Swaggers write '%s'..." % fsws)
+    self.writeJSON(fsws)
 
   def updateSwagger(self, service, sw):
     if service['swagger'] == '':
