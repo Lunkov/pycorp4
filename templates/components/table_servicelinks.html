@@ -16,28 +16,20 @@ $(document).ready(function() {
 			<table class="table table-bordered" id="dataTable-{{ table_id }}" width="100%" cellspacing="0">
 				<thead>
 					<tr>
-						<th>Идентификатор</th>
-						<th>Домен</th>
-						<th>Имя</th>
+						<th>Сервис</th>
 						<th>Описание</th>
-						<th>Тип</th>
-						<th>Тэги</th>
-						<th>Слой</th>
 						<th>Статус</th>
+						<th>Тэги</th>
 						<th>Wiki</th>
 						<th>Swagger</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
-						<th>Идентификатор</th>
-						<th>Домен</th>
-						<th>Имя</th>
+						<th>Сервис</th>
 						<th>Описание</th>
-						<th>Тип</th>
-						<th>Тэги</th>
-						<th>Слой</th>
 						<th>Статус</th>
+						<th>Тэги</th>
 						<th>Wiki</th>
 						<th>Swagger</th>
 					</tr>
@@ -45,24 +37,20 @@ $(document).ready(function() {
 				<tbody>
 {% for i, item in table_rows %}
 					<tr>
-						<td>{{ item.id }}</td>
-						<td>{{ item.domain }}</td>
-						<td><a href="/service/{{ item.id }}.html">{{ item.name }}</a></td>
+						<td><a href="/service/{{ item[service_name] }}.html">{{ item[service_name] }}</a></td>
 						<td>{{ item.description }}</td>
-						<td>{{ item.type }}</td>
+						<td>{{ item.status }}</td>
 						<td>
 							{% for tag in item.tags %}
 							  <a href="/tag/{{ tag }}.html">{{ tag }}</a>,
 							{% endfor %}
 						</td>
-						<td>{{ item.layer }}</td>
-						<td>{{ item.status }}</td>
-						<td><a href="{{ item.link }}">Wiki</a></td>
-					{% if item.swagger|length %}
-					  <td><a href="{{ item.swagger }}" target=_blank>Swagger</a></td>
-					{% else %}
-					  <td>&#128533;</td>
-					{% endif %}
+						<td><a href="{{ item.link }}" target=_blank>Wiki</a></td>
+						{% if item.swagger|length %}
+						  <td><a href="{{ item.swagger }}" target=_blank>Swagger</a></td>
+						{% else %}
+						  <td>&#128533;</td>
+						{% endif %} 
 
 					</tr>
 {% endfor %}
