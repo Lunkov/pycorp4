@@ -59,7 +59,11 @@ $(document).ready(function() {
                                             <td>{{ item.date }}</td>
                                             <td>{{ item.descripton }}</td>
                                             <td>{{ item.status }}</td>
-                                            <td>{{ item.tags }}</td>
+                                            <td>
+												{% for tag in item.tags %}
+												  <a href="/tag/{{ tag }}.html">{{ tag }}</a>,
+												{% endfor %}
+   										    </td>
                                             <td>{{ item.services }}</td>
                                             {% if item.link|length %}
                                               <td><a href="{{ item.link }}" target=_blank>Link</a></td>
