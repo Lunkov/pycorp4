@@ -38,7 +38,7 @@ class Swagger():
     return self.data['info']['title']
 
   def hash(self):
-    return hashlib.md5(json.dumps(self.data, sort_keys=True).encode('utf-8')).hexdigest()
+    return hashlib.md5(json.dumps(self.data, sort_keys=True, default=str).encode('utf-8')).hexdigest()
 
   def loadYAML(self, filename):
     self.data = {}
@@ -51,7 +51,7 @@ class Swagger():
 
       except yaml.YAMLError as exc:
         print("ERR: Bad format in %s: %s" % (filename, exc))        
-        return {}, False
+        return self.data, False
 
     return self.data, True
 

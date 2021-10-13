@@ -209,7 +209,7 @@ class Basic():
   def writeJSON(self, filename):
     try:
       with codecs.open(filename, 'w', 'utf-8') as outfile:
-        json.dump(self.m, outfile)
+        json.dump(self.m, outfile, default=str)
     except Exception as err:
       print("FATAL: writeJSON(%s): %s" % (filename, str(err)))
 

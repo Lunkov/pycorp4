@@ -28,21 +28,21 @@ class Swaggers(Basic):
       for path in Path(fp).rglob('*.yaml'):
         fullPath = os.path.join(fp, path.parent, path.name)
         if os.path.isfile(fullPath):
-          sw.loadYAML(fullPath)
-
-          prop = {}
-          prop['version'] = sw.getVersion()
-          prop['service'] = sw.getName()
-          prop['swagger-data'] = sw.get()
-          prop['plan'] = False
-          prop['fact'] = True
-          # key = self.genId(prop)
-          key = sw.hash()
-          prop['id'] = key
-          prop['hash'] = sw.hash()
-          
-          if key != '':
-            self.addItem(key, prop)
+          data, ok = sw.loadYAML(fullPath)
+          if ok:
+            prop = {}
+            prop['version'] = sw.getVersion()
+            prop['service'] = sw.getName()
+            prop['swagger-data'] = sw.get()
+            prop['plan'] = False
+            prop['fact'] = True
+            # key = self.genId(prop)
+            key = sw.hash()
+            prop['id'] = key
+            prop['hash'] = key
+            
+            if key != '':
+              self.addItem(key, prop)
 
     except Exception as err:
       print("FATAL: File(%s): %s" % (fullPath, str(err)))

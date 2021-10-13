@@ -330,10 +330,11 @@ class Architector():
       linksTo = self.srvlinks.filter('service_to', j)
       service_api = self.api.filter('service', j)
       service_fsd = self.fsd.filter('services', j)
+      service_ups = self.updates.filter('service', j)
       service_swaggers = self.swaggers.filter('service', j)
       self.html.render('service.html', '%s/service/%s.html' % (htmlPath, j.replace('/', '-')),
                         {'service': service,
-                         'ups': ups.items(),
+                         'ups': service_ups.items(),
                          'fsd': service_fsd.items(),
                          'swaggers': service_swaggers.items(),
                          'service_api': service_api.items(),
