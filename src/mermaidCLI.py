@@ -27,7 +27,7 @@ class MermaidCLI():
       return False
     
     fname = filename.replace(pathDia, '')
-    command = '-i /data/%s -o /data/%s.png' % (fname, fname)
+    command = '-i /data/%s -o /data/%s.png -w 3000' % (fname, fname)
 
     # Volumes
     volumes = dict()
