@@ -58,7 +58,7 @@ class Uploader():
   def save(self, data):
     filename = ''
     try:
-      os.makedirs("%s/%s" % (self.savepath, self.getName(data)))
+      os.makedirs("%s/%s" % (self.savepath, self.getName(data)), exist_ok=True)
       filename = "%s/%s/%s.yaml" % (self.savepath, self.getName(data), self.getVersion(data))
       re.sub('[^\w\-_\. ]', '_', filename)
       
