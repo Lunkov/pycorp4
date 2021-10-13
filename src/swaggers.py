@@ -28,7 +28,7 @@ class Swaggers(Basic):
       for path in Path(fp).rglob('*.yaml'):
         fullPath = os.path.join(fp, path.parent, path.name)
         if os.path.isfile(fullPath):
-          sw.load(fullPath)
+          sw.loadYAML(fullPath)
 
           prop = {}
           prop['version'] = sw.getVersion()
@@ -45,7 +45,7 @@ class Swaggers(Basic):
             self.addItem(key, prop)
 
     except Exception as err:
-      print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))
+      print("FATAL: File(%s): %s" % (fullPath, str(err)))
 
     if self.verbose:
       print("LOG: Swaggers write '%s'..." % fsws)

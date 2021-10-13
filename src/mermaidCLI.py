@@ -24,7 +24,6 @@ class MermaidCLI():
     # docker run -it -v /path/to/diagrams:/data minlag/mermaid-cli -i /data/diagram.mmd
 
     if not self.docker:
-      print("ERR: Docker run: Not Found")
       return False
     
     fname = filename.replace(pathDia, '')

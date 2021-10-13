@@ -207,10 +207,16 @@ class Basic():
       irow = irow + 1
 
   def writeJSON(self, filename):
-    with codecs.open(filename, 'w', 'utf-8') as outfile:
-      json.dump(self.m, outfile)
+    try:
+      with codecs.open(filename, 'w', 'utf-8') as outfile:
+        json.dump(self.m, outfile)
+    except Exception as err:
+      print("FATAL: writeJSON(%s): %s" % (filename, str(err)))
 
   def readJSON(self, filename):
-    if os.path.isfile(filename):
-      with codecs.open(filename, 'r', 'utf-8') as infile:
-        self.m = json.load(infile)
+    try:
+      if os.path.isfile(filename):
+        with codecs.open(filename, 'r', 'utf-8') as infile:
+          self.m = json.load(infile)
+    except Exception as err:
+      print("FATAL: readJSON(%s): %s" % (filename, str(err)))

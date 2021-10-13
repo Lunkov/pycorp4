@@ -40,14 +40,14 @@ class Swagger():
   def hash(self):
     return hashlib.md5(json.dumps(self.data, sort_keys=True).encode('utf-8')).hexdigest()
 
-  def load(self, filename):
+  def loadYAML(self, filename):
     self.data = {}
     if self.verbose:
       print("LOG: Swagger load '%s'..." % filename)
 
-    with codecs.open(filename, 'r', encoding='utf-8') as stream:
       try:
-        self.data = yaml.safe_load(stream)
+        with codecs.open(filename, 'r', encoding='utf-8') as stream:
+          self.data = yaml.safe_load(stream)
 
       except yaml.YAMLError as exc:
         print("ERR: Bad format in %s: %s" % (filename, exc))        
