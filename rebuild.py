@@ -92,6 +92,9 @@ def main(options):
   if options.xls:
     arc.readXLS(options.xls)
 
+  if options.path:
+    arc.readXLSs(options.path)
+
   if options.update:
     arc.updateOnlineData()
   

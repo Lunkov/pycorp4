@@ -3,7 +3,9 @@
 
 import logging
 import os
+from pathlib import Path
 import pylightxl as xl
+
 from urllib.parse import urlencode, quote
 from pprint import pprint
 from datetime import date
@@ -116,6 +118,20 @@ class Architector():
           title = method.upper() + ' ' + path
           self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'plan', 'method': method.upper(), 'url': path, 'description': desc} )
 
+
+  def readXLSs(self, pathname):
+    fp = os.path.abspath(pathname)
+    fullPath = fp
+    if self.verbose:
+      print("LOG: XLSs read from '%s'..." % fp)
+    try:
+      for path in Path(fp).rglob('*.xlsx'):
+        fullPath = os.path.join(fp, path.parent, path.name)
+        if os.path.isfile(fullPath):
+          self.readXLS(fullPath)
+          
+    except Exception as err:
+      print("FATAL: File(%s): %s" % (fullPath, str(err)))
     
   def readXLS(self, filename):
     if self.verbose:
