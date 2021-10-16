@@ -40,10 +40,15 @@ class Mermaid():
 
     self.typeLinksDefault = 'o--o'
     self.typeLinks = {
-     'deprecated':   'x-.-x',
-     'plan':         '-.-',
+     'deprecated':   '-...-',
+     'plan':         '-..-',
      'dev':          '-.->',
      'ok':           'o-->',
+    }
+    self.statusLinks = {
+     'undef':        "fill:#111111,stroke:#333,stroke-width:1px",
+     'deprecated':   "fill:#aa0000,stroke:#333,stroke-width:2px",
+     'ok':           "fill:#00ee00,stroke-width:2px"
     }
     self.statusNodes = {
      'undef':        "fill:#111111,stroke:#333,stroke-width:4px",
@@ -108,6 +113,9 @@ class Mermaid():
     else:
       G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinksDefault, linktext, idn2))
     
+    #if status in self.statusLinks:
+    #  G = G + ("%sstyle %s %s;\n" % (self.tab, idn1, self.statusLinks[status]))
+
     self.gNodes[group] = G
 
   def sequence(self, group, service_from, service_to, api = '', ntype = ''):

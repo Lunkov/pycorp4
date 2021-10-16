@@ -44,7 +44,7 @@ class Dia():
 
   def finish(self, filename):
     if self.verbose:
-      print('LOG: Make diagram "%s"' % filename)
+      print('LOG: Make diagram: %s' % filename)
     nn = {}
     try:
       with Diagram(self.name, show = False, filename = filename, outformat = 'png') as diag:

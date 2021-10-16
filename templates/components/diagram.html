@@ -45,6 +45,7 @@ function zoomFrame(x) {
 		<div class="d-inline">
 		<button type="button" onclick="zoomFrame(1)">- ZOOM OUT</button>
 		<button type="button" onclick="zoomFrame(-1)">+ ZOOM IN</button>
+		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.mmd')" formtarget="_blank">Просмотр MMD</button>
 		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.html')" formtarget="_blank">Просмотр SVG</button>
 		<button type="button" onclick="window.open('/dia/{{ dia_path }}/{{ dia_id }}.mmd.png')" formtarget="_blank">Просмотр PNG</button>
 {% if print_png %}
