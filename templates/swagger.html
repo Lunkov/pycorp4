@@ -13,6 +13,27 @@
 
 <div class="container-fluid">
 
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+		<ul>
+		  <li><a href="#about">О Swagger</a></li>
+{% for ip, path in swagger['paths'].items() %}
+  {% for im, method in swagger['paths'][ip].items() %}
+<li><a href="#api-{{ md5(ip+im) }}">{{ im.upper() }} {{ ip }}</a></li>
+<ul>
+<li><a href="#api-parameters-{{md5(ip+im)}}">Входные параметры</a></li>
+<li><a href="#api-responses-{{md5(ip+im)}}">Выходные данные</a></li>
+</ul>
+  {% endfor %}
+{% endfor %}
+		</ul>
+	  </div>
+   </div>
+</div>
 
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
@@ -55,12 +76,31 @@
      </div>
    </div>
 </div>
+
 {% for ip, path in swagger['paths'].items() %}
   {% for im, method in swagger['paths'][ip].items() %}
-   * {{ ip }} - {{ im }}</br>
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h2 class="m-0 font-weight-bold text-primary" id="api-{{md5(ip+im)}}">{{ im.upper() }} {{ ip }}</h2>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+<p>{{ method['description'] }}</p>
+   
+{% with table_title='Входные параметры', table_id='api-parameters-'+md5(ip+im), table_rows=method['parameters'] %}
+  {% include "components/table_up_api_parameters.html" %}
+{% endwith %}
+
+{% with table_title='Выходные данные', table_id='api-responses-'+md5(ip+im), table_rows=method['responses'] %}
+  {% include "components/table_up_api_response.html" %}
+{% endwith %}
+
+   
+     </div>
+   </div>
+</div>
   {% endfor %}
 {% endfor %}
-
 
 		</div>
 		<!-- End of Main Content -->

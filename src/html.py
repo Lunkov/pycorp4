@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import jinja2
+import hashlib
 
 class HTML():
   def __init__ (self, fs, verbose):
@@ -15,7 +16,7 @@ class HTML():
     if not tmplfile in self.templates:
       self.templates[tmplfile] = self.templateEnv.get_template(tmplfile)
 
-    self.fs.writeFile(dstfile, self.templates[tmplfile].render(prop))
+    self.fs.writeFile(dstfile, self.templates[tmplfile].render(prop, md5=self.fs.md5String))
 
   def getTemplatePath():
     return self.templatesPath

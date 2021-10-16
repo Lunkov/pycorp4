@@ -17,26 +17,26 @@
 				<thead>
 					<tr>
 						<th>Код</th>
+						<th>Описание</th>
 						<th>Ответ</th>
 						<th>Пример</th>
-						<th>Описание</th>
 					</tr>
 				</thead>
 				<tbody>
 {% for i, item in table_rows.items() %}
 					<tr>
 						<td>{{ i }}</td>
+						<td>{{ item.description }}</td>
 						<td>
-							{% if item.content|length %}
-							{{ item.content['application/json'].schema }}
+							{% if item.content and item.content['application/json']|length %}
+							  {{ item.content['application/json'].schema }}
 							{% endif %}
 						</td>
 						<td>
-							{% if item.content|length %}
+							{% if item.content and item.content['application/json']|length %}
 							{{ item.content['application/json'].example }}
 							{% endif %}
 						</td>
-						<td>{{ item.description }}</td>
 					</tr>
 {% endfor %}
 					
