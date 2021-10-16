@@ -38,7 +38,7 @@ class Mermaid():
      'ok':           '-->',
     }
 
-    self.typeLinksDefault = 'o--o'
+    self.typeLinksDefault = '-...-'
     self.typeLinks = {
      'deprecated':   '-...-',
      'plan':         '-..-',
@@ -111,6 +111,7 @@ class Mermaid():
     if status in self.typeLinks:
       G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinks[status], linktext, idn2))
     else:
+      print('LOG: status not found "%s"' % status)
       G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinksDefault, linktext, idn2))
     
     #if status in self.statusLinks:
