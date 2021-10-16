@@ -312,6 +312,7 @@ class Architector():
     self.tags.writeJSON('%s/data/tags.json'          % htmlPath)
     self.domains.writeJSON('%s/data/domains.json'    % htmlPath)
     self.services.writeJSON('%s/data/services.json'  % htmlPath)
+    self.updates.writeJSON('%s/data/updates.json'    % htmlPath)
 
     self.dia.drawBlockDiagram('index', self.domains.get(), self.services.get(), self.srvlinks.get(), '%s/dia/index' % (htmlPath))
 
@@ -376,6 +377,10 @@ class Architector():
     if self.verbose:
       print("LOG: Rebuilding HTML for Swaggers (%d)..." % self.swaggers.getCount())
     self.html.render('swaggers.html', '%s/swaggers.html'     % htmlPath, {'swaggers': self.swaggers.getItems()})
+    for j, swagger in self.swaggers.getItems():
+      # pprint(swagger['swagger-data'])
+      self.html.render('swagger.html', '%s/swagger/%s.html' % (htmlPath, j),
+                       {'swaggerinfo': swagger, 'swagger': swagger['swagger-data']})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Updates (%d)..." % self.updates.getCount())
