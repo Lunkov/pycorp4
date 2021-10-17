@@ -17,6 +17,7 @@ from .links import Links
 from .tags import Tags
 from .fsd import FSD
 from .swaggers import Swaggers
+from .structs import Structs
 from .update import Updates
 from .uploader import Uploader
 from .servicelinks import ServiceLinks
@@ -41,6 +42,7 @@ class Architector():
     self.tags = Tags()
     self.fsd = FSD()
     self.swaggers = Swaggers(verbose)
+    self.structs = Structs()
     self.updates = Updates(verbose)
 
     self.html = HTML(self.fs, verbose)
@@ -72,7 +74,7 @@ class Architector():
     self.swaggers.load(os.path.join(self.fs.getPathData(), 'swaggers'))
     for i, sw in self.swaggers.getItems():
       if not 'swagger-data' in sw:
-        pprint(sw)
+        print("ERR: Swagger data '%s' Not found struct" % (i))
         continue
       if not 'info' in sw['swagger-data']:
         continue
@@ -143,7 +145,6 @@ class Architector():
     self.srvlinks.readXLS(db, 'SERVICE.LINKS')
     self.api.readXLS(db, 'API')
     self.tags.readXLS(db, 'TAGS')
-    self.srvlinks.calc(self.services)
     if self.verbose:
       print("LOG: Read '%s' - OK" % filename)
 
@@ -161,7 +162,36 @@ class Architector():
     for i, service in self.services.getItems():
       if 'swagger' in service:
         uploader.updateSwagger(service)
-    
+  
+  def prepare(self):
+    self.srvlinks.calc(self.services)
+    for i, service in self.services.getItems():
+      service_swaggers = self.swaggers.filter('service', i)
+      if len(service_swaggers) > 1:
+        print("WRN: Service '%s' have %d swaggers" % (i, len(service_swaggers)))
+        for isw, swg in service_swaggers.items():
+          #print("WRN: Service '%s' have %s" % (isw, swg))
+          print("WRN: Service '%s' have" % (isw))
+        #pprint(service_swaggers)
+
+    for i, swagger in self.swaggers.getItems():
+      if 'swagger-data' in swagger:
+        if 'components' in swagger['swagger-data']:
+          if 'schemas' in swagger['swagger-data']['components']:
+            for j, st in swagger['swagger-data']['components']['schemas'].items():
+              key = "%s.%s.%s" % (swagger.get('service', ''), swagger.get('version', ''), j)
+              p = {}
+              if 'properties' in st:
+                p = st['properties']
+                
+              self.structs.addItem(key, {'description': st.get('description', ''),
+                                         'type': st.get('type', ''),
+                                         'name': j,
+                                         'properties': p,
+                                         'service': swagger.get('service', ''),
+                                         'service.version': "%s.%s" % (swagger.get('service', ''), swagger.get('version', ''))
+                                        })
+
     if self.verbose:
       print("LOG: Update online data - OK")
 
@@ -378,9 +408,14 @@ class Architector():
       print("LOG: Rebuilding HTML for Swaggers (%d)..." % self.swaggers.getCount())
     self.html.render('swaggers.html', '%s/swaggers.html'     % htmlPath, {'swaggers': self.swaggers.getItems()})
     for j, swagger in self.swaggers.getItems():
-      # pprint(swagger['swagger-data'])
+      sts = self.structs.filter('service.version', "%s.%s" % (swagger.get('service', ''), swagger.get('version', '')))
+      stn = {}
+      for i, st in sts.items():
+        stn[st['name']] = st
       self.html.render('swagger.html', '%s/swagger/%s.html' % (htmlPath, j),
-                       {'swaggerinfo': swagger, 'swagger': swagger['swagger-data']})
+                       {'swaggerinfo': swagger,
+                        'swagger': swagger['swagger-data'],
+                        'structs': stn})
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Updates (%d)..." % self.updates.getCount())

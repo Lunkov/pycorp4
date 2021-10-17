@@ -7,7 +7,6 @@ import json
 import hashlib
 import pylightxl as xl
 import numpy as np
-from pprint import pprint
 
 class Basic():
   def __init__ (self):

@@ -100,6 +100,8 @@ def main(options):
   
   if options.path:
     arc.loadData()
+
+  arc.prepare()
   
   if options.analyze:
     arc.analyze()

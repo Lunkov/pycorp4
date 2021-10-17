@@ -30,12 +30,19 @@
 <p>{{ item.description }}</p>
 <p><b>Выходные данные</b></p>
 	<p>
-		{% if item.content and item.content['application/json']|length %}
-		  {{ item.content['application/json'].schema }}
+		{% set schema = '' %}
+		{% if item.content and item.content['application/json']|length and item.content['application/json']['schema']|length %}
+		  {% set schema = item.content['application/json'].schema %}
 		{% endif %}
-		{% if item.content and item.content['application/xml']|length %}
-		  {{ item.content['application/xml'].schema }}
+		{% if item.content and item.content['application/xml']|length and item.content['application/xml']['schema']|length %}
+		  {% set schema = item.content['application/xml'].schema %}
 		{% endif %}
+
+{% if schema|length and schema['#ref']|length and table_structs[schema['#ref']]|length %}
+	{% with table_title='Входные параметры', table_id='api-response-'+md5(schema['#ref']), item=table_structs[schema['#ref']] %}
+	  {% include "components/api_response_struct.html" %}
+	{% endwith %}
+{% endif %}
 	</p>
 <p><b>Пример</b></p>
 	<p>

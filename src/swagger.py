@@ -22,7 +22,10 @@ class Swagger():
 
   def get(self):
     return self.data
-    
+
+  def set(self, data):
+    self.data = data
+
   def getVersion(self):
     if not 'info' in self.data:
       return '0.0.0.0' 
@@ -53,7 +56,48 @@ class Swagger():
         print("ERR: Bad format in %s: %s" % (filename, exc))        
         return self.data, False
 
-    return self.data, True
+  def prepare(self, name, data):
+    try:
+      # make simple link to reference struct
+      if 'components' in data:
+        if 'schemas' in data['components']:
+          for j, st in data['components']['schemas'].items():
+            if 'properties' in st:
+              for p, pr in st['properties'].items():
+                if 'items' in pr:
+                  if '$ref' in pr['items']:
+                    # make simple link to reference struct
+                    ip = pr['items']['$ref'].replace('#/components/schemas/', '')
+                    if ip in self.data['components']['schemas']:
+                      data['components']['schemas'][j]['properties'][p]['items']['#ref'] = ip
+                    else:
+                      print("ERR: Swagger '%s': Not found struct '%s'" % (name, ip))
+    except Exception as err:
+      print("ERR: Searching in components %s: %s" % (name, str(err)))
+      return data, False
+
+    try:
+      # make simple link to reference struct
+      if 'paths' in self.data:
+        for ip, ipath in data['paths'].items():
+          for im, imeth in ipath.items():
+            if 'responses' in imeth:
+              for ir, iresp in imeth['responses'].items():
+                if 'content' in iresp:
+                  for ic, icont in iresp['content'].items():
+                    if 'schema' in icont:
+                      if '$ref' in icont['schema']:
+                        icont = icont['schema']['$ref'].replace('#/components/schemas/', '')
+                        if icont in data['components']['schemas']:
+                          data['paths'][ip][im]['responses'][ir]['content'][ic]['schema']['#ref'] = icont
+                        else:
+                          print("ERR: Swagger '%s': Not found struct '%s' inside response" % (name, icont))
+
+    except Exception as err:
+      print("ERR: Searching in paths %s: %s" % (name, str(err)))
+      return data, False
+
+    return data, True
 
   def compare(self, swg):
     c = {}

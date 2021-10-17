@@ -11,7 +11,6 @@ import yaml
 import hashlib
 from csv import reader
 from urllib.parse import urlencode, quote
-from pprint import pprint
 
 from .fs import FS
 from .elog import ELog

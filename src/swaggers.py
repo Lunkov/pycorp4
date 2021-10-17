@@ -30,19 +30,22 @@ class Swaggers(Basic):
         if os.path.isfile(fullPath):
           data, ok = sw.loadYAML(fullPath)
           if ok:
-            prop = {}
-            prop['version'] = sw.getVersion()
-            prop['service'] = sw.getName()
-            prop['swagger-data'] = sw.get()
-            prop['plan'] = False
-            prop['fact'] = True
-            # key = self.genId(prop)
-            key = sw.hash()
-            prop['id'] = key
-            prop['hash'] = key
-            
-            if key != '':
-              self.addItem(key, prop)
+            data, ok = sw.prepare(fullPath, data)
+            if ok:
+              sw.set(data)
+              prop = {}
+              prop['version'] = sw.getVersion()
+              prop['service'] = sw.getName()
+              prop['swagger-data'] = sw.get()
+              prop['plan'] = False
+              prop['fact'] = True
+              # key = self.genId(prop)
+              key = sw.hash()
+              prop['id'] = key
+              prop['hash'] = key
+              
+              if key != '':
+                self.addItem(key, prop)
 
     except Exception as err:
       print("FATAL: File(%s): %s" % (fullPath, str(err)))

@@ -85,7 +85,7 @@
 {% endwith %}
 
 {% with table_title='Выходные данные', table_id='api-responses', table_rows=up['swagger-api-responses'] %}
-  {% include "components/table_up_api_response.html" %}
+  {% include "components/api_response.html" %}
 {% endwith %}
 
 {% with dia_path='up', dia_id=up.id, dia_name=up.name, print_png=false %}

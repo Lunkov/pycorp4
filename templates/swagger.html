@@ -13,6 +13,8 @@
 
 <div class="container-fluid">
 
+<h1>Swagger: {{ swagger.name }}</h1>
+
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
 		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
@@ -92,7 +94,7 @@
   {% include "components/table_up_api_parameters.html" %}
 {% endwith %}
 
-{% with table_title='Выходные данные', table_id='api-responses-'+md5(ip+im), table_rows=method['responses'] %}
+{% with table_title='Выходные данные', table_id='api-responses-'+md5(ip+im), table_rows=method['responses'], table_structs=structs %}
   {% include "components/api_response.html" %}
 {% endwith %}
 

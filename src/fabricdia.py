@@ -4,7 +4,6 @@
 import codecs
 import logging
 import os
-from pprint import pprint
 
 from .mermaid import Mermaid
 from .mermaidCLI import MermaidCLI

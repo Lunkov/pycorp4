@@ -4,7 +4,6 @@
 import codecs
 import logging
 import os
-from pprint import pprint
 
 import hashlib
 
