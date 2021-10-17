@@ -107,6 +107,10 @@ $(document).ready(function() {
 });
 </script>
 
+{% with table_title='Swaggers', table_id='swaggers_service', table_rows=swaggers %}
+  {% include "components/table_swaggers.html" %}
+{% endwith %}
+
 {% with table_title='FSDs', table_id='fsd_services', table_rows=fsd %}
   {% include "components/table_fsds.html" %}
 {% endwith %}

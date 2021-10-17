@@ -1,0 +1,56 @@
+{% if table_rows|length %}
+{% set typeErr = dict() %}
+{% set ok = typeErr.update({'200': 'OK'}) %}
+{% set ok = typeErr.update({'201': 'Created'}) %}
+{% set ok = typeErr.update({'202': 'Accepted'}) %}
+{% set ok = typeErr.update({'301': 'Moved Permanently'}) %}
+{% set ok = typeErr.update({'308': 'Permanent Redirect'}) %}
+{% set ok = typeErr.update({'400': 'Bad Request'}) %}
+{% set ok = typeErr.update({'401': 'Unauthorized'}) %}
+{% set ok = typeErr.update({'403': 'Forbidden'}) %}
+{% set ok = typeErr.update({'404': 'Not Found'}) %}
+{% set ok = typeErr.update({'405': 'Method Not Allowed'}) %}
+{% set ok = typeErr.update({'406': 'Not Acceptable'}) %}
+{% set ok = typeErr.update({'409': 'Conflict'}) %}
+{% set ok = typeErr.update({'415': 'Unsupported Media Type'}) %}
+{% set ok = typeErr.update({'500': 'Internal Server Error'}) %}
+{% set ok = typeErr.update({'501': 'Not Implemented'}) %}
+{% set ok = typeErr.update({'502': 'Bad Gateway'}) %}
+{% set ok = typeErr.update({'503': 'Service Unavailable'}) %}
+{% set ok = typeErr.update({'504': 'Gateway Timeout'}) %}
+{% set ok = typeErr.update({'505': 'HTTP Version Not Supported'}) %}
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h4 class="m-0 font-weight-bold text-primary">{{ table_title }}</h4>
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+{% for i, item in table_rows.items() %}
+<h6 class="m-0 font-weight-bold text-primary">{{ i }} {{ typeErr[i] }}</h6>
+<p>{{ item.description }}</p>
+<p><b>Выходные данные</b></p>
+	<p>
+		{% if item.content and item.content['application/json']|length %}
+		  {{ item.content['application/json'].schema }}
+		{% endif %}
+		{% if item.content and item.content['application/xml']|length %}
+		  {{ item.content['application/xml'].schema }}
+		{% endif %}
+	</p>
+<p><b>Пример</b></p>
+	<p>
+		<code>
+		{% if item.content and item.content['application/json']|length %}
+		{{ item.content['application/json'].example }}
+		{% endif %}
+		{% if item.content and item.content['application/xml']|length %}
+		{{ item.content['application/xml'].example }}
+		{% endif %}
+		</code>
+	</p>
+{% endfor %}
+		</div>
+  </div>
+</div>
+{% endif %}
+<!-- END DataTables  '{{ table_title }}' -->

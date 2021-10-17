@@ -84,15 +84,16 @@
 		<h2 class="m-0 font-weight-bold text-primary" id="api-{{md5(ip+im)}}">{{ im.upper() }} {{ ip }}</h2>
 	</div>
 	<div class="card-body">
+      <p><b>{{ method['description'] }}</b></p>
+
       <div class="card shadow mb-4">
-<p>{{ method['description'] }}</p>
    
 {% with table_title='Входные параметры', table_id='api-parameters-'+md5(ip+im), table_rows=method['parameters'] %}
   {% include "components/table_up_api_parameters.html" %}
 {% endwith %}
 
 {% with table_title='Выходные данные', table_id='api-responses-'+md5(ip+im), table_rows=method['responses'] %}
-  {% include "components/table_up_api_response.html" %}
+  {% include "components/api_response.html" %}
 {% endwith %}
 
    
