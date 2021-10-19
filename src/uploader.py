@@ -9,6 +9,7 @@ import requests
 import json
 import yaml
 import hashlib
+from pprint import pprint
 from csv import reader
 from urllib.parse import urlencode, quote
 
@@ -96,7 +97,8 @@ class Uploader():
     except Exception as e:
       print("ERR: HTTP '%s' (type='%s'): %s" % (url, contentType, str(e)))
       if self.verbose >= 9:
-        print("DBG: HTTP '%s': %s" % (url, content))
+        print("DBG: HTTP '%s'" % (url))
+        pprint(x)
 
     ok = False
     if (not x is None) and (x.status_code == 200):
