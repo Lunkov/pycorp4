@@ -157,27 +157,30 @@ class Basic():
     return columns, find
     
   def readXLS(self, xls, worksheet):
-    columns, ok = self.findColumns(xls, worksheet)
-    if not ok:
-      print("ERR: Read titles %s" % worksheet)
-      return
-    for i, row in enumerate(xls.ws(ws = worksheet).rows, start=1):
-      if i == 1:
-        continue
-      value = {}
-      key  = ''
-      for c in self.fields:
-        if not c in columns:
+    try:
+      columns, ok = self.findColumns(xls, worksheet)
+      if not ok:
+        print("ERR: Read titles %s" % worksheet)
+        return
+      for i, row in enumerate(xls.ws(ws = worksheet).rows, start=1):
+        if i == 1:
           continue
-        value[c] = str(row[columns[c]]).strip()
-        if c == 'id':
-          key = value[c]
-      if key == '' and len(self.ids) > 0:
-        key = self.genId(value)
-      if key != '':
-        self.addItem(key, value)
-      else:
-        print("ERR: id not set for %s" % worksheet)
+        value = {}
+        key  = ''
+        for c in self.fields:
+          if not c in columns:
+            continue
+          value[c] = str(row[columns[c]]).strip()
+          if c == 'id':
+            key = value[c]
+        if key == '' and len(self.ids) > 0:
+          key = self.genId(value)
+        if key != '':
+          self.addItem(key, value)
+        else:
+          print("ERR: id not set for %s" % worksheet)
+    except Exception as err:
+      print("ERR: readXLS(ws:%s): %s" % (worksheet, str(err)))
 
   def genId(self, properties):
     key = ''

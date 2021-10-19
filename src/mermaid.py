@@ -52,6 +52,7 @@ class Mermaid():
     }
     self.statusNodes = {
      'undef':        "fill:#111111,stroke:#333,stroke-width:4px",
+     'plan':         "fill:#00ccff,stroke-width:2px",
      'deprecated':   "fill:#aaaaaa,stroke:#333,stroke-width:2px",
      'ok':           "fill:#00ee00,stroke-width:2px"
     }

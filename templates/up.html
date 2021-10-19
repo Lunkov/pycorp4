@@ -84,7 +84,7 @@
   {% include "components/table_up_api_parameters.html" %}
 {% endwith %}
 
-{% with table_title='Выходные данные', table_id='api-responses', table_rows=up['swagger-api-responses'] %}
+{% with table_title='Выходные данные', table_id='api-responses', table_rows=up['swagger-api-responses'], table_structs=structs %}
   {% include "components/api_response.html" %}
 {% endwith %}
 
