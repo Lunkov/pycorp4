@@ -40,8 +40,8 @@ class Mermaid():
 
     self.typeLinksDefault = '-...-'
     self.typeLinks = {
-     'deprecated':   '-...-',
-     'plan':         '-..-',
+     'deprecated':   '-...->',
+     'plan':         '-..->',
      'dev':          '-.->',
      'ok':           'o-->',
     }

@@ -15,10 +15,30 @@
 
 <h1>Функциональное требование: {{ fsd.name }}</h1>
 
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+		<ul>
+		  <li><a href="#fsd_services">Сервисы</a></li>
+		  <li><a href="#fsd_serviceslinks">Перечень связей</a></li>
+		  <li><a href="#schemaiframe">Схема</a></li>
+		</ul>
+	  </div>
+   </div>
+</div>
+
 <p>{{ fsd.description }}</p>
+
 
 {% with table_title='Перечень сервисов', table_id='fsd_services', table_rows=fsd_services %}
   {% include "components/table_service.html" %}
+{% endwith %}
+
+{% with table_title='Перечень связей', table_id='fsd_serviceslinks', table_rows=fsd_servicelinks %}
+  {% include "components/table_service2links.html" %}
 {% endwith %}
 
 {% with dia_path='fsd', dia_id=fsd.id, dia_name=fsd.name %}

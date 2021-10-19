@@ -354,6 +354,7 @@ class Architector():
       self.html.render('domain.html', '%s/domain/%s.html' % (htmlPath, j),
                         {'domain': domain,
                          'domains': domains,
+                         'domain_servicelinks': srvlinks.items(),
                          'domain_services': services.items()})
 
     if self.verbose:
@@ -365,6 +366,7 @@ class Architector():
       self.html.render('tag.html', '%s/tag/%s.html' % (htmlPath, j),
                         {'tag': tag,
                          'fsd': tag_fsd.items(),
+                         'tag_servicelinks': srvlinks.items(),
                          'tag_services': services.items()})
 
     if self.verbose:
@@ -402,6 +404,7 @@ class Architector():
       self.dia.drawBlockDiagram(j, domains, services, srvlinks, '%s/dia/fsd/%s' % (htmlPath, j))
       self.html.render('fsd.html', '%s/fsd/%s.html' % (htmlPath, j),
                        {'fsd': fsd,
+                        'fsd_servicelinks': srvlinks.items(),
                         'fsd_services': services.items()})
 
     if self.verbose:

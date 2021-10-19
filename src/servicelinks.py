@@ -9,7 +9,7 @@ class ServiceLinks(Basic):
     super(ServiceLinks, self).__init__()
     self.name = 'servicelinks'
     self.ids = ['service_from', 'service_to', 'tags', 'link', 'status', 'description']
-    self.fields = ['service_from', 'service_to', 'status', 'tags', 'link', 'domain', 'description']
+    self.fields = ['service_from', 'service_to', 'status', 'tags', 'link', 'domain', 'description', 'comment']
 
   def calc(self, services):
     elog = ELog()
