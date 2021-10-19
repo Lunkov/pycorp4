@@ -95,6 +95,8 @@ class Uploader():
       contentType = x.headers['content-type']
     except Exception as e:
       print("ERR: HTTP '%s' (type='%s'): %s" % (url, contentType, str(e)))
+      if self.verbose >= 9:
+        print("DBG: HTTP '%s': %s" % (url, content))
 
     ok = False
     if (not x is None) and (x.status_code == 200):
