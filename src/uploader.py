@@ -18,6 +18,7 @@ from .elog import ELog
 class Uploader():
   def __init__ (self, fs, savepath, verbose):
     self.verbose = verbose
+    self.initLog()
     self.savepath = savepath
     self.etc = {}
     self.fs = fs
@@ -28,6 +29,14 @@ class Uploader():
           self.etc = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
           print("ERR: Bad format in %s: %s" % (fileconfig, exc))
+
+  def initLog(self):
+    if self.verbose >= 9:
+      logging.basicConfig()
+      logging.getLogger().setLevel(logging.DEBUG)
+      requests_log = logging.getLogger("requests.packages.urllib3")
+      requests_log.setLevel(logging.DEBUG)
+      requests_log.propagate = True
 
   def updateSwagger(self, service):
     if len(service['swagger']) < 10:
@@ -79,7 +88,7 @@ class Uploader():
     x = None
     contentType =  ''
     try:
-      if self.verbose:
+      if self.verbose > 0:
         print("LOG: Download swagger from '%s'" % (url))
       header, auth = self.auth(url)
       x = requests.get(url = url, headers = header, auth = auth)

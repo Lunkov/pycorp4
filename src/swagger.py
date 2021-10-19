@@ -45,7 +45,7 @@ class Swagger():
 
   def loadYAML(self, filename):
     self.data = {}
-    if self.verbose:
+    if self.verbose > 0:
       print("LOG: Swagger load '%s'..." % filename)
 
       try:

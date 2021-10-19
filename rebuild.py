@@ -56,9 +56,9 @@ class CommandArgs(object):
                           )
     self.parser.add_option('-v', '--verbose',
                            help="Verbose",
-                           action="store_true",
+                           type="int",
                            dest="verbose",
-                           default=False
+                           default=0
                           )
     self.options = None
 

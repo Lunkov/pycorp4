@@ -42,7 +42,7 @@ class Dia():
     self.gLinks[idn1] = {'service_from': service_from, 'service_to': service_to, 'text': text, 'status': status}
 
   def finish(self, filename):
-    if self.verbose:
+    if self.verbose > 0:
       print('LOG: Make diagram: %s' % filename)
     nn = {}
     try:

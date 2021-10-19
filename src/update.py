@@ -32,14 +32,14 @@ class Updates(Basic):
 
   def load(self, updatepath):
     fp = os.path.abspath(updatepath)
-    if self.verbose:
+    if self.verbose > 0:
       print("LOG: Updates: Scaning folder '%s'..." % fp)
     try:
 
       for path in Path(fp).rglob('*.yaml'):
         fullPath = os.path.join(fp, path.parent, path.name)
         if not os.path.isdir(fullPath):
-          if self.verbose:
+          if self.verbose > 5:
             print("DBG: Scan: %s" % fullPath)
             try:
               with codecs.open(fullPath, 'r', encoding='utf-8') as stream:

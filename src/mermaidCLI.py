@@ -13,7 +13,7 @@ class MermaidCLI():
     try:
       self.docker = docker.from_env()
       info = self.docker.version()
-      if self.verbose:
+      if self.verbose > 5:
         print("DBG: docker.version %s" % (info['Components'][0]['Version']))
     except:
       print("FATAL: Docker Not Found")
@@ -34,12 +34,12 @@ class MermaidCLI():
     volumes[os.path.abspath(pathDia)] = {'bind': '/data'}
 
     try:
-      if self.verbose:
-        print("LOG: Docker: Run '%s' container. Command: %s" % (self.src, command))
+      if self.verbose > 5:
+        print("DBG: Docker: Run '%s' container. Command: %s" % (self.src, command))
       container = self.docker.containers.run(self.src, command=command, volumes=volumes, detach=False, user='root', auto_remove=True)
       
-      if self.verbose:
-        print("LOG: %s" % container)
+      if self.verbose > 5:
+        print("DBG: %s" % container)
 
     except Exception as e:
       print("FATAL: Docker run container '%s': %s" % (self.src, str(e)))

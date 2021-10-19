@@ -18,10 +18,10 @@ class Swaggers(Basic):
   def load(self, swaggerpath):
     fp = os.path.abspath(swaggerpath)
     fsws = '%s.all.json' % fp
-    if self.verbose:
+    if self.verbose > 0:
       print("LOG: Swaggers read '%s'..." % fsws)
     self.readJSON(fsws)
-    if self.verbose:
+    if self.verbose > 0:
       print("LOG: Swaggers: Scaning folder '%s'..." % fp)
     try:
       sw = Swagger(self.verbose)
@@ -50,7 +50,7 @@ class Swaggers(Basic):
     except Exception as err:
       print("FATAL: File(%s): %s" % (fullPath, str(err)))
 
-    if self.verbose:
+    if self.verbose > 0:
       print("LOG: Swaggers write '%s'..." % fsws)
     self.writeJSON(fsws)
 
