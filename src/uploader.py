@@ -99,8 +99,6 @@ class Uploader():
     ok = False
     if (not x is None) and (x.status_code == 200):
       self.data, ok = self.parseUpload(url, contentType, x.text)
-      if not ok:
-        print("ERR: Swagger parse '%s': %s" % (url, x))
 
     return self.data, ok
 
@@ -115,6 +113,8 @@ class Uploader():
         return data, True
     except Exception as e:
       print("ERR: Swagger parse '%s' (type='%s'/yaml): %s" % (url, contentType, str(e)))
+      if self.verbose >= 9:
+        print("DBG: Swagger parse '%s': %s" % (url, content))
 
     try:
       if ('application/json' in contentType) or ('.json' in url)  :
