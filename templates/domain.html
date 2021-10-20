@@ -67,13 +67,14 @@
   {% include "components/table_service.html" %}
 {% endwith %}
 
+{% with dia_path='domain', dia_id=domain.id, dia_name=domain.name, print_png=true %}
+  {% include "components/diagram.html" %}
+{% endwith %}
+
 {% with table_title='Перечень связей', table_id='domain_serviceslinks', table_rows=domain_servicelinks %}
   {% include "components/table_service2links.html" %}
 {% endwith %}
 
-{% with dia_path='domain', dia_id=domain.id, dia_name=domain.name, print_png=true %}
-  {% include "components/diagram.html" %}
-{% endwith %}
 
 </div>
 

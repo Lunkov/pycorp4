@@ -127,12 +127,12 @@ $(document).ready(function() {
   {% include "components/table_service.html" %}
 {% endwith %}
 
-{% with table_title='Перечень связей', table_id='tag_serviceslinks', table_rows=tag_servicelinks %}
-  {% include "components/table_service2links.html" %}
-{% endwith %}
-
 {% with dia_path='tag', dia_id=tag.id, dia_name=tag.name, print_png=true %}
   {% include "components/diagram.html" %}
+{% endwith %}
+
+{% with table_title='Перечень связей', table_id='tag_serviceslinks', table_rows=tag_servicelinks %}
+  {% include "components/table_service2links.html" %}
 {% endwith %}
 
 		</div>
