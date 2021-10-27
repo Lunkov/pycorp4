@@ -51,7 +51,7 @@ class Mermaid():
      'ok':           "fill:#00ee00,stroke-width:2px"
     }
     self.statusNodes = {
-     'undef':        "fill:#111111,stroke:#333,stroke-width:4px",
+     'undef':        "fill:#110000,stroke:#333,stroke-width:4px",
      'plan':         "fill:#00ccff,stroke-width:2px",
      'deprecated':   "fill:#aaaaaa,stroke:#333,stroke-width:2px",
      'ok':           "fill:#00ee00,stroke-width:2px"
@@ -63,6 +63,27 @@ class Mermaid():
     self.gGroups = {}
     self.gNodes = {}
     self.gLinks = {}
+
+  def getLegend(self, name):
+    self.new('flowLR', name)
+    
+    self.group('status', 'Статус нод')
+    for i, v in self.statusNodes.items():
+      self.node(i, i, 'status', 'service', i, '', i)
+
+    self.group('types', 'Типы нод')
+    for i, v in self.typeNodes.items():
+      self.node(i, i, 'types', i, 'ok', '', i)
+
+    self.group('typelinks', 'Типы связей')
+    for i, v in self.statusLinks.items():
+      idn1 = hashlib.md5((i+'-srv1').encode('utf-8')).hexdigest()
+      idn2 = hashlib.md5((i+'-srv2').encode('utf-8')).hexdigest()
+      self.node(idn1, 'Сервис 1', 'typelinks', 'service', 'ok', '', i)
+      self.node(idn2, 'Сервис 2', 'typelinks', 'service', 'ok', '', i)
+      self.link(idn1, idn2, 'typelinks', '', i, i)
+
+    return self.finish()
 
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
     if not group in self.gNodes:

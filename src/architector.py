@@ -331,6 +331,7 @@ class Architector():
     self.fs.rsync(self.fs.getPathTemplates() + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
     self.fs.rsync(self.fs.getPathData() + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
+    self.html.render('legend.html',   '%s/legend.html'   % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
     self.html.render('index.html',    '%s/index.html'    % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
     self.html.render('domains.html',  '%s/domains.html'  % htmlPath, {'domains': self.domains.getItems()})
     self.html.render('services.html', '%s/services.html' % htmlPath, {'services': self.services.getItems()})
@@ -345,6 +346,7 @@ class Architector():
     self.updates.writeJSON('%s/data/updates.json'    % htmlPath)
 
     self.dia.drawBlockDiagram('index', self.domains.get(), self.services.get(), self.srvlinks.get(), '%s/dia/index' % (htmlPath))
+    self.dia.drawBlockDiagramLegend('legend', '%s/dia/legend' % (htmlPath))
 
     if self.verbose:
       print("LOG: Rebuilding HTML for Domains (%d)..." % self.domains.getCount())

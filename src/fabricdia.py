@@ -16,6 +16,16 @@ class FabricDia():
     self.fs = fs
     self.html = html
     self.mermaidcli = MermaidCLI(verbose)
+
+  def drawBlockDiagramLegend(self, name, filename):
+    D = Mermaid()
+    dia = D.getLegend(name)
+    if not self.fs.writeFile(filename + '.mmd', dia):
+      return
+
+    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
+    self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
+
     
   def drawBlockDiagram(self, name, domains, services, srvlinks, filename):
     D = Mermaid()

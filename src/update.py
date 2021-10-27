@@ -41,17 +41,17 @@ class Updates(Basic):
         if not os.path.isdir(fullPath):
           if self.verbose > 5:
             print("DBG: Scan: %s" % fullPath)
-            try:
-              with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
-                prop = yaml.safe_load(stream)
-                key = self.genId(prop)
-                prop['id'] = key
-                prop['code'] = self.genCode(prop)
-                if key != '':
-                  self.updateItem(key, self.updateProp(prop))
+          try:
+            with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
+              prop = yaml.safe_load(stream)
+              key = self.genId(prop)
+              prop['id'] = key
+              prop['code'] = self.genCode(prop)
+              if key != '':
+                self.updateItem(key, self.updateProp(prop))
 
-            except yaml.YAMLError as err:
-              print("ERR: Bad format in %s: %s" % (fullPath, str(err)))    
+          except yaml.YAMLError as err:
+            print("ERR: Bad format in %s: %s" % (fullPath, str(err)))    
 
     except Exception as err:
       print("FATAL: Folder Not Found: %s: %s" % (fp, str(err)))
