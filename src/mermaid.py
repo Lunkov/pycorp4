@@ -69,7 +69,10 @@ class Mermaid():
     
     self.group('status', 'Статус нод')
     for i, v in self.statusNodes.items():
-      self.node(i, i, 'status', 'service', i, '', i)
+      if i == 'undef':
+        self.node(i, i, 'status', 'service', '', '', i)
+      else:
+        self.node(i, i, 'status', 'service', i, '', i)
 
     self.group('types', 'Типы нод')
     for i, v in self.typeNodes.items():
@@ -99,9 +102,11 @@ class Mermaid():
     
     if status in self.statusNodes:
       G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes[status]))
+    else:
+      G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes['undef']))
 
-    if link != "":
-      # G = G + ("%sclick %s \"%s\" _blank\n" % (self.tab, idn, link))
+    if link != '':
+      # COMMENT: For HTTP ref => G = G + ("%sclick %s \"%s\" _blank\n" % (self.tab, idn, link))
       G = G + ("%sclick %s call nodeClick(\"%s\")\n" % (self.tab, idn, id))
     self.gNodes[group] = G
 
@@ -140,6 +145,17 @@ class Mermaid():
     #  G = G + ("%sstyle %s %s;\n" % (self.tab, idn1, self.statusLinks[status]))
 
     self.gNodes[group] = G
+
+  def sequenceNote(self, group, service, text = ''):
+    if text == '':
+      return
+    if not group in self.gLinks:
+      self.gLinks[group] = ''
+
+    idn = hashlib.md5(service.encode('utf-8')).hexdigest()
+    G = self.gLinks[group]
+    G = G + ("%sNote right of %s: %s\n" % (self.tab, idn, text))
+    self.gLinks[group] = G
 
   def sequence(self, group, service_from, service_to, api = '', ntype = ''):
 

@@ -92,32 +92,6 @@ class Updates(Basic):
       res[k] = item
     return res
 
-  def graphSequence(self, D, seq, services):
-    if hasattr(seq['sequence'], "__len__"):
-      for v in seq['sequence']:
-        if 'parallel-start' in v:
-          D.parallelStart('main', v['parallel-start'])
-        if 'alt-if' in v:
-          D.altIf('main', v['alt-if'])
-        if 'alt-else' in v:
-          D.altElse('main', v['alt-else'])
-        if 'alt-end' in v:
-          D.altEnd('main', v['alt-end'])
-        if 'opt-if' in v:
-          D.optIf('main', v['opt-if'])
-        if 'opt-end' in v:
-          D.optEnd('main', v['opt-end'])
-        if 'parallel-and' in v:
-          D.parallelAnd('main', v['parallel-and'])
-        if 'from' in v:
-          D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', v.get('answer', '')), v.get('type', 'ok'))
-        if 'activate' in v:
-          D.activate('main', v['activate'])
-        if 'deactivate' in v:
-          D.deactivate('main', v['deactivate'])
-        if 'parallel-finish' in v:
-          D.parallelFinish('main', v['parallel-finish'])
-
   def calc(self, services):
     res = {}
     for j, up in self.getItems():

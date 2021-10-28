@@ -303,13 +303,6 @@ class Architector():
     
     return domains, services.get(), srvlinks.get()
 
-  def graphSequence(self, seq):
-    D = Mermaid()
-    D.new('sequence', seq.get('name', ''))
-    
-    self.updates.graphSequence(D, seq, self.services)
-    return D.finish()
-
   def makeAll(self):
     self.cnt_files = 0
     self.cnt_writes = 0

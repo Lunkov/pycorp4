@@ -4,6 +4,7 @@
 import codecs
 import logging
 import os
+from pprint import pprint
 
 from .mermaid import Mermaid
 from .mermaidCLI import MermaidCLI
@@ -111,6 +112,11 @@ class FabricDia():
           D.parallelAnd('main', v['parallel-and'])
         if 'from' in v:
           D.sequence('main', v.get('from', 'undef'), v.get('to', 'undef'), v.get('api', v.get('answer', '')), v.get('type', 'ok'))
+        if 'from' in v and (v.get('type', 'undef') == 'answer'):
+          if v['from'] in services:
+            if 'rt_99' in services[v['from']]:
+              if services[v['from']]['rt_99'] != '':
+                D.sequenceNote('main', v['from'], '99%% responce time %s ms' % services[v['from']]['rt_99'])
         if 'activate' in v:
           D.activate('main', v['activate'])
         if 'deactivate' in v:
