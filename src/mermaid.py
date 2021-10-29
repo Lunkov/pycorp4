@@ -79,7 +79,7 @@ class Mermaid():
       self.node(i, i, 'types', i, 'ok', '', i)
 
     self.group('typelinks', 'Типы связей')
-    for i, v in self.statusLinks.items():
+    for i, v in self.typeLinks.items():
       idn1 = hashlib.md5((i+'-srv1').encode('utf-8')).hexdigest()
       idn2 = hashlib.md5((i+'-srv2').encode('utf-8')).hexdigest()
       self.node(idn1, 'Сервис 1', 'typelinks', 'service', 'ok', '', i)
