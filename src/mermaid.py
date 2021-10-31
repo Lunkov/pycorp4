@@ -23,6 +23,8 @@ class Mermaid():
      'default':   ['[', ']'],
      'undef':     ['[', ']'],
      'kafka':     ['(', ')'],
+     'nats':      ['(', ')'],
+     'nsq':       ['(', ')'],
      'rabbitmq':  ['(', ')'],
      'service':   ['{{', '}}'],
      'app':       ['[[', ']]'],
@@ -51,7 +53,7 @@ class Mermaid():
      'ok':           "fill:#00ee00,stroke-width:2px"
     }
     self.statusNodes = {
-     'undef':        "fill:#110000,stroke:#333,stroke-width:4px",
+     'undef':        "fill:#ee1010,color:#ebd4cb,stroke:#333,stroke-width:4px",
      'plan':         "fill:#00ccff,stroke-width:2px",
      'deprecated':   "fill:#aaaaaa,stroke:#333,stroke-width:2px",
      'ok':           "fill:#00ee00,stroke-width:2px"
@@ -70,7 +72,7 @@ class Mermaid():
     self.group('status', 'Статус нод')
     for i, v in self.statusNodes.items():
       if i == 'undef':
-        self.node(i, i, 'status', 'service', '', '', i)
+        self.node(i, i, 'status', 'service', '-', '', i)
       else:
         self.node(i, i, 'status', 'service', i, '', i)
 

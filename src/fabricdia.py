@@ -115,8 +115,11 @@ class FabricDia():
         if 'from' in v and (v.get('type', 'undef') == 'answer'):
           if v['from'] in services:
             if 'rt_99' in services[v['from']]:
-              if services[v['from']]['rt_99'] != '':
-                D.sequenceNote('main', v['from'], '99%% responce time %s ms' % services[v['from']]['rt_99'])
+              if services[v['from']]['rt_99'] != '' and services[v['from']]['max_rps'] != '':
+                D.sequenceNote('main', v['from'], '99%% responce time %s ms, max %s rps' % (services[v['from']]['rt_99'], services[v['from']]['max_rps']))
+              else:
+                if services[v['from']]['rt_99'] != '':
+                  D.sequenceNote('main', v['from'], '99%% responce time %s ms, max %s rps' % (services[v['from']]['rt_99'], services[v['from']]['max_rps']))
         if 'activate' in v:
           D.activate('main', v['activate'])
         if 'deactivate' in v:
