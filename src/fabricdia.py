@@ -4,6 +4,7 @@
 import codecs
 import logging
 import os
+import math
 from pprint import pprint
 
 from .mermaid import Mermaid
@@ -59,7 +60,7 @@ class FabricDia():
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
 
-    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
+    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd', len(domains) * 500)
     self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
 
     D = Dia(self.verbose)

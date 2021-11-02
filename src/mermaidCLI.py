@@ -18,7 +18,7 @@ class MermaidCLI():
     except:
       print("FATAL: Docker Not Found")
 
-  def makePNG(self, pathDia, filename):
+  def makePNG(self, pathDia, filename, width = 3000):
     # HELP: https://docker-py.readthedocs.io/en/stable/containers.html
     # HELP: https://github.com/mermaid-js/mermaid-cli
     # docker run -it -v /path/to/diagrams:/data minlag/mermaid-cli -i /data/diagram.mmd
@@ -27,7 +27,7 @@ class MermaidCLI():
       return False
     
     fname = filename.replace(pathDia, '')
-    command = '-i /data/%s -o /data/%s.png -w 3000' % (fname, fname)
+    command = '-i /data/%s -o /data/%s.png -w %d' % (fname, fname, width)
 
     # Volumes
     volumes = dict()
