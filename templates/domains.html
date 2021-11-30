@@ -53,7 +53,7 @@ $(document).ready(function() {
                                             <td><a href="/domain/{{ item.id }}.html">{{ item.name }}</a></td>
                                             <td>{{ item.layer }}</td>
                                             <td>{{ item.status }}</td>
-                                            <td>{{ item.link }}</td>
+                                            <td><a href="{{ item.link }}" target=_blank>&#8599;</a></td>
                                         </tr>
 {% endfor %}
                                         
