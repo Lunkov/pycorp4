@@ -6,8 +6,8 @@ import logging
 import os
 import re
 import hashlib
-import jinja2
 import sysrsync
+import tempfile
 
 
 class FS():
@@ -37,6 +37,9 @@ class FS():
   def getPathTemplates(self):
     return self.pathTemplates
 
+  def getPathTempDir(self):
+    return tempfile.gettempdir()
+
   def md5File(self, fname):
     hash_md5 = hashlib.md5()
     try:
@@ -65,7 +68,7 @@ class FS():
   def mkDir(self, destination, dirs):
     for p in dirs:
       os.makedirs(destination % p, exist_ok=True)
-
+      
   def rsync(self, source, destination, dirs):
     for p in dirs:
       if os.name != 'nt':
@@ -79,3 +82,28 @@ class FS():
   def printStats(self):
     if self.verbose:
       print("LOG: Write files: %d / %d" % (self.cnt_writes, self.cnt_files))
+
+  @staticmethod
+  def rm(pathName):
+    """ remove folders
+    """
+    shutil.rmtree(pathName, ignore_errors=True)
+    mypath = Path(pathName)
+    if mypath.is_dir():
+      for root, dirs, files in os.walk(pathName):
+        for f in files:
+          try:
+            os.chmod(os.path.join(root, f),stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH|stat.S_IXUSR|stat.S_IRUSR|stat.S_IWUSR|stat.S_IWGRP|stat.S_IXGRP)
+          except:
+            continue
+          os.remove(os.path.join(root, f))
+        for d in dirs:
+          shutil.rmtree(os.path.join(root, d), ignore_errors=True)
+      for f in os.scandir(pathName):
+        try:
+          if f.is_dir():
+            shutil.rmtree(f, ignore_errors=True)
+          if f.is_file():
+            os.remove(f)
+        except:
+          continue

@@ -6,6 +6,7 @@ import optparse
 
 from src.fs import FS
 from src.architector import Architector
+from src.arc_patterns import ArcPatterns
 
 
 class CommandArgs(object):
@@ -87,6 +88,10 @@ def main(options):
     fs.setPathTemplates(options.templates)
   if options.out:
     fs.setPathHTML(options.out)
+    
+  arcp = ArcPatterns(fs, options.verbose)
+  arcp.update()
+  arcp.makeAll()
 
   arc = Architector(fs, options.verbose)
   if options.xls:
