@@ -321,7 +321,7 @@ class Architector():
                     'up', 'dia', 'swagger', 'api',
                     'dia/service', 'dia/tag', 'dia/up', 'dia/fsd', 'dia/domain'])
 
-    self.fs.rsync(self.fs.getPathTemplates() + '/%s', htmlPath + '/%s', ['js', 'css', 'img', 'scss', 'vendor'])
+    self.fs.rsync(self.fs.getPathTemplates() + '/%s', htmlPath + '/%s', ['js', 'css', 'scss', 'vendor'])
     self.fs.rsync(self.fs.getPathData() + '/%s', htmlPath + '/%s', ['updates', 'swaggers'])
 
     self.html.render('legend.html',   '%s/legend.html'   % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
@@ -410,8 +410,14 @@ class Architector():
       stn = {}
       for i, st in sts.items():
         stn[st['name']] = st
+      swaggerurl = ''
+      sr = self.services.getItem(swagger.get('service', ''))
+      if not None is sr:
+        if 'swagger' in sr:
+          swaggerurl = sr['swagger']
       self.html.render('swagger.html', '%s/swagger/%s.html' % (htmlPath, j),
                        {'swaggerinfo': swagger,
+                        'swaggerurl': swaggerurl,
                         'swagger': swagger['swagger-data'],
                         'structs': stn})
 
