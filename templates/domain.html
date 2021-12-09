@@ -25,7 +25,7 @@
       <div class="card shadow mb-4">
 		<ul>
 		  <li><a href="#about">О Домене</a></li>
-		  <li><a href="#services">Сервисы домена</a></li>
+		  <li><a href="#services">Связанные сервисы</a></li>
 		  <li><a href="#domain_serviceslinks">Перечень связей</a></li>
 		  <li><a href="#schemaiframe">Схема</a></li>
 		</ul>
@@ -63,7 +63,7 @@
 </div>
 
 
-{% with table_title='Сервисы домена', table_id='services', table_rows=domain_services %}
+{% with table_title='Связанные сервисы', table_id='services', table_rows=domain_services %}
   {% include "components/table_service.html" %}
 {% endwith %}
 
