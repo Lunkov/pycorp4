@@ -1,5 +1,9 @@
 etc
 html
 data
+web
+workspaces
 src/__pycache__/
+src/obj/__pycache__/
+src/obj/test/__pycache__/
 src/test/__pycache__/

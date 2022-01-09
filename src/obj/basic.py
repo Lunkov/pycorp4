@@ -7,6 +7,7 @@ import json
 import hashlib
 import pylightxl as xl
 import numpy as np
+from pathlib import Path
 
 class Basic():
   def __init__ (self):
@@ -222,3 +223,31 @@ class Basic():
           self.m = json.load(infile)
     except Exception as err:
       print("FATAL: readJSON(%s): %s" % (filename, str(err)))
+
+  def loadFromPath(self, pathname, mask, verbose):
+    fp = os.path.abspath(pathname)
+    fullPath = fp
+    if verbose > 8:
+      print("LOG: Config read from '%s'..." % fp)
+    try:
+      for path in Path(fp).rglob(mask):
+        fullPath = os.path.join(fp, path.parent, path.name)
+        if os.path.isfile(fullPath):
+          self.load(fullPath, verbose)
+          
+    except Exception as err:
+      print("FATAL: File(%s): %s" % (fullPath, str(err)))
+
+  def load(self, fullPath, verbose):
+    try:
+      with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
+        item = yaml.safe_load(stream)
+        if 'code' in item:
+          if item['code'] in self.m:
+            self.m[item['code']].update(item)
+          else:
+            self.m[item['code']] = item
+        if verbose > 2:
+          print("DBG: Item load %s" % fullPath)
+    except yaml.YAMLError as exc:
+      print("ERR: Bad format in %s: %s" % (fullPath, exc))

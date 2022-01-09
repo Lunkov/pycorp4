@@ -30,7 +30,7 @@ import re
 
 
 class Architector():
-  def __init__ (self, fs, verbose):
+  def __init__ (self, fs, config, verbose):
     self.fs = fs
 
     self.verbose = verbose
@@ -46,7 +46,7 @@ class Architector():
     self.updates = Updates(verbose)
 
     self.html = HTML(self.fs, verbose)
-    self.dia = FabricDia(self.fs, self.html, verbose)
+    self.dia = FabricDia(self.fs, self.html, config, verbose)
 
   def loadServices(self, fileServices):
     columns = {}
@@ -121,33 +121,6 @@ class Architector():
           self.api.addItem(ida, { 'id': ida, 'title': title, 'service': service, 'version': version, 'status': 'plan', 'method': method.upper(), 'url': path, 'description': desc} )
 
 
-  def readXLSs(self, pathname):
-    fp = os.path.abspath(pathname)
-    fullPath = fp
-    if self.verbose:
-      print("LOG: XLSs read from '%s'..." % fp)
-    try:
-      for path in Path(fp).rglob('*.xlsx'):
-        fullPath = os.path.join(fp, path.parent, path.name)
-        if os.path.isfile(fullPath):
-          self.readXLS(fullPath)
-          
-    except Exception as err:
-      print("FATAL: File(%s): %s" % (fullPath, str(err)))
-    
-  def readXLS(self, filename):
-    if self.verbose:
-      print("LOG: Reading '%s'..." % filename)
-    db = xl.readxl(fn=filename)
-    self.domains.readXLS(db, 'DOMAINS')
-    self.fsd.readXLS(db, 'FSD')
-    self.services.readXLS(db, 'SERVICES')
-    self.srvlinks.readXLS(db, 'SERVICE.LINKS')
-    self.api.readXLS(db, 'API')
-    self.tags.readXLS(db, 'TAGS')
-    if self.verbose:
-      print("LOG: Read '%s' - OK" % filename)
-
   def analyze(self):
     srv = Services()
     for j, fsd in self.fsd.getItems():
@@ -206,43 +179,6 @@ class Architector():
     self.tags.writeXLS(db, 'TAGS')
     xl.writexl(db = db, fn = filename % (self.nowDate()))
 
-  def dump(self):
-    self.domains.dumpCSV('data/domains.csv')
-    self.services.dumpCSV('data/services.csv')
-    self.api.dumpCSV('data/api.csv')
-
-  def filterTag(self, name, tag):
-    srv = self.services.filter('tags', tag)
-    services = Services()
-    services.set(srv)
-    
-    lsrv = services.getVariants('id')
-    
-    srvlinks = ServiceLinks()
-    #linksFrom = self.srvlinks.filter('service_from', lsrv)
-    #srvlinks.set(linksFrom)
-    #linksTo = self.srvlinks.filter('service_to', lsrv)
-    #srvlinks.append(linksTo)
-    
-    links = self.srvlinks.filter('tags', tag)
-    srvlinks.set(links)
-    #srvlinks.append(links)
-    #links = self.srvlinks.filter('service_from', lsrv)
-    #srvlinks.append(links)
-    
-    srvsTo = srvlinks.getVariants('service_to')
-    srvs1 = self.services.filter('id', srvsTo)
-    services.append(srvs1)
-    
-    srvsFrom = srvlinks.getVariants('service_from')
-    srvs1 = self.services.filter('id', srvsFrom)
-    services.append(srvs1)
-
-    ldmn = services.getVariants('domain')
-    domains = self.domains.filter('id', ldmn)
-    
-    return domains, services.get(), srvlinks.get()
-    
   def findSources(self, srvlinks, service_from):
     linksFrom = self.srvlinks.filter('service_from', service_from)
     if len(linksFrom) > 0:

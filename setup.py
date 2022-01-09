@@ -28,5 +28,11 @@ setup(
   packages=['pycorp4'],
   install_requires=[
     "gitpython",
+    "pylightxl",
+    "sysrsync",
+    "numpy",
+    "diagrams",
+    "gitpython",
+    "flask",
   ],
 )

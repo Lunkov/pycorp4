@@ -12,52 +12,35 @@ from datetime import date
 import hashlib
 
 class Mermaid():
-  def __init__ (self):
+  def __init__ (self, config):
     self.tab = '    '
     self.typeDia = ''
+
     self.gNodes = {}
     self.gGroups = {}
     self.gLinks = {}
-    self.typeNodesDef = ['[', ']']
-    self.typeNodes = {
-     'default':   ['[', ']'],
-     'undef':     ['[', ']'],
-     'kafka':     ['(', ')'],
-     'nats':      ['(', ')'],
-     'nsq':       ['(', ')'],
-     'rabbitmq':  ['(', ')'],
-     'service':   ['{{', '}}'],
-     'app':       ['[[', ']]'],
-     'db':        ['[(', ')]'],
-     'storage':   ['[(', ')]'],
-     'bff':       ['[/', '\]'],
-    }
-    self.typeSeqLinksDefault = '->>'
-    self.typeSeqLinks = {
-     'deprecated':   '-->>',
-     'plan':         '-->>',
-     'dev':          '-->>',
-     'ok':           '-->',
-    }
 
-    self.typeLinksDefault = '-...-'
-    self.typeLinks = {
-     'deprecated':   '-...->',
-     'plan':         '-..->',
-     'dev':          '-.->',
-     'ok':           'o-->',
-    }
-    self.statusLinks = {
-     'undef':        "fill:#111111,stroke:#333,stroke-width:1px",
-     'deprecated':   "fill:#aa0000,stroke:#333,stroke-width:2px",
-     'ok':           "fill:#00ee00,stroke-width:2px"
-    }
-    self.statusNodes = {
-     'undef':        "fill:#ee1010,color:#ebd4cb,stroke:#333,stroke-width:4px",
-     'plan':         "fill:#00ccff,stroke-width:2px",
-     'deprecated':   "fill:#aaaaaa,stroke:#333,stroke-width:2px",
-     'ok':           "fill:#00ee00,stroke-width:2px"
-    }
+    self.typeNodesDef = '["%s"]'
+    self.typeNodes = {}
+    if 'objects' in config:
+      self.typeNodes = config['objects']
+    self.statusNodes = {}
+    if 'objects-status' in config:
+      self.statusNodes = config['objects-status']
+
+    self.typeLinksDefault = '-...-|%s|'
+    self.typeLinks = {}
+    if 'links' in config:
+      self.typeLinks = config['links']
+    self.statusLinks = {}
+    if 'links-status' in config:
+      self.statusLinks = config['links-status']
+
+    self.typeSeqLinksDefault = '->>'
+    self.typeSeqLinks = {}
+    if 'links' in config:
+      self.typeSeqLinks = config['links']
+
 
   def new(self, typeDia, name):
     self.name = name
@@ -66,46 +49,59 @@ class Mermaid():
     self.gNodes = {}
     self.gLinks = {}
 
-  def getLegend(self, name):
+  def makeLegend(self, name):
     self.new('flowLR', name)
     
-    self.group('status', 'Статус нод')
+    self.group('status', 'Status of nodes')
     for i, v in self.statusNodes.items():
       if i == 'undef':
         self.node(i, i, 'status', 'service', '-', '', i)
       else:
         self.node(i, i, 'status', 'service', i, '', i)
 
-    self.group('types', 'Типы нод')
+    ki = 0
+    kc = int(len(self.typeNodes) / 5)
+    self.group('type%d' % kc, 'Types of nodes %d' % kc)
     for i, v in self.typeNodes.items():
-      self.node(i, i, 'types', i, 'ok', '', i)
+      ki = ki + 1
+      self.node(i, i, ('type%d' % kc), i, 'ok', '', i)
+      if ki % 5 == 0:
+        kc = kc - 1
+        self.group('type%d' % kc, 'Types of nodes %d' % kc)
 
-    self.group('typelinks', 'Типы связей')
+    self.group('typelinks', 'Types of links')
     for i, v in self.typeLinks.items():
       idn1 = hashlib.md5((i+'-srv1').encode('utf-8')).hexdigest()
       idn2 = hashlib.md5((i+'-srv2').encode('utf-8')).hexdigest()
-      self.node(idn1, 'Сервис 1', 'typelinks', 'service', 'ok', '', i)
-      self.node(idn2, 'Сервис 2', 'typelinks', 'service', 'ok', '', i)
+      self.node(idn1, 'Service 1', 'typelinks', 'service', 'ok', '', i)
+      self.node(idn2, 'Service 2', 'typelinks', 'service', 'ok', '', i)
       self.link(idn1, idn2, 'typelinks', '', i, i)
 
     return self.finish()
+
+  def _node(self, id, name, ntype = '', description = ''):
+    idn = hashlib.md5(id.encode('utf-8')).hexdigest()
+    nname = name.replace('"', '\'').replace('(', ' ').replace(')', ' ') #.replace(':', '\:').replace('.', '\.')
+    ndescription = description.replace('"', '\'').replace(':', '\:').replace('.', '\.')
+    N = ''
+    if ntype in self.typeNodes:
+      N = self.typeNodes[ntype].get('view', '[%s]') % (nname)
+    else:
+      N = self.typeNodesDef % (nname)
+    return idn, ("%s%s%s\n" % (self.tab, idn, N))    
 
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
     if not group in self.gNodes:
       self.gNodes[group] = ''
     G = self.gNodes[group]
-    idn = hashlib.md5(id.encode('utf-8')).hexdigest()
-    nname = name.replace('"', '\'') #.replace(':', '\:').replace('.', '\.')
-    ndescription = description.replace('"', '\'').replace(':', '\:').replace('.', '\.')
-    if ntype in self.typeNodes:
-      G = G + ("%s%s%s\"%s\"%s\n" % (self.tab, idn, self.typeNodes[ntype][0], nname, self.typeNodes[ntype][1]))
-    else:
-      G = G + ("%s%s%s\"%s\"%s\n" % (self.tab, idn, self.typeNodesDef[0], nname, self.typeNodesDef[1]))
+    idn, N = self._node(id, name, ntype, description)
+    
+    G = G + N
     
     if status in self.statusNodes:
       G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes[status]))
-    else:
-      G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes['undef']))
+    #else:
+    #  G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes['undef']))
 
     if link != '':
       # COMMENT: For HTTP ref => G = G + ("%sclick %s \"%s\" _blank\n" % (self.tab, idn, link))
@@ -136,13 +132,17 @@ class Mermaid():
     idn2 = hashlib.md5(service_to.encode('utf-8')).hexdigest()
     linktext = ''
     if len(text) > 0:
-      linktext = "|%s|" % text.replace('"', '\'')
-    if status in self.typeLinks:
-      G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinks[status], linktext, idn2))
-    else:
-      print('LOG: status not found "%s"' % status)
-      G = G + ("%s%s %s%s %s\n" % (self.tab, idn1, self.typeLinksDefault, linktext, idn2))
+      linktext = text.replace('"', '\'')
     
+    N = ''
+    
+    if status in self.typeLinks:
+      N = self.typeLinks[status].get('view', '-- %s --') % linktext
+    else:
+      print('WRN: status not found "%s"' % status)
+      N = self.typeLinksDefault % linktext
+    N = N.replace('||', '')
+    G = G + ("%s%s %s %s\n" % (self.tab, idn1, N, idn2))
     #if status in self.statusLinks:
     #  G = G + ("%sstyle %s %s;\n" % (self.tab, idn1, self.statusLinks[status]))
 

@@ -11,13 +11,13 @@ from urllib.parse import urlencode, quote
 from pprint import pprint
 from datetime import date
 
-from .domains import Domains
-from .services import Services
-from .api import API
-from .servicelinks import ServiceLinks
-from .tags import Tags
+from .obj.domains import Domains
+from .obj.services import Services
+from .obj.api import API
+from .obj.links import Links
+from .obj.tags import Tags
+from .obj.elog import ELog
 from .fabricdia import FabricDia
-from .elog import ELog
 from .fs import FS
 from .html import HTML
 
@@ -25,18 +25,18 @@ import re
 
 
 class ArcPatterns():
-  def __init__ (self, fs, verbose):
+  def __init__ (self, fs, config, verbose):
     self.fs = fs
 
     self.verbose = verbose
     self.domains = Domains()
     self.api = API()
     self.services = Services()
-    self.srvlinks = ServiceLinks()
+    self.links = Links()
     self.tags = Tags()
 
     self.html = HTML(self.fs, verbose)
-    self.dia = FabricDia(self.fs, self.html, verbose)
+    self.dia = FabricDia(self.fs, self.html, config, verbose)
 
   def update(self):
     pathname = "%s/arc.patterns" % self.fs.getPathTempDir()
@@ -75,7 +75,7 @@ class ArcPatterns():
       db = xl.readxl(fn=filename)
       self.domains.readXLS(db, 'DOMAINS')
       self.services.readXLS(db, 'SERVICES')
-      self.srvlinks.readXLS(db, 'SERVICE.LINKS')
+      self.links.readXLS(db, 'LINKS')
       self.tags.readXLS(db, 'TAGS')
       if self.verbose:
         print("LOG: Read '%s' - OK" % filename)
@@ -89,23 +89,23 @@ class ArcPatterns():
     
     lsrv = services.getVariants('id')
     
-    srvlinks = ServiceLinks()
+    srvlinks = Links()
     #linksFrom = self.srvlinks.filter('service_from', lsrv)
     #srvlinks.set(linksFrom)
     #linksTo = self.srvlinks.filter('service_to', lsrv)
     #srvlinks.append(linksTo)
     
-    links = self.srvlinks.filter('tags', tag)
+    links = self.links.filter('tags', tag)
     srvlinks.set(links)
     #srvlinks.append(links)
     #links = self.srvlinks.filter('service_from', lsrv)
     #srvlinks.append(links)
     
-    srvsTo = srvlinks.getVariants('service_to')
+    srvsTo = srvlinks.getVariants('item_to')
     srvs1 = self.services.filter('id', srvsTo)
     services.append(srvs1)
     
-    srvsFrom = srvlinks.getVariants('service_from')
+    srvsFrom = srvlinks.getVariants('item_from')
     srvs1 = self.services.filter('id', srvsFrom)
     services.append(srvs1)
 
@@ -130,11 +130,12 @@ class ArcPatterns():
     self.fs.mkDir(htmlPath + '/%s',
                    ['dia', 'patterns', 'patterns/tag'])
 
-    self.html.render('legend.html',      '%s/patterns/legend.html' % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
-    self.html.render('arcpatterns.html', '%s/patterns/tags.html'   % htmlPath, {'tags': self.tags.getItems(), 'services': self.services.getItems()})
+    #self.html.render('legend.html',      '%s/patterns/legend.html' % htmlPath, {'domains': self.domains.getItems(), 'services': self.services.getItems(), 'tags': self.tags.getItems()})
+    #self.html.render('arcpatterns.html', '%s/patterns/tags.html'   % htmlPath, {'tags': self.tags.getItems(), 'services': self.services.getItems()})
 
     self.dia.drawBlockDiagramLegend('legend', '%s/dia/legend' % (htmlPath))
 
+    '''
     if self.verbose:
       print("LOG: Rebuilding HTML for Tags (%d)..." % self.tags.getCount())
     for j, tag in self.tags.getItems():
@@ -148,4 +149,4 @@ class ArcPatterns():
     
     self.fs.printStats()
     
-
+    '''

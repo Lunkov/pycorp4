@@ -13,24 +13,25 @@ from .dia import Dia
 
 
 class FabricDia():
-  def __init__ (self, fs, html, verbose):
+  def __init__ (self, fs, html, config, verbose):
     self.verbose = verbose
+    self.config = config
     self.fs = fs
     self.html = html
     self.mermaidcli = MermaidCLI(verbose)
 
   def drawBlockDiagramLegend(self, name, filename):
-    D = Mermaid()
-    dia = D.getLegend(name)
+    D = Mermaid(self.config.getCfg('mermaid'))
+    dia = D.makeLegend(name)
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
 
     self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
-    self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
+    self.html.render('html/components/diagram_template_simple.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
 
     
-  def drawBlockDiagram(self, name, domains, services, srvlinks, filename):
-    D = Mermaid()
+  def drawBlockDiagram(self, name, iw, domains, services, srvlinks, filename):
+    D = Mermaid(self.config.getCfg('mermaid'))
     D.new('flowLR', name)
     
     for j, domain in domains.items():
@@ -49,8 +50,8 @@ class FabricDia():
              service.get('description', ''))
 
     for i, link in srvlinks.items():
-      D.link(link.get('service_from', 'xz'),
-             link.get('service_to', 'xz'),
+      D.link(link.get('item_from', 'xz'),
+             link.get('item_to', 'xz'),
              link.get('domain', ''),
              link.get('tags', ''),
              link.get('status', ''),
@@ -61,7 +62,7 @@ class FabricDia():
       return
 
     self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd', len(domains) * 500)
-    self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
+    self.html.render('html/components/diagram_template.html', filename + '.html', {'wsname': iw, 'dia_id': name, 'dia_scheme': dia})
 
     D = Dia(self.verbose)
     D.new('dia', name)
@@ -82,8 +83,8 @@ class FabricDia():
              service.get('description', ''))
 
     for i, link in srvlinks.items():
-      D.link(link.get('service_from', 'xz'),
-             link.get('service_to', 'xz'),
+      D.link(link.get('item_from', 'xz'),
+             link.get('item_to', 'xz'),
              link.get('domain', ''),
              link.get('tags', ''),
              link.get('status', ''),
@@ -92,7 +93,7 @@ class FabricDia():
     D.finish(filename+'.dia')
 
   def drawSequenceDiagram(self, name, seq, services, filename):
-    D = Mermaid()
+    D = Mermaid(self.config.get('mermaid', ''))
     D.new('sequence', seq.get('name', ''))
 
     if hasattr(seq['sequence'], "__len__"):
@@ -132,4 +133,4 @@ class FabricDia():
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
     self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
-    self.html.render('components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})
+    self.html.render('html/components/diagram_template.html', filename + '.html', {'dia_id': name, 'dia_scheme': dia})

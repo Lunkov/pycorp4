@@ -5,6 +5,7 @@ import os
 import optparse
 
 from src.fs import FS
+from src.cfg import Cfg
 from src.architector import Architector
 from src.arc_patterns import ArcPatterns
 
@@ -20,6 +21,11 @@ class CommandArgs(object):
                            action="store_true",
                            help="show this help message and exit",
                            dest="help"
+                          )
+    self.parser.add_option('-c', '--config',
+                           type="string",
+                           help="Config path",
+                           dest="path"
                           )
     self.parser.add_option('-p', '--path',
                            type="string",
@@ -81,6 +87,9 @@ class CommandArgs(object):
 def main(options):
   ''' Main Function '''
   fs = FS(options.verbose)
+  cfg = Cfg(options.verbose)
+  cfg.loadFromPath('./etc/')
+  return
   
   if options.path:
     fs.setPathData(options.path)

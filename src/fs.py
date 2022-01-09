@@ -11,13 +11,13 @@ import tempfile
 
 
 class FS():
-  def __init__ (self, verbose):
-    self.verbose = verbose
+  def __init__ (self, options):
+    self.verbose = options.verbose
     self.cnt_files = 0
     self.cnt_writes = 0
-    self.pathHTML = ''
-    self.pathData = ''
-    self.pathTemplates = ''
+    self.pathHTML = options.webpath
+    self.pathData = options.datapath
+    self.pathTemplates = options.templates
 
   def setPathHTML(self, p):
     self.pathHTML = p
@@ -59,6 +59,7 @@ class FS():
       return False
     if self.verbose:
       print("LOG: Write file: %s" % fname)
+    os.makedirs(os.path.dirname(fname), exist_ok=True)
     text_file = codecs.open(fname, 'w', 'utf-8')
     text_file.write(data)
     text_file.close()
