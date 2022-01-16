@@ -60,6 +60,8 @@ class Workspaces():
     self.m[iw]['services'].loadFromPath(path, '*.service', self.verbose)
     self.m[iw]['links'].loadFromPath(path, '*.link', self.verbose)
     self.m[iw]['tags'].loadFromPath(path, '*.tag', self.verbose)
+    self.m[iw]['services'].makeIndexes()
+    self.m[iw]['links'].makeIndexes()
 
   def loadXLSs(self, iw, pathname):
     fp = os.path.abspath(pathname)
@@ -133,9 +135,7 @@ class Workspaces():
     if not self.exists(iw):
       return Domains(), Services(), Links()
       
-    srv = self.m[iw]['services'].filter('tags', tag)
-    services = Services()
-    services.set(srv)
+    services = self.m[iw]['services'].filter('tags', tag)
     
     lsrv = services.getVariants('id')
     
@@ -152,14 +152,63 @@ class Workspaces():
     #srvlinks.append(links)
     
     srvsTo = srvlinks.getVariants('item_to')
-    srvs1 = self.services.filter('id', srvsTo)
+    srvs1 = self.m[iw]['services'].filter('id', srvsTo)
     services.append(srvs1)
     
     srvsFrom = srvlinks.getVariants('item_from')
-    srvs1 = self.services.filter('id', srvsFrom)
+    srvs1 = self.m[iw]['services'].filter('id', srvsFrom)
     services.append(srvs1)
 
     ldmn = services.getVariants('domain')
     domains = self.m[iw]['domains'].filter('id', ldmn)
     
-    return domains, services.get(), srvlinks.get()
+    return domains, services, srvlinks
+
+  def filterService(self, iw, name, service):
+    if not self.exists(iw):
+      return Domains(), Services(), Links()
+
+    services = self.m[iw]['services'].filter('id', service)
+    
+    srvlinks = self.m[iw]['links'].filter('service_from', service)
+    linksTo = self.m[iw]['links'].filter('service_to', service)
+    srvlinks.append(linksTo)
+    
+    srvsTo = srvlinks.getVariants('service_to')
+    srvs1 = self.m[iw]['services'].filter('id', srvsTo)
+    services.append(srvs1)
+    
+    srvsFrom = srvlinks.getVariants('service_from')
+    srvs1 = self.m[iw]['services'].filter('id', srvsFrom)
+    services.append(srvs1)
+
+    ldmn = services.getVariants('domain')
+    domains = self.m[iw]['domains'].filter('id', ldmn)
+    
+    srvsIds = services.getVariants('id')
+    
+    return domains, services, srvlinks, self.updates.filter('service', srvsIds)
+
+  def filterDomain(self, iw, domain):
+    if not self.exists(iw):
+      return Domains(), Services(), Links()
+    
+    services = self.m[iw]['services'].filter('domain', domain)
+    srvs = services.getVariants('id')
+    
+    srvlinks = self.m[iw]['links'].filter('service_from', srvs)
+    linksTo = self.m[iw]['links'].filter('service_to', srvs)
+    srvlinks.append(linksTo)
+    
+    srvsTo = srvlinks.getVariants('service_to')
+    srvs1 = self.m[iw]['services'].filter('id', srvsTo)
+    services.append(srvs1)
+    
+    srvsFrom = srvlinks.getVariants('service_from')
+    srvs1 = self.m[iw]['services'].filter('id', srvsFrom)
+    services.append(srvs1)
+
+    ldmn = services.getVariants('domain')
+    domains = self.m[iw]['domains'].filter('id', ldmn)
+    
+    return domains, services, srvlinks

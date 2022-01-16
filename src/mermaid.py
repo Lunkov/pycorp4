@@ -19,6 +19,10 @@ class Mermaid():
     self.gNodes = {}
     self.gGroups = {}
     self.gLinks = {}
+    
+    print('===')
+    pprint(config)
+    print('===')
 
     self.typeNodesDef = '["%s"]'
     self.typeNodes = {}

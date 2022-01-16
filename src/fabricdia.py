@@ -21,7 +21,7 @@ class FabricDia():
     self.mermaidcli = MermaidCLI(verbose)
 
   def drawBlockDiagramLegend(self, name, filename):
-    D = Mermaid(self.config.getCfg('mermaid'))
+    D = Mermaid(self.config['mermaid'])
     dia = D.makeLegend(name)
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
@@ -34,13 +34,13 @@ class FabricDia():
     D = Mermaid(self.config.getCfg('mermaid'))
     D.new('flowLR', name)
     
-    for j, domain in domains.items():
+    for j, domain in domains.getItems():
       D.group(domain.get('id', 'xz'),
               domain.get('name', 'xz').replace('"', '\''),
               domain.get('status', 'undef'),
               domain.get('link', ''))
       
-    for i, service in services.items():
+    for i, service in services.getItems():
       D.node(service.get('id', 'xz'),
              service.get('name', 'xz'),
              service.get('domain', 'undef'), 
@@ -49,7 +49,7 @@ class FabricDia():
              service.get('link', ''),
              service.get('description', ''))
 
-    for i, link in srvlinks.items():
+    for i, link in srvlinks.getItems():
       D.link(link.get('item_from', 'xz'),
              link.get('item_to', 'xz'),
              link.get('domain', ''),
@@ -61,19 +61,19 @@ class FabricDia():
     if not self.fs.writeFile(filename + '.mmd', dia):
       return
 
-    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd', len(domains) * 500)
+    self.mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd', domains.getCount() * 500)
     self.html.render('html/components/diagram_template.html', filename + '.html', {'wsname': iw, 'dia_id': name, 'dia_scheme': dia})
 
     D = Dia(self.verbose)
     D.new('dia', name)
     
-    for j, domain in domains.items():
+    for j, domain in domains.getItems():
       D.group(domain.get('id', 'xz'),
               domain.get('name', 'xz').replace('"', '\''),
               domain.get('status', 'undef'),
               domain.get('link', ''))
       
-    for i, service in services.items():
+    for i, service in services.getItems():
       D.node(service.get('id', 'xz'),
              service.get('name', 'xz'),
              service.get('domain', 'undef'), 
@@ -82,7 +82,7 @@ class FabricDia():
              service.get('link', ''),
              service.get('description', ''))
 
-    for i, link in srvlinks.items():
+    for i, link in srvlinks.getItems():
       D.link(link.get('item_from', 'xz'),
              link.get('item_to', 'xz'),
              link.get('domain', ''),

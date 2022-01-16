@@ -128,11 +128,14 @@ class WebSrv(object):
 
   def workspace_domain(self, iw, domain):
     workspace = self.workspaces.getStat(iw)
-    domains = self.workspaces.getDomains(iw)
-    dn = domains.getItem(domain)
+    dm = self.workspaces.getDomains(domain)
+    domains, services, srvlinks = self.workspaces.filterDomain(iw, domain)
+    self.dia.drawBlockDiagram(domain, iw, domains, services, srvlinks, '%s/dia/%s/domain/%s' % (self.fs.getPathHTML(), iw, domain.replace('/', '-')))
     return render_template('html/domain.html', options = self.options,
-                              domain = dn,
-                              domains = self.workspaces.getDomains(iw).getItems(),
+                              domain = dm,
+                              domains = domains.getItems(),
+                              domain_services = services.getItems(),
+                              domain_servicelinks = srvlinks.getItems(),
                               wsname = iw, workspaces = self.cfg.getCfg('workspaces'),
                               workspace = workspace)
 

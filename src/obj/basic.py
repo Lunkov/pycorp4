@@ -12,14 +12,33 @@ from pathlib import Path
 class Basic():
   def __init__ (self):
     self.name = 'unknown'
-    self.m = {}
-    self.dia = {}
-    self.ids = []
+    self.data = {}
     self.fields = []
+    self.ids = []
+    self.index = {}
+    self.f_index = []
+    self.dia = {}
+
+  def setData(self, mapV):
+    self.data = mapV
+
+  def getData(self):
+    return self.data
+
+  def setIndex(self, mapI):
+    self.index = mapI
+
+  def getCount(self):
+    return len(self.data)
+
+  def clone(self):
+    c = self.__class__()
+    c.setIndex(self.index)
+    return c
   
   def updateItem(self, name, properties):
-    if name in self.m:
-      prop = self.m[name]
+    if name in self.data:
+      prop = self.data[name]
       properties.update(self.normProp(prop))
 
     self.addItem(name, properties)
@@ -38,28 +57,25 @@ class Basic():
     if name == '':
       return
     self.dia[name] = None
-    self.m[name] = self.normProp(properties)
+    self.data[name] = self.normProp(properties)
   
   def getItem(self, name):
-    if name in self.m:
-      return self.m[name]
+    if name in self.data:
+      return self.data[name]
     return None
 
-  def set(self, mapV):
-    self.m = mapV
-    
-  def append(self, mapV):
-    self.m.update(mapV)
+  def append(self, m):
+    self.data.update(m.getData())
 
-  def get(self):
-    return self.m
+  def appendData(self, mapV):
+    self.data.update(mapV)
 
   def getItems(self):
-    return self.m.items()
+    return self.data.items()
 
   def getVariants(self, field):
     res = {}
-    for key, value in self.m.items():
+    for key, value in self.data.items():
       if type(value[field]) is list:
         for v in value[field]:
           res[v] = 1
@@ -67,61 +83,46 @@ class Basic():
         res[value[field]] = 1
     return list(res.keys())
 
-  def filter(self, field, val):
-    res = {}
-    for key, value in self.m.items():
+  def makeIndexes(self):
+    for i in self.f_index:
+      self.makeIndex(i)
+    
+  def makeIndex(self, field):
+    self.index[field] = {}
+    for key, value in self.data.items():
       if not field in value:
+        if not 'NONE' in self.index[field]:
+          self.index[field]['NONE'] = []
+        self.index[field]['NONE'].append(key)
         continue
-      if type(val) is list:
-        if len(val) < 1:
-          continue
-        if 'all' in val:
-          res[key] = value
-          continue
-        if type(value[field]) is list:
-          if len(value[field]) < 1:
-            continue
-          if 'all' in value[field]:
-            res[key] = value
-            continue
-          for item in value[field]:
-            if item in val:
-              res[key] = value
-              break
-        else:
-          if value[field] == '':
-            continue
-          if 'all' == value[field]:
-            res[key] = value
-            continue
-          if value[field] in val:
-            res[key] = value
+      if type(value[field]) is list:  
+        for item in value[field]:
+          if not item in self.index[field]:
+            self.index[field][item] = []
+          self.index[field][item].append(key)
       else:
-        if val == '':
-          continue
-        if 'all' == val:
-          res[key] = value
-          continue
-        if type(value[field]) is list:
-          if len(value[field]) < 1:
-            continue
-          if 'all' in value[field]:
-            res[key] = value
-            continue
-          if val in value[field]:
-            res[key] = value
-        else:
-          if value[field] == '':
-            continue
-          if 'all' == value[field]:
-            res[key] = value
-            continue
-          if value[field].find(val) > -1:
-            res[key] = value
+        if not value[field] in self.index[field]:
+          self.index[field][value[field]] = []
+        self.index[field][value[field]].append(key)
+    
+  def filter(self, field, val):
+    if not field in self.index:
+      self.makeIndex(field)
+    
+    res = self.clone()
+    if type(val) is list:
+      if 'all' in val:
+        return self
+      
+      for key in val:
+        if key in self.index[field]:
+          for ki in self.index[field][key]:
+            res.addItem(ki, self.data[ki])
+    else:
+      if val in self.index[field]:
+        for ki in self.index[field][val]:
+          res.addItem(ki, self.data[ki])
     return res
-
-  def getCount(self):
-    return len(self.m)
 
   def getName(self):
     return self.name
@@ -130,7 +131,7 @@ class Basic():
     text_file = codecs.open(filename, 'w', 'utf-8')
     text_file.write("%s\n" % ','.join(self.fields))
     
-    for i, v in self.m.items():
+    for i, v in self.data.items():
       rec = i + ','
       for c in self.fields:
         rec = rec + '\"' + v[c] + '\"' + ','
@@ -204,7 +205,7 @@ class Basic():
       columns[j] = c
 
     irow = 2
-    for key, value in self.m.items():
+    for key, value in self.data.items():
       for j, c in enumerate(self.fields):
         xls.ws(ws = worksheet).update_index(row = irow, col = j + 1, val = value[columns[j]])
       irow = irow + 1
@@ -212,7 +213,7 @@ class Basic():
   def writeJSON(self, filename):
     try:
       with codecs.open(filename, 'w', 'utf-8') as outfile:
-        json.dump(self.m, outfile, default=str)
+        json.dump(self.data, outfile, default=str)
     except Exception as err:
       print("FATAL: writeJSON(%s): %s" % (filename, str(err)))
 
@@ -220,7 +221,7 @@ class Basic():
     try:
       if os.path.isfile(filename):
         with codecs.open(filename, 'r', 'utf-8') as infile:
-          self.m = json.load(infile)
+          self.data = json.load(infile)
     except Exception as err:
       print("FATAL: readJSON(%s): %s" % (filename, str(err)))
 
@@ -243,10 +244,10 @@ class Basic():
       with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
         item = yaml.safe_load(stream)
         if 'code' in item:
-          if item['code'] in self.m:
-            self.m[item['code']].update(item)
+          if item['code'] in self.data:
+            self.data[item['code']].update(item)
           else:
-            self.m[item['code']] = item
+            self.data[item['code']] = item
         if verbose > 2:
           print("DBG: Item load %s" % fullPath)
     except yaml.YAMLError as exc:
