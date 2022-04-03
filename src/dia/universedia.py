@@ -17,7 +17,7 @@ from src.helpers.html import HTML
 
 
 class UniverseDia():
-  def __init__ (self, fs: FS, html: HTML, config, verbose = 0):
+  def __init__ (self, fs: FS, html: HTML, config: Cfg, verbose = 0):
     self.__verbose = verbose
     self.__config = config
     self.__fs = fs

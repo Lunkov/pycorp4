@@ -12,7 +12,7 @@ from datetime import date
 import hashlib
 
 class Mermaid():
-  def __init__ (self, config):
+  def __init__ (self, config: dict):
     self.__tab = '    '
     self.__name = ''
     self.__typeDia = ''
@@ -88,6 +88,9 @@ class Mermaid():
     nname = name.replace('"', '\'').replace('(', ' ').replace(')', ' ') #.replace(':', '\:').replace('.', '\.')
     ndescription = description.replace('"', "\'").replace(':', '\\:').replace('.', '\\.')
     N = ''
+    pprint('---- NODE ===')
+    pprint(ntype)
+    pprint(self.__typeNodes)
     if ntype in self.__typeNodes:
       N = self.__typeNodes[ntype].get('view', '[%s]') % (nname)
     else:

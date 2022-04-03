@@ -38,13 +38,11 @@ class ImportXLSV1(BasicImportXLS):
         if (reciever := self.getValue(row, columns, 'reciever')) is None:
           continue
         workspace.getSystems().append(System().set({'id': sender,
-                                                    'type': 'microservice',
                                                     'tags': tags}))
         workspace.getSystems().append(System().set({'id': reciever,
-                                                    'type': 'microservice',
                                                     'tags': tags}))
         workspace.getSystems().append(System().set({'id': topic,
-                                                    'type': 'kafka-topic',
+                                                    'type': 'topic',
                                                     'tags': tags}))
         
         workspace.getLinks().append(Link().set({'item_from': sender,
@@ -63,7 +61,6 @@ class ImportXLSV1(BasicImportXLS):
       traceback.print_exc(file=sys.stdout)
       return False
     return True
-
 
   def loadData(self, filename, workspace: Workspace):
     if (db := self.openFile(filename)) is None:
@@ -220,3 +217,52 @@ class ImportXLSV1(BasicImportXLS):
     t = tags.split(',')
     for it in t:
       workspace.getTags().append(Tag().set({'id': it}))
+
+  def loadSystems(self, filename, workspace: Workspace):
+    if (db := self.openFile(filename)) is None:
+      return False
+
+    nws = 'systems.info'
+    if (sheet := self.openWorksheet(db, nws)) is None:
+      return False
+ 
+    try:
+      columns, find = self.findColumns(sheet)
+      
+      ir = 0
+      for row in sheet.rows:
+        ir = ir + 1
+        if ir == 1:
+          continue
+        tags = self.getValue(row, columns, 'tags', '')
+        workspace.getSystems().append(System().set({'id': self.getValue(row, columns, 'id'),
+                                                    'name': self.getValue(row, columns, 'name'),
+                                                    'type': self.getValue(row, columns, 'type'),
+                                                    'tags': tags}))
+                                                
+    except Exception as err:
+      print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
+      traceback.print_exc(file=sys.stdout)
+      return False
+
+    nws = 'tags.info'
+    if (sheet := self.openWorksheet(db, nws)) is None:
+      return False
+ 
+    try:
+      columns, find = self.findColumns(sheet)
+      
+      ir = 0
+      for row in sheet.rows:
+        ir = ir + 1
+        if ir == 1:
+          continue
+        workspace.getTags().append(Tag().set({'id': self.getValue(row, columns, 'id'),
+                                                    'name': self.getValue(row, columns, 'name')}))
+                                                
+    except Exception as err:
+      print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
+      traceback.print_exc(file=sys.stdout)
+      return False
+
+    return True
