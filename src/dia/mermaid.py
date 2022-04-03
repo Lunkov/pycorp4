@@ -88,9 +88,6 @@ class Mermaid():
     nname = name.replace('"', '\'').replace('(', ' ').replace(')', ' ') #.replace(':', '\:').replace('.', '\.')
     ndescription = description.replace('"', "\'").replace(':', '\\:').replace('.', '\\.')
     N = ''
-    pprint('---- NODE ===')
-    pprint(ntype)
-    pprint(self.__typeNodes)
     if ntype in self.__typeNodes:
       N = self.__typeNodes[ntype].get('view', '[%s]') % (nname)
     else:
