@@ -47,12 +47,12 @@ class ImportXLSV1(BasicImportXLS):
         
         workspace.getLinks().append(Link().set({'item_from': sender,
                                                 'item_to': topic,
-                                                'type': 'q-a-pub',
+                                                'type': 'data',
                                                 'tags': tags}))
 
         workspace.getLinks().append(Link().set({'item_from': topic,
                                                 'item_to': reciever,
-                                                'type': 'q-a-sub',
+                                                'type': 'data',
                                                 'tags': tags}))
         self.appendTags(workspace, tags)
                                                 

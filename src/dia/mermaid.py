@@ -161,7 +161,7 @@ class Mermaid():
 
     self.__gGroups[id] = G
 
-  def link(self, node_from, node_to, group = '-', tags = '', status = '', text = ''):
+  def link(self, node_from, node_to, group = '-', tags = '', ltype = '', text = ''):
     if not group in self.__gNodes:
       self.__gNodes[group] = ''
 
@@ -174,11 +174,10 @@ class Mermaid():
       linktext = text.replace('"', '\'')
 
     N = ''
-
-    if status in self.__typeLinks:
-      N = self.__typeLinks[status].get('view', '-- %s --') % linktext
+    if ltype in self.__typeLinks:
+      N = self.__typeLinks[ltype].get('view', '-- %s --') % linktext
     else:
-      print('WRN: status not found "%s"' % status)
+      print('WRN: Link type not found "%s"' % ltype)
       N = self.__typeLinksDefault % linktext
     N = N.replace('||', '')
     G = G + ("%s%s %s %s\n" % (self.__tab, idn1, N, idn2))

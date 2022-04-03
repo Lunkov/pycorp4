@@ -66,7 +66,7 @@ class UniverseDia():
                  link.get('item_to', 'xz'),
                  link.get('group', 'undef'),
                  link.get('tags', ''),
-                 link.get('status', ''),
+                 link.get('type', 'data'),
                  link.get('description', ''))
 
   def drawBlockDiagram(self, name: str, groups: dict, nodes: dict, links: dict, filename: str):
