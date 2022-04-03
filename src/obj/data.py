@@ -15,22 +15,33 @@ class DataSets(BasicMap):
 
 class DataField(Basic):
   def __init__ (self):
-    super(DataField, self).__init__(['id', 'name', 'data', 'type', 'tags', 'length', 'sizeof'], ['data', 'id'], ['tags'])
+    super(DataField, self).__init__(['id', 'name', 'parent', 'type', 'tags', 'length', 'sizeof', 'required'], ['parent', 'name'], ['tags'])
 
   def set(self, properties: dict):
     if not 'sizeof' in properties:
       if 'type' in properties:
-        if properties['type'] == 'string':
+        ft = properties['type']
+        if ft == 'string' or ft == 'varchar':
           if 'length' in properties:
             properties['sizeof'] = (int(properties['length']) + 1) * 2  #utf-8
           else:
             properties['sizeof'] = 256
-        if properties['type'] == 'int':
+        if ft == 'bool' or ft == 'boolean':
+          properties['sizeof'] = 1
+        if ft == 'int':
           properties['sizeof'] = 4
-        if properties['type'] == 'float':
+        if ft == 'bigint':
           properties['sizeof'] = 4
-        if properties['type'] == 'double':
+        if ft == 'float':
+          properties['sizeof'] = 4
+        if ft == 'double':
           properties['sizeof'] = 8
+        if ft == 'date':
+          properties['sizeof'] = 4
+        if ft == 'timestamp':
+          properties['sizeof'] = 8
+        if ft == 'uuid':
+          properties['sizeof'] = 16
     return super().set(properties)
 
 class DataFields(BasicMap):

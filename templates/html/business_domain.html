@@ -1,0 +1,90 @@
+{% include "html/base/header.html" %}
+
+<div id="wrapper">
+
+	{% include "html/base/menu-workspace.html" %}
+
+	<!-- Content Wrapper -->
+	<div id="content-wrapper" class="d-flex flex-column">
+
+		<!-- Main Content -->
+		<div id="content">
+
+		{% include "html/base/navbar.html" %}
+
+<div class="container-fluid">
+
+<h1><a href="/workspace/{{ wsname }}/business_domains">&#x2B11;</a>&nbsp; Бизнес домен: {{ business_domain.name }}</h1>
+
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+		<ul>
+		  <li><a href="#about">О Бизнес домене</a></li>
+		  <li><a href="#services">Связанные сервисы</a></li>
+		  <li><a href="#domain_serviceslinks">Перечень связей</a></li>
+		  <li><a href="#schemaiframe">Схема</a></li>
+		</ul>
+	  </div>
+   </div>
+</div>
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary" id="about">О Бизнес домене</h6>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+
+<table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Параметр</th>
+			<th>Значение</th>
+		</tr>
+	</thead>
+<tbody>
+	<tr>
+		<td>Описание</td>
+		<td>{{ business_domain.description }}</td>
+	</tr>
+	<tr>
+		<td>Описание Домена</td>
+		<td><a href="{{ business_domain.link }}" target=_blank>Wiki</a></td>
+	</tr>
+</tbody>
+</table>
+
+   </div>
+</div>
+
+
+{% with table_title='Связанные сервисы', table_id='business_domain_services', table_rows=business_domain_services %}
+  {% include "html/components/table_service.html" %}
+{% endwith %}
+
+{% with dia_path='business-domain', dia_id=business_domain.id, dia_name=business_domain.name, print_png=true %}
+  {% include "html/components/diagram.html" %}
+{% endwith %}
+
+{% with table_title='Перечень связей', table_id='business_domain_serviceslinks', table_rows=business_domain_servicelinks %}
+  {% include "html/components/table_service2links.html" %}
+{% endwith %}
+
+
+</div>
+
+		</div>
+		<!-- End of Main Content -->
+
+	</div>
+	<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+{% include "html/base/footer.html" %}

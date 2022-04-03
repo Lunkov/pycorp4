@@ -1,0 +1,36 @@
+{% include "html/base/header.html" %}
+
+<div id="wrapper">
+
+	{% include "html/base/menu-index.html" %}
+
+	<!-- Content Wrapper -->
+	<div id="content-wrapper" class="d-flex flex-column">
+
+		<!-- Main Content -->
+		<div id="content">
+
+		{% include "html/base/navbar.html" %}
+
+<div class="container-fluid">
+
+  <div class="row">
+
+{% with dia_path='', dia_id='legend', dia_name='Легенда схем', print_png=true %}
+  {% include "html/components/diagram.html" %}
+{% endwith %}
+	
+  </div>
+
+</div>
+
+		</div>
+		<!-- End of Main Content -->
+
+	</div>
+	<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+{% include "html/base/footer.html" %}

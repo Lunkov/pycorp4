@@ -1,0 +1,153 @@
+{% include "html/base/header.html" %}
+
+<div id="wrapper">
+
+	{% include "html/base/menu-workspace.html" %}
+
+	<!-- Content Wrapper -->
+	<div id="content-wrapper" class="d-flex flex-column">
+
+		<!-- Main Content -->
+		<div id="content">
+		{% include "html/base/navbar.html" %}
+
+<div class="container-fluid">
+
+<h1><a href="/workspace/{{ wsname }}/tags">&#x2B11;</a>&nbsp; Тэг: {{ tag.name }}</h1>
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h3 class="m-0 font-weight-bold text-primary" id="content">Содержание</h3>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+		<ul>
+		  <li><a href="#about">О теге</a></li>
+		  <li><a href="#fsd">Функциональные требования</a></li>
+		  <li><a href="#dataTableIN">Перечень сервисов</a></li>
+		  <li><a href="#tag_systemlinks">Перечень связей</a></li>
+		  <li><a href="#schemaiframe">Схема</a></li>
+		</ul>
+	  </div>
+   </div>
+</div>
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary" id="about">О теге</h6>
+	</div>
+	<div class="card-body">
+      <div class="card shadow mb-4">
+
+<table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Параметр</th>
+			<th>Значение</th>
+		</tr>
+	</thead>
+<tbody>
+	<tr>
+		<td>Идентификатор тега</td>
+		<td>{{ tag.id }}</td>
+	</tr>
+	<tr>
+		<td>Описание тега</td>
+		<td>{{ tag.description }}</td>
+	</tr>
+</tbody>
+</table>
+     
+     </div>
+   </div>
+</div>
+
+
+<!-- DataTales  -->
+<script>
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+  $('#dataTableIN').DataTable();
+  $('#dataTableFSD').DataTable();
+});
+</script>
+
+		<div class="card shadow mb-4">
+			<div class="card-header py-3">
+				<h6 class="m-0 font-weight-bold text-primary" id="fsd">Функциональные требования</h6>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table table-bordered" id="dataTableFSD" width="100%" cellspacing="0">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Name</th>
+								<th>Date</th>
+								<th>Description</th>
+								<th>Status</th>
+								<th>Tags</th>
+								<th>Services</th>
+								<th>Link</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th>ID</th>
+								<th>Name</th>
+								<th>Date</th>
+								<th>Description</th>
+								<th>Status</th>
+								<th>Tags</th>
+								<th>Services</th>
+								<th>Link</th>
+							</tr>
+						</tfoot>
+						<tbody>
+{% for i, item in fsd %}
+							<tr>
+								<td>{{ item.id }}</td>
+								<td>{{ item.name }}</td>
+								<td>{{ item.date }}</td>
+								<td>{{ item.descripton }}</td>
+								<td>{{ item.status }}</td>
+								<td>{{ item.tags }}</td>
+								<td>{{ item.services }}</td>
+								{% if item.link|length %}
+								  <td><a href="{{ item.link }}" target=_blank>Link</a></td>
+								{% else %}
+								  <td>&#128533;</td>
+								{% endif %}
+							</tr>
+{% endfor %}
+							
+						</tbody>
+					</table>
+		</div>
+  </div>
+</div>
+
+{% with table_title='Перечень сервисов', table_id='tag_systems', table_rows=tag_systems %}
+  {% include "html/components/table_system.html" %}
+{% endwith %}
+
+{% with dia_filter='tag', dia_id=tag.id, dia_name=tag.name, print_png=true %}
+  {% include "html/components/diagram.html" %}
+{% endwith %}
+
+{% with table_title='Перечень связей', table_id='tag_systemlinks', table_rows=tag_systemlinks %}
+  {% include "html/components/table_system2links.html" %}
+{% endwith %}
+
+		</div>
+
+		</div>
+		<!-- End of Main Content -->
+
+	</div>
+	<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+{% include "html/base/footer.html" %}

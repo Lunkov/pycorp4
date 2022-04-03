@@ -1,0 +1,62 @@
+<!-- BEGIN DataTables  '{{ table_title }}' -->
+{% if table_rows|length %}
+<table class="table table-bordered" id="dataTable-{{ table_id }}" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Наименование</th>
+			<th>Тип</th>
+			<th>Описание</th>
+			<th>Пример</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>{{ item.name }}</td>
+			<td>{{ item.type }} / {{ item.format }}</td>
+			<td>{{ item.description }}</td>
+			<td>{{ item.example }}</td>
+		</tr>
+
+{% if item['properties']|length %}
+		<tr>
+			<td colspan=4>
+
+<table class="table table-bordered" id="dataTable-{{ table_id }}" width="100%" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Наименование</th>
+			<th>Тип</th>
+			<th>Описание</th>
+			<th>Пример</th>
+		</tr>
+	</thead>
+	<tbody>
+
+	{% for it, itr in item['properties'].items() %}
+		<tr>
+			<td>{{ it }}</td>
+			<td>{{ itr.type }}</td>
+			<td>{{ itr.description }}</td>
+			<td>{{ itr.example }}</td>
+		</tr>
+		{% if itr['properties']|length %}
+		
+			{% with table_id='api-responses-'+md5(ip+im), item=itr %}
+			  {% include "components/api_struct_properties.html" %}
+			{% endwith %}
+
+		
+		{% endif %}
+
+	{% endfor %}
+	</tbody>
+</table>
+	
+			</td>
+		</tr>
+{% endif %}
+		
+	</tbody>
+</table>
+{% endif %}
+<!-- END DataTables  '{{ table_title }}' -->

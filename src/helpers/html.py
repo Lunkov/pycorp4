@@ -11,8 +11,8 @@ class HTML():
     self.__verbose = verbose
     self.__fs = fs
     self.__templates = {}
-    self.__templateLoader = jinja2.FileSystemLoader(searchpath = self.fs.getPathTemplates())
-    self.__templateEnv = jinja2.Environment(loader = self.templateLoader)
+    self.__templateLoader = jinja2.FileSystemLoader(searchpath = self.__fs.getPathTemplates())
+    self.__templateEnv = jinja2.Environment(loader = self.__templateLoader)
 
   def render(self, tmplfile, dstfile, prop = {}):
     if not tmplfile in self.templates:

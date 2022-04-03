@@ -28,7 +28,7 @@ class Basic():
 
   def set(self, properties: dict):
     self.__data = self.__normProp(properties)
-    self.__id = self.__data.get('id', self.__genUID())
+    self.__id = self.__data.get('id', self.__genCode(self.__data))
     self.__uid = self.__genUID()
     self.__code = self.__genCode(self.__data)
     self.__name = self.__data.get('name', 'undef')
@@ -72,6 +72,9 @@ class Basic():
   def __genCode(self, properties):
     key = ''
     for j in self.__ids:
+      if key == '':
+        key = properties.get(j, '')
+        continue
       key = key + '.' + properties.get(j, '')
     return key
 

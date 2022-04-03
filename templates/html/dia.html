@@ -1,0 +1,81 @@
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Schema</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link
+	  href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+	  rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="/static/css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+<body id="page-top">
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+<script>
+var services = {};
+$.getJSON("/data/{{ wsname }}/services.json", function( json ) {
+	services = new Map(Object.entries(json));
+});
+
+var config = {
+	startOnLoad:true,
+	htmlLabels:true,
+	securityLevel: 'loose',
+	maxTextSize: 300000,
+	noteMargin: 10,
+	flowchart:{
+		useMaxWidth:false,
+	}
+};
+mermaid.initialize(config);
+mermaid.parseError = function(err,hash){  console.log(err);};
+
+var nodeClick = function(id_service) {
+  if(services.get(id_service)) {
+	$("#block-name").html(services.get(id_service).name);
+	$("#block-description").html("Описание: " + services.get(id_service).description);
+	$("#block-dialink").html("<a href=\"/dia/service/"+id_service+".html\" target=_blank>Схема сервиса</a>");
+	$("#block-link").html("<a href=\"/service/"+id_service+".html\" target=_blank>"+services.get(id_service).name+"</a>");
+	$("#block-linkwiki").html("<a href=\""+services.get(id_service).link+"\" target=_blank>Wiki</a>");
+	$("#block-swagger").html("<a href=\""+services.get(id_service).swagger+"\" target=_blank>Swagger</a>");
+  }
+  $("#block-dlg").modal();
+}
+</script>
+<div class="modal" tabindex="-1" role="dialog" id="block-dlg">
+  <div class="modal-dialog" role="document">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<h5 class="modal-title" id="block-name"></h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		  <span aria-hidden="true">&times;</span>
+		</button>
+	  </div>
+	  <div class="modal-body">
+		<p id="block-description"></p>
+		<p id="block-link"></p>
+		<p id="block-linkwiki"></p>
+		<p id="block-swagger"></p>
+	  </div>
+	  <div class="modal-footer">
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</div>
+  </div>
+</div>
+<div class="mermaid" id="{{ dia_id }}">
+{{ dia_scheme }}
+</div>
+</body>

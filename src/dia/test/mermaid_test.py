@@ -20,7 +20,7 @@ class TestDiagram(unittest.TestCase):
   def setUp(self):
     self.fs = FS()
     
-    self.w = Workspace('test', self.fs, True)
+    self.w = Workspace('test', self.fs, '', 0)
     
     self.w.getSystems().append(System().set({'id': 'srv.1', 'name': 'srv.1', 'type': 'microservice', 'tags': 'price'}))
     self.w.getSystems().append(System().set({'id': 'srv.2', 'name': 'srv.2', 'type': 'microservice', 'tags': 'price'}))

@@ -11,17 +11,24 @@ import tempfile
 
 
 class FS():
-  def __init__ (self, templates = 'tempaltes/', datapath = 'data/', webpath = 'www/', verbose = 0):
+  def __init__ (self, config = 'etc/', templates = 'tempaltes/', datapath = 'data/', webpath = 'www/', verbose = 0):
     self.__verbose = verbose
     self.__pathHTML = webpath
     self.__pathData = datapath
     self.__pathTemplates = templates
+    self.__pathConfig = config
     self.__cnt_files = 0
     self.__cnt_writes = 0
 
   def initCount(self):
     self.__cnt_files = 0
     self.__cnt_writes = 0
+
+  def setPathConfig(self, p):
+    self.__pathConfig = p
+
+  def getPathConfig(self):
+    return self.__pathConfig
 
   def setPathHTML(self, p):
     self.__pathHTML = p
@@ -77,15 +84,18 @@ class FS():
   def rsync(self, source, destination, dirs):
     for p in dirs:
       if os.name != 'nt':
-        sysrsync.run(source = source % p,
-                   destination = destination % p,
-                   sync_source_contents = True,
-                   exclusions = ['.~*', 'Thumbs.db:encryptable'],
-                   options = ['-a'],
-                   verbose = self.__verbose)
+        if os.path.exists(source % p): 
+          sysrsync.run(source = source % p,
+                     destination = destination % p,
+                     sync_source_contents = True,
+                     exclusions = ['.~*', 'Thumbs.db:encryptable'],
+                     options = ['-a'],
+                     verbose = self.__verbose)
+        else:
+          print("ERR: Path is not exists: %s" % (source % p))
 
   def printStats(self):
-    if self.__verbose:
+    if self.__verbose > 3:
       print("LOG: Write files: %d / %d" % (self.cnt_writes, self.cnt_files))
 
   @staticmethod

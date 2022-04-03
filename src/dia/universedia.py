@@ -11,7 +11,6 @@ from .mermaid import Mermaid
 from .mermaidCLI import MermaidCLI
 from .dia import Dia
 
-from src.workspace import Workspace
 from src.cfg import Cfg
 from src.helpers.fs import FS
 from src.helpers.html import HTML
@@ -44,17 +43,17 @@ class UniverseDia():
     if not groups is None:
       for j, group in groups.items():
         if group.get('id', '') != '':
-          D.group(group.get('id', 'xz'),
-                  group.get('name', 'xz').replace('"', '\''),
+          D.group(group.get('id', 'undef'),
+                  group.get('name', group.get('id', 'undef')).replace('"', '\''),
                   group.get('status', 'undef'),
                   group.get('link', ''))
 
     if not nodes is None:
       for i, node in nodes.items():
         if node.get('id', '') != '':
-          D.node(node.get('id', 'xz'),
-                 node.get('name', 'xz'),
-                 node.get('domain', 'undef'), 
+          D.node(node.get('id', 'undef'),
+                 node.get('name', node.get('id', 'undef')),
+                 node.get('group', 'undef'), 
                  node.get('type', 'service'),
                  node.get('status', 'undef'),
                  node.get('link', ''),
@@ -65,12 +64,12 @@ class UniverseDia():
         if link.get('item_from', '') != '' and link.get('item_to', '') != '':
           D.link(link.get('item_from', 'xz'),
                  link.get('item_to', 'xz'),
-                 link.get('domain', ''),
+                 link.get('group', 'undef'),
                  link.get('tags', ''),
                  link.get('status', ''),
                  link.get('description', ''))
 
-  def drawBlockDiagram(self, name: str, iw: Workspace, groups: dict, nodes: dict, links: dict, filename: str):
+  def drawBlockDiagram(self, name: str, groups: dict, nodes: dict, links: dict, filename: str):
     cfg = {}
     if not self.__config is None:
       cfg = self.__config.getCfg('mermaid')

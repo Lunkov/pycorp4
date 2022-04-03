@@ -27,8 +27,8 @@ class Cfg():
   def loadFromPath(self, pathname):
     fp = os.path.abspath(pathname)
     fullPath = fp
-    if self.__verbose:
-      print("LOG: Config read from '%s'..." % fp)
+    if self.__verbose > 0:
+      print("LOG: Config read from '%s' ..." % fp)
     try:
       for path in Path(fp).rglob('*.cfg'):
         fullPath = os.path.join(fp, path.parent, path.name)
@@ -39,6 +39,8 @@ class Cfg():
       print("FATAL: File(%s): %s" % (fullPath, str(err)))
 
   def load(self, fullPath):
+    if self.__verbose > 0:
+      print("LOG: Config file read from '%s'" % fullPath)
     try:
       with codecs.open(fullPath, 'r', encoding='utf-8') as stream:
         config = yaml.safe_load(stream)

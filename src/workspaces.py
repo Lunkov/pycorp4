@@ -4,44 +4,51 @@
 import logging
 import os
 from pathlib import Path
-import pylightxl as xl
 
 from urllib.parse import urlencode, quote
 from pprint import pprint
 from datetime import date
 
-from .obj.business_domains import BusinessDomains
+from .cfg import Cfg
+from .workspace import Workspace
+
 from .obj.tags import Tags
-from .obj.services import Services
+from .obj.systems import Systems
+from .obj.data import DataSets
 from .obj.nodes import Nodes
 from .obj.links import Links
-from .obj.solutions import Solutions
 from .helpers.fs import FS
+
+from .load.loader import Loader
 
 import re
 
 
 class Workspaces():
-  def __init__ (self, fs, config, verbose):
-    self._fs = fs
-    self._config = config
-    self._verbose = verbose
+  def __init__ (self, fs: FS, config: Cfg, verbose = 0):
+    self.__fs = fs
+    self.__config = config
+    self.__verbose = verbose
     
-    self._ws = {}
+    self.__ws = {}
 
-  def init():
-    ws = self.config.getCfg('workspaces')
+  def init(self):
+    ws = self.__config.getCfg('workspaces')
     for iw, wv in ws.items():
-      self._ws[iw] = Workspace(iw, self.__fs, wv, self.__verbose)
+      self.__ws[iw] = Workspace(iw, self.__fs, wv['path'], self.__verbose)
 
-  def reload(self, iw):
-    w = self._config.getCfg('workspaces')
-    if iw in self._ws:
-      self._ws[iw].load()
+  def reload(self):
+    wc = self.__config.getCfg('workspaces')
+    loader = Loader()
+    for iw, wv in wc.items():
+      if iw in self.__ws:
+        if 'loaddata' in wv:
+          loader.run(self.__ws[iw], self.__fs.getPathData(), wv['loaddata'])
+  
+  def getStat(self):
+    return {}
 
-  def loadAll(self):
-    ws = self._config.getCfg('workspaces')
-    for iw, wv in ws.items():
-      if iw in self._ws:
-        self._ws[iw].load()
-
+  def getWorkspace(self, iw: str):
+    if iw not in self.__ws:
+      return {}
+    return self.__ws[iw]

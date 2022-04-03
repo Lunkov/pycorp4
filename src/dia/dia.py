@@ -64,12 +64,12 @@ class Dia():
                 if ntype == 'db':
                   nn[j] = RDS(j)
         for k, lnk in self.__gLinks.items():
-          if lnk['node_from'] in nn and lnk['service_to'] in nn:
+          if lnk['node_from'] in nn and lnk['item_to'] in nn:
             # print("LOG: Edge '%s' => '%s' : %s" % (nn[lnk['service_from']], nn[lnk['service_to']], lnk['text']), flush=True)
             if lnk['status'] == 'ok':
-              nn[lnk['node_from']] >> Edge(label=lnk['text'], style="bold") >> nn[lnk['service_to']]
+              nn[lnk['node_from']] >> Edge(label=lnk['text'], style="bold") >> nn[lnk['item_to']]
             else:
-              nn[lnk['node_from']] >> Edge(label=lnk['text']) >> nn[lnk['service_to']]
+              nn[lnk['node_from']] >> Edge(label=lnk['text']) >> nn[lnk['item_to']]
     except Exception as e:
       print("ERR: Diagram: %s: %s" % (filename, str(e)))
       return False
