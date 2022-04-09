@@ -18,7 +18,9 @@ class TestImportData(unittest.TestCase):
     
     self.assertEqual(ok, True)
     self.assertEqual(w.getSystems().count(), 27)
-    self.assertEqual(w.getSystems().getItem('Service 1'), {'id': 'Service 1', 'layers': [], 'tags': ['tag1'], 'type': 'microservice'})
+    self.assertEqual(w.getSystems().getItem('Service 1'), {'id': 'Service 1', 'layers': [], 'tags': ['tag1']})
+    self.assertEqual(w.getLinks().count(), 32)
+    self.assertEqual(w.getLinks().getItem('27648c0f118c43ef73bb5b03815c61ee'), {'link_from': 'Service 1', 'link_to': 'Topic 1', 'type': 'data', 'tags': 'tag1'})
 
   def testData(self):
 

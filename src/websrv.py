@@ -3,7 +3,7 @@
 
 import os
 import json
-from flask import Flask, Blueprint, request, send_from_directory, render_template, session
+from flask import Flask, Blueprint, request, send_from_directory, render_template, session, jsonify
 
 from pprint import pprint
 
@@ -40,6 +40,7 @@ class WebSrv(object):
     self.__blueprint.add_url_rule('/workspace/<string:iw>/systems',                                 view_func=self.getWorkspaceSystems,         methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/system/<string:system>',                  view_func=self.getWorkspaceSystem,          methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/links',                                   view_func=self.getWorkspaceLinks,           methods=['GET'])
+    self.__blueprint.add_url_rule('/workspace/<string:iw>/link/<string:linkname>',                  view_func=self.getWorkspaceLink,            methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/solutions',                               view_func=self.getWorkspaceSolutions,       methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/sd/<string:sd>',                          view_func=self.getWorkspaceLinks,           methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/reports',                                 view_func=self.getWorkspaceReports,         methods=['GET'])
@@ -49,7 +50,8 @@ class WebSrv(object):
     self.__blueprint.add_url_rule('/legend',                             view_func=self.getHelpLegend,         methods=['GET'])
     self.__blueprint.add_url_rule('/patterns/<string:name>',             view_func=self.getHelpPatterns,       methods=['GET'])
     self.__blueprint.add_url_rule('/best_practices/<string:name>',       view_func=self.getHelpBestPractices,  methods=['GET'])
-    self.__blueprint.add_url_rule('/api/workspace/<string:name>/reload', view_func=self.getWorkspaceReload,    methods=['POST'])
+    self.__blueprint.add_url_rule('/api/workspace/<string:name>/reload',    view_func=self.apiWorkspaceReload,    methods=['POST'])
+    self.__blueprint.add_url_rule('/api/workspace/<string:name>/services',  view_func=self.apiWorkspaceSystems,   methods=['GET'])
 
     self.__blueprint.add_url_rule('/workspace/<string:iw>/rfc/<string:rfc>/yaml/<string:filename>',          view_func=self.yaml,             methods=['GET', 'POST'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/rfc/<string:rfc>/yaml/<string:filename>/tree',     view_func=self.yamlTree,         methods=['GET', 'POST'])
@@ -103,8 +105,13 @@ class WebSrv(object):
                            workspaces = self.__cfg.getCfg('workspaces'),
                            workspace = workspace, workspace_stat = workspace.getStat())
     
-  def getWorkspaceReload(self, iw):
-    self.__workspaces.reload(iw)
+  def apiWorkspaceReload(self, iw):
+    self.__workspaces.reloadWorkspace(iw)
+    return "OK"
+
+  def apiWorkspaceSystems(self, iw):
+    workspace = self.__workspaces.getStat(iw)
+    return jsonify(workspace.getSystems().get())
 
   def getWorkspaceBusinessDomains(self, iw):
     workspace = self.__workspaces.getStat(iw)
@@ -166,16 +173,15 @@ class WebSrv(object):
     if fsystem is not None:
       fsystems, flinks = workspace.filterSystem(fsystem)
       filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'system', fsystem)
-      self.__dia.drawBlockDiagram(fsystem, {}, fsystems.get(), flinks.get(), filename)
+      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+      self.__dia.drawBlockDiagram(fsystem, groups, fsystems.get(), flinks.get(), filename)
     
     ftag = request.args.get('tag')
-    pprint('--tag--')
-    pprint(ftag)
     if ftag is not None:
       fsystems, flinks = workspace.filterTag(ftag)
-      pprint(fsystems)
       filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'tag', ftag)
-      self.__dia.drawBlockDiagram(ftag, {}, fsystems.get(), flinks.get(), filename)
+      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+      self.__dia.drawBlockDiagram(ftag, groups, fsystems.get(), flinks.get(), filename)
     f = open(filename + '.mmd')
     mmd  = f.read()
     f.close()
@@ -185,12 +191,19 @@ class WebSrv(object):
     workspace = self.__workspaces.getWorkspace(iw)
     systems = workspace.getSystems()
     srv = systems.getItem(system)
-
-    #fsystems, flinks = workspace.filterSystem(system)
-    #self.__dia.drawBlockDiagram(system, iw, {}, fsystems.get(), flinks.get(), '%s/dia/%s/systems/%s' % (self.__fs.getPathHTML(), iw, system.replace('/', '-')))
     
+    idfrom = workspace.getLinks().filter('link_from', system).getVariants('link_to')
+    pprint('===idfrom===')
+    pprint(idfrom)
+    idto = workspace.getLinks().filter('link_to', system).getVariants('link_from')
+    pprint('===idto===')
+    pprint(idto)
+    pprint('===idto 2===')
+    pprint(workspace.getSystems().filter('id', idfrom).get().items())
     return render_template('html/system.html', wsname = iw, system = srv,
                             systems = systems.get().items(),
+                            links_to = workspace.getSystems().filter('id', idfrom).get().items(),
+                            links_from = workspace.getSystems().filter('id', idto).get().items(),
                             workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
 
   def getWorkspaceSolutions(self, iw):
@@ -203,13 +216,15 @@ class WebSrv(object):
 
   def getWorkspaceLinks(self, iw):
     workspace = self.__workspaces.getWorkspace(iw).getStat()
+    pprint(self.__workspaces.getWorkspace(iw).getLinks().get().items())
     return render_template('html/links.html', wsname = iw, 
-                            links = self.__workspaces.getWorkspace(iw).getLinks().get(),
-                            workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
+                            links = self.__workspaces.getWorkspace(iw).getLinks().get().items(),
+                            workspaces = self.__cfg.getCfg('workspaces'),
+                            workspace = workspace)
 
-  def workspace_sd(self, iw):
+  def getWorkspaceLink(self, iw, linkname):
     workspace = self.__workspaces.getStat(iw)
-    return render_template('html/links.html', wsname = iw, 
+    return render_template('html/link.html', wsname = iw, 
                             links = self.__workspaces.getLinks(iw).getItems(),
                             workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
 

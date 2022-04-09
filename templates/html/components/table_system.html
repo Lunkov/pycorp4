@@ -17,36 +17,29 @@ $(document).ready(function() {
 				<thead>
 					<tr>
 						<th>Идентификатор</th>
-						<th>Домен</th>
 						<th>Имя</th>
 						<th>Описание</th>
 						<th>Тип</th>
 						<th>Тэги</th>
 						<th>Слой</th>
 						<th>Статус</th>
-						<th>Wiki</th>
-						<th>Swagger</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr>
 						<th>Идентификатор</th>
-						<th>Домен</th>
 						<th>Имя</th>
 						<th>Описание</th>
 						<th>Тип</th>
 						<th>Тэги</th>
 						<th>Слой</th>
 						<th>Статус</th>
-						<th>Wiki</th>
-						<th>Swagger</th>
 					</tr>
 				</tfoot>
 				<tbody>
 {% for i, item in table_rows %}
 					<tr>
 						<td>{{ item.id }}</td>
-						<td><a href="/workspace/{{ wsname }}/business_domain/{{ item['business-domain'] }}">{{ item['business-domain'] }}</a></td>
 						<td><a href="/workspace/{{ wsname }}/service/{{ item.id }}">{{ item.name }}</a></td>
 						<td>{{ item.description }}</td>
 						<td>{{ item.type }}</td>
@@ -57,14 +50,6 @@ $(document).ready(function() {
 						</td>
 						<td>{{ item.layer }}</td>
 						<td>{{ item.status }}</td>
-						<td><a href="{{ item.link }}">Wiki</a></td>
-					{% if item.swagger|length %}
-					  <td><a href="{{ item.swagger }}" target=_blank>Swagger</a></td>
-					{% else %}
-					  <td>&#128533;</td>
-					{% endif %}
-
-					</tr>
 {% endfor %}
 					
 				</tbody>

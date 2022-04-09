@@ -27,18 +27,18 @@ class TestDiagram(unittest.TestCase):
     self.w.getSystems().append(System().set({'id': 'srv.3', 'name': 'srv.3', 'type': 'microservice', 'tags': 'price'}))
     self.w.getSystems().append(System().set({'id': 'topic.1', 'name': 'topic.1', 'type': 'kafka-topic', 'tags': 'price'}))
     
-    self.w.getLinks().append(Link().set({'item_from': 'srv.1',
-                                    'item_to': 'topic.1',
+    self.w.getLinks().append(Link().set({'link_from': 'srv.1',
+                                    'link_to': 'topic.1',
                                     'type': 'data',
                                     'tags': 'price'}))
 
-    self.w.getLinks().append(Link().set({'item_from': 'topic.1',
-                                    'item_to': 'srv.2',
+    self.w.getLinks().append(Link().set({'link_from': 'topic.1',
+                                    'link_to': 'srv.2',
                                     'type': 'data',
                                     'tags': 'price'}))
 
-    self.w.getLinks().append(Link().set({'item_from': 'topic.1',
-                                    'item_to': 'srv.3',
+    self.w.getLinks().append(Link().set({'link_from': 'topic.1',
+                                    'link_to': 'srv.3',
                                     'type': 'data',
                                     'tags': 'price'}))
 
@@ -47,8 +47,8 @@ class TestDiagram(unittest.TestCase):
     self.w.getDataFields().append(DataField().set({'data': 'msg_price', 'id': 'price', 'name': 'price', 'type': 'float', 'length': '8', 'tags': 'price'}))
     self.w.getDataSets().append(DataSet().set({'id': 'msg_price_full', 'name': 'msg_price_full', 'type': 'struct', 'tags': 'price'}))
 
-    self.w.getLinks().append(Link().set({'item_from': 'msg_price',
-                                    'item_to': 'msg_price_full',
+    self.w.getLinks().append(Link().set({'link_from': 'msg_price',
+                                    'link_to': 'msg_price_full',
                                     'type': 'dataflow',
                                     'description': 'price',
                                     'tags': 'price'}))
@@ -65,8 +65,8 @@ class TestDiagram(unittest.TestCase):
 
     for i, link in self.w.getLinks().get().items():
       if link.get('type', '') != 'dataflow':
-        dia.link(link.get('item_from', 'xz'),
-                 link.get('item_to', 'xz'),
+        dia.link(link.get('link_from', 'xz'),
+                 link.get('link_to', 'xz'),
                  link.get('domain', ''),
                  link.get('tags', ''),
                  link.get('status', ''),
@@ -96,8 +96,8 @@ class TestDiagram(unittest.TestCase):
 
     for i, link in self.w.getLinks().get().items():
       if link.get('type', '') == 'dataflow':
-        dia.dataLink(link.get('item_from', 'xz'),
-                 link.get('item_to', 'xz'),
+        dia.dataLink(link.get('link_from', 'xz'),
+                 link.get('link_to', 'xz'),
                  link.get('type', ''),
                  link.get('description', ''))
 
@@ -116,7 +116,7 @@ class TestDiagram(unittest.TestCase):
 
   def testUniverseDia(self):
     dia = UniverseDia(self.fs, None, None, True)
-    dia.drawBlockDiagram('Test Dia', self.w, None, self.w.getSystems().get(), self.w.getLinks().filter('type', 'data').get(), 'src/dia/test/data/test1')
+    dia.drawBlockDiagram('Test Dia', None, self.w.getSystems().get(), self.w.getLinks().filter('type', 'data').get(), 'src/dia/test/data/test1')
     
     self.assertEqual(True, filecmp.cmp('src/dia/test/data/test1_need.mmd', 'src/dia/test/data/test1.mmd'))
     os.remove('src/dia/test/data/test1.mmd')

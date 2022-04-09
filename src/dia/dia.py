@@ -39,7 +39,7 @@ class Dia():
     self.__gGroups[id] = {'name': name, 'status': status}
 
   def link(self, node_from, node_to, group = '-', tags = '', status = '', text = ''):
-    idn1 = hashlib.md5(node_from.encode('utf-8') + node_to.encode('utf-8')).hexdigest()
+    idn1 = hashlib.md5(str(node_from).encode('utf-8') + str(node_to).encode('utf-8')).hexdigest()
     self.__gLinks[idn1] = {'node_from': node_from, 'node_to': node_to, 'text': text, 'status': status}
 
   def finish(self, filename):

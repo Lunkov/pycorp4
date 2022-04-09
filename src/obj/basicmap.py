@@ -47,6 +47,12 @@ class BasicMap():
       return self.__data[name]
     return None
 
+  def deleteItem(self, name):
+    if name in self.__data:
+      del self.__data[name]
+      return True
+    return False
+
   def appendData(self, data: dict):
     self.__data.update(data)
 

@@ -53,7 +53,7 @@ class UniverseDia():
         if node.get('id', '') != '':
           D.node(node.get('id', 'undef'),
                  node.get('name', node.get('id', 'undef')),
-                 node.get('group', 'undef'), 
+                 node.get('parent', 'undef'), 
                  node.get('type', 'service'),
                  node.get('status', 'undef'),
                  node.get('link', ''),
@@ -61,10 +61,10 @@ class UniverseDia():
 
     if not links is None:
       for i, link in links.items():
-        if link.get('item_from', '') != '' and link.get('item_to', '') != '':
-          D.link(link.get('item_from', 'xz'),
-                 link.get('item_to', 'xz'),
-                 link.get('group', 'undef'),
+        if link.get('link_from', '') != '' and link.get('link_to', '') != '':
+          D.link(link.get('link_from', 'xz'),
+                 link.get('link_to', 'xz'),
+                 link.get('parent', 'undef'),
                  link.get('tags', ''),
                  link.get('type', 'data'),
                  link.get('description', ''))

@@ -42,16 +42,16 @@ class ImportXLSV1(BasicImportXLS):
         workspace.getSystems().append(System().set({'id': reciever,
                                                     'tags': tags}))
         workspace.getSystems().append(System().set({'id': topic,
-                                                    'type': 'topic',
+                                                    'type': 'queue',
                                                     'tags': tags}))
         
-        workspace.getLinks().append(Link().set({'item_from': sender,
-                                                'item_to': topic,
+        workspace.getLinks().append(Link().set({'link_from': sender,
+                                                'link_to': topic,
                                                 'type': 'data',
                                                 'tags': tags}))
 
-        workspace.getLinks().append(Link().set({'item_from': topic,
-                                                'item_to': reciever,
+        workspace.getLinks().append(Link().set({'link_from': topic,
+                                                'link_to': reciever,
                                                 'type': 'data',
                                                 'tags': tags}))
         self.appendTags(workspace, tags)
@@ -147,8 +147,8 @@ class ImportXLSV1(BasicImportXLS):
                                                         'type': 'db',
                                                         'tags': tags}))
           
-          workspace.getLinks().append(Link().set({'item_from': dbname,
-                                                  'item_to': ftname,
+          workspace.getLinks().append(Link().set({'link_from': dbname,
+                                                  'link_to': ftname,
                                                   'type': 'table',
                                                   'tags': tags}))
           self.appendTags(workspace, tags)
@@ -177,8 +177,8 @@ class ImportXLSV1(BasicImportXLS):
                                                         'type': 'db',
                                                         'tags': tags}))
           
-          workspace.getLinks().append(Link().set({'item_from': sname,
-                                                  'item_to': dbname,
+          workspace.getLinks().append(Link().set({'link_from': sname,
+                                                  'link_to': dbname,
                                                   'type': 'db',
                                                   'tags': tags}))
           self.appendTags(workspace, tags)
@@ -213,11 +213,6 @@ class ImportXLSV1(BasicImportXLS):
         print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
     return True
 
-  def appendTags(self, workspace, tags):
-    t = tags.split(',')
-    for it in t:
-      workspace.getTags().append(Tag().set({'id': it}))
-
   def loadSystems(self, filename, workspace: Workspace):
     if (db := self.openFile(filename)) is None:
       return False
@@ -239,7 +234,38 @@ class ImportXLSV1(BasicImportXLS):
                                                     'name': self.getValue(row, columns, 'name'),
                                                     'type': self.getValue(row, columns, 'type'),
                                                     'tags': tags}))
-                                                
+        self.appendTags(workspace, tags)
+
+    except Exception as err:
+      print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
+      traceback.print_exc(file=sys.stdout)
+      return False
+
+    nws = 'links.info'
+    if (sheet := self.openWorksheet(db, nws)) is None:
+      return False
+ 
+    try:
+      columns, find = self.findColumns(sheet)
+      
+      ir = 0
+      for row in sheet.rows:
+        ir = ir + 1
+        if ir == 1:
+          continue
+        tags = self.getValue(row, columns, 'tags', '')
+        ltype = self.getValue(row, columns, 'link.type')
+        sfrom = str(self.getValue(row, columns, 'link.from'))
+        sto = str(self.getValue(row, columns, 'link.to'))
+        workspace.getLinks().append(Link().set({'link_from': sfrom,
+                                                'link_to': sto,
+                                                'type': ltype,
+                                                'tags': tags}))
+        self.appendTags(workspace, tags)
+        if ltype == 'include':
+          workspace.getSystems().append(System().set({'id': sto,
+                                                      'parent': sfrom}))
+ 
     except Exception as err:
       print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
       traceback.print_exc(file=sys.stdout)

@@ -15,8 +15,8 @@ from src.load.importv1xls import ImportXLSV1
 from src.workspace import Workspace
 
 class Loader():
-  def __init__ (self):
-    print('init')
+  def __init__ (self, verbose):
+    self.__verbose = verbose
 
   def run(self, workspace: Workspace, pathname, loadmap):
     for i in list(loadmap):
@@ -36,6 +36,8 @@ class Loader():
   
   def loadEngine(self, engine, fullPath, workspace: Workspace):
     c = engine.split('.')
+    if self.__verbose > 7:
+      print('DBG: Load by engine: %s("%s")' % (engine, fullPath))
     if len(c) < 2:
       return False
     ok = False

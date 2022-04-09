@@ -14,10 +14,11 @@ from pprint import pprint
  Basic class for entities
 '''
 class Basic():
-  def __init__ (self, fields, ids, splitfields):
+  def __init__ (self, fields, ids, splitfields, typeid = 'code'):
     self.__fields = fields
     self.__ids = ids
     self.__splitfields = splitfields
+    self.__typeid = typeid
     self.__strSeparator = ','
 
     self.__id = ''
@@ -28,9 +29,18 @@ class Basic():
 
   def set(self, properties: dict):
     self.__data = self.__normProp(properties)
-    self.__id = self.__data.get('id', self.__genCode(self.__data))
-    self.__uid = self.__genUID()
-    self.__code = self.__genCode(self.__data)
+    self.__uid = self.genUID()
+    self.__code = self.genCode()
+    if self.__typeid == 'code':
+      self.__id = self.__data.get('id', self.__code)
+    else:
+      self.__id = self.__data.get('id', self.__uid)
+    if not 'id' in self.__data:
+      self.__data['id'] = self.__id
+    if not 'code' in self.__data:
+      self.__data['code'] = self.__code
+    if not 'name' in self.__data:
+      self.__data['name'] = self.__id
     self.__name = self.__data.get('name', 'undef')
     return self
 
@@ -38,13 +48,13 @@ class Basic():
     return self.__data
 
   def getId(self):
-    return self.__id
+    return str(self.__id)
 
   def getUID(self):
-    return self.__uid
+    return str(self.__uid)
 
   def getCode(self):
-    return self.__code
+    return str(self.__code)
 
   def getName(self):
     return self.__name
@@ -63,19 +73,19 @@ class Basic():
             properties[c] = list(filter(None, tmp))
     return properties
 
-  def __genUID(self):
+  def genUID(self):
     key = ''
     for j in self.__ids:
-      key = key + '*' + self.__data.get(j, '')
+      key = str(key) + '*' + str(self.__data.get(j, ''))
     return hashlib.md5(key.encode('utf-8')).hexdigest()
 
-  def __genCode(self, properties):
+  def genCode(self):
     key = ''
     for j in self.__ids:
       if key == '':
-        key = properties.get(j, '')
+        key = self.__data.get(j, '')
         continue
-      key = key + '.' + properties.get(j, '')
+      key = str(key) + '.' + str(self.__data.get(j, ''))
     return key
 
   def calcStorageSize(self, duration):

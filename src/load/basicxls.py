@@ -10,6 +10,8 @@ import numpy as np
 from pathlib import Path
 from pprint import pprint
 
+from src.obj.tags import Tag
+
 class BasicImportXLS():
   def __init__ (self):
     self.__id = 'unknown'
@@ -53,3 +55,9 @@ class BasicImportXLS():
       if columns[name] < len(row):
         return row[columns[name]]
     return default
+
+  def appendTags(self, workspace, tags):
+    t = tags.split(',')
+    for it in t:
+      workspace.getTags().append(Tag().set({'id': it}))
+

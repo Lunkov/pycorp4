@@ -7,9 +7,9 @@ from .basicmap import BasicMap
 
 class Link(Basic):
   def __init__ (self):
-    super(Link, self).__init__(['item_from', 'item_to', 'type', 'status', 'tags', 'link', 'group', 'description', 'comment'], ['item_from', 'item_to', 'type', 'tags'], [])
+    super(Link, self).__init__(['link_from', 'link_to', 'type', 'status', 'tags', 'link', 'group', 'description', 'comment'], ['link_from', 'link_to', 'type', 'tags'], [], 'uuid')
 
 class Links(BasicMap):
   def __init__ (self):
-    super(Links, self).__init__(Link().getFields(), ['type', 'status', 'item_from', 'item_to', 'tags'], Link())
+    super(Links, self).__init__(Link().getFields(), ['type', 'status', 'link_from', 'link_to', 'tags'], Link())
 

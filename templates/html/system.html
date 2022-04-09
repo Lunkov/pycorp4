@@ -51,6 +51,14 @@
 	</thead>
 <tbody>
 	<tr>
+		<td>Идентификатор системы</td>
+		<td>{{ system.id }}</td>
+	</tr>
+	<tr>
+		<td>Наименование системы</td>
+		<td>{{ system.name }}</td>
+	</tr>
+	<tr>
 		<td>Описание системы</td>
 		<td>{{ system.description }}</td>
 	</tr>
@@ -65,26 +73,6 @@
 		{% else %}
 		  <td>&#128533;</td>
 		{% endif %}
-	</tr>
-	<tr>
-		<td>Максимальное количество запросов в секунду</td>
-		<td>{{ system['max-rps'] }}</td>
-	</tr>
-	<tr>
-		<td>Максимально допустимое количество запросов в секунду</td>
-		<td>{{ system['max-rps-high'] }}</td>
-	</tr>
-	<tr>
-		<td>Пиковое время ответа для 99% запросов, мс</td>
-		<td>{{ system['rt99'] }}</td>
-	</tr>
-	<tr>
-		<td>Пиковое время ответа для 95% запросов, мс</td>
-		<td>{{ system['rt95'] }}</td>
-	</tr>
-	<tr>
-		<td>Доля запросов выполненных с ошибками 5xx, %</td>
-		<td>{{ system['5xx'] }}</td>
 	</tr>
 
 </tbody>
@@ -107,111 +95,12 @@ $(document).ready(function() {
 });
 </script>
 
-{% with table_title='Swaggers', table_id='swaggers_system', table_rows=swaggers %}
-  {% include "html/components/table_swaggers.html" %}
-{% endwith %}
-
-{% with table_title='FSDs', table_id='fsd_system', table_rows=fsd %}
-  {% include "html/components/table_fsds.html" %}
-{% endwith %}
-
 {% with table_title='Источники данных', table_id='input', table_rows=links_from, system_name='system_to' %}
-  {% include "html/components/table_systemlinks.html" %}
+  {% include "html/components/table_system.html" %}
 {% endwith %}
 
 {% with table_title='Потребители данных', table_id='output', table_rows=links_to, system_name='system_from' %}
-  {% include "html/components/table_systemlinks.html" %}
-{% endwith %}
-            
-
-
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary" id="swaggers">Swaggers</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Version</th>
-                                            <th>Plan</th>
-                                            <th>Fact</th>
-                                            <th>Link</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Version</th>
-                                            <th>Plan</th>
-                                            <th>Fact</th>
-                                            <th>Link</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-{% for i, item in swaggers %}
-                                        <tr>
-                                            <td><a href="/swaggers/{{ item.id }}.html">{{ item.system }}</a></td>
-                                            <td>{{ item.version }}</td>
-                                            <td>{{ item.plan }}</td>
-                                            <td>{{ item.fact }}</td>
-                                            <td>{{ item.link }}</td>
-                                        </tr>
-{% endfor %}
-                                        
-                                    </tbody>
-                                </table>
-                    </div>
-              </div>
-            </div>
-
-
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary" id="api">API</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTableAPI" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>API</th>
-                                            <th>Method</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Link</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>API</th>
-                                            <th>Method</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Link</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-{% for i, item in system_api %}
-                                        <tr>
-                                            <td><a href="/api/{{ item.linkin }}.html">{{ item.api }}</a></td>
-                                            <td>{{ item.method }}</td>
-                                            <td>{{ item.description }}</td>
-                                            <td>{{ item.status }}</td>
-                                            <td><a href="{{ item.link }}" target=_blank>Wiki</a></td>
-                                        </tr>
-{% endfor %}
-                                        
-                                    </tbody>
-                                </table>
-                    </div>
-              </div>
-            </div>
-
-{% with table_title='Список КД', table_id='ups', table_rows=ups %}
-  {% include "html/components/table_ups.html" %}
+  {% include "html/components/table_system.html" %}
 {% endwith %}
             
 {% with dia_filter='system', dia_id=system.id, dia_name=system.name, print_png=true %}

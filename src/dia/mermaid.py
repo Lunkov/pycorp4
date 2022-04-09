@@ -98,8 +98,8 @@ class Mermaid():
     if type(s) is str:
       return hashlib.md5(s.encode('utf-8')).hexdigest()
     ret = ''
-    for i in s:
-      ret = ret + '.' + i
+    for i in str(s):
+      ret = ret + '.' + str(i)
     return hashlib.md5(ret.encode('utf-8')).hexdigest()
 
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
