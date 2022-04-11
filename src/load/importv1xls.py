@@ -265,6 +265,7 @@ class ImportXLSV1(BasicImportXLS):
         if ltype == 'include':
           workspace.getSystems().append(System().set({'id': sto,
                                                       'parent': sfrom}))
+          workspace.getSystems().appendChild(sfrom, sto)
  
     except Exception as err:
       print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))

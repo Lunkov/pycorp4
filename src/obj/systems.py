@@ -6,7 +6,7 @@ from .basicmap import BasicMap
 
 class System(Basic):
   def __init__ (self):
-    super(System, self).__init__(['id', 'name', 'title', 'type', 'status', 'layers', 'tags', 'description', 'parent', 'git', 'wiki'], [], ['tags', 'layers'])
+    super(System, self).__init__(['id', 'name', 'title', 'type', 'status', 'layers', 'tags', 'description', 'parent', 'children', 'git', 'wiki'], [], ['tags', 'layers'])
 
 class Systems(BasicMap):
   def __init__ (self):

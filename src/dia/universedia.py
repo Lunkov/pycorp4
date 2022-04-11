@@ -45,6 +45,7 @@ class UniverseDia():
         if group.get('id', '') != '':
           D.group(group.get('id', 'undef'),
                   group.get('name', group.get('id', 'undef')).replace('"', '\''),
+                  group.get('parent', ''),
                   group.get('status', 'undef'),
                   group.get('link', ''))
 

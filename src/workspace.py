@@ -87,6 +87,11 @@ class Workspace():
     linksTo = self.__links.filter('link_to', systemname)
     flinks.appendData(linksTo.get().items())
     
+    if self.__systems.isParent(systemname):
+      srvsTo = flinks.getVariants('link_to')
+      linksTo = self.__links.filter('link_from', srvsTo)
+      flinks.appendData(linksTo.get().items())
+      
     srvsTo = flinks.getVariants('link_to')
     srvs1 = self.__systems.filter('id', srvsTo)
     systems.appendData(srvs1.get().items())
@@ -120,6 +125,7 @@ class Workspace():
 
   def getParents(self, fsystems, flinks):
     groups = {}
+    ik = []
     for k, v in fsystems.get().items():
       ids = str(v.get('parent', ''))
       if ids != '':
@@ -128,9 +134,12 @@ class Workspace():
           groups[str(s.get('id', ''))] = {
                                       'id': str(s.get('id', '')),
                                       'name': s.get('name', ''),
+                                      'parent': s.get('parent', ''),
                                       'status': s.get('status', '')
                                     }
-          fsystems.deleteItem(ids)
+          ik.append(k)
+    for k in ik:
+      fsystems.deleteItem(ids)
     ik = []
     for k, v in flinks.get().items():
       if v.get('link_from', '') in groups:

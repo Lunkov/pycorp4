@@ -62,72 +62,7 @@
    </div>
 </div>
 
-
-<!-- DataTales  -->
-<script>
-// Call the dataTables jQuery plugin
-$(document).ready(function() {
-  $('#dataTableIN').DataTable();
-  $('#dataTableFSD').DataTable();
-});
-</script>
-
-		<div class="card shadow mb-4">
-			<div class="card-header py-3">
-				<h6 class="m-0 font-weight-bold text-primary" id="fsd">Функциональные требования</h6>
-			</div>
-			<div class="card-body">
-				<div class="table-responsive">
-					<table class="table table-bordered" id="dataTableFSD" width="100%" cellspacing="0">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Name</th>
-								<th>Date</th>
-								<th>Description</th>
-								<th>Status</th>
-								<th>Tags</th>
-								<th>Services</th>
-								<th>Link</th>
-							</tr>
-						</thead>
-						<tfoot>
-							<tr>
-								<th>ID</th>
-								<th>Name</th>
-								<th>Date</th>
-								<th>Description</th>
-								<th>Status</th>
-								<th>Tags</th>
-								<th>Services</th>
-								<th>Link</th>
-							</tr>
-						</tfoot>
-						<tbody>
-{% for i, item in fsd %}
-							<tr>
-								<td>{{ item.id }}</td>
-								<td>{{ item.name }}</td>
-								<td>{{ item.date }}</td>
-								<td>{{ item.descripton }}</td>
-								<td>{{ item.status }}</td>
-								<td>{{ item.tags }}</td>
-								<td>{{ item.services }}</td>
-								{% if item.link|length %}
-								  <td><a href="{{ item.link }}" target=_blank>Link</a></td>
-								{% else %}
-								  <td>&#128533;</td>
-								{% endif %}
-							</tr>
-{% endfor %}
-							
-						</tbody>
-					</table>
-		</div>
-  </div>
-</div>
-
-{% with table_title='Перечень сервисов', table_id='tag_systems', table_rows=tag_systems %}
+{% with table_title='Перечень сервисов', table_id='tag_systems', table_rows=tag_systems.items() %}
   {% include "html/components/table_system.html" %}
 {% endwith %}
 
@@ -135,7 +70,7 @@ $(document).ready(function() {
   {% include "html/components/diagram.html" %}
 {% endwith %}
 
-{% with table_title='Перечень связей', table_id='tag_systemlinks', table_rows=tag_systemlinks %}
+{% with table_title='Перечень связей', table_id='tag_systemlinks', table_rows=tag_systemlinks.items() %}
   {% include "html/components/table_system2links.html" %}
 {% endwith %}
 

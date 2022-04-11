@@ -2,9 +2,9 @@
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 	{% if wsname|length %}
     <div >
-		Рабочая область: &nbsp;{{ wsname }}
-		<button class="btn" type="button">
-			<i class='fa fa-refresh'></i> 
+		Рабочая область:
+		<button class="btn btn-outline-primary" type="button" onclick="fReload('{{ wsname }}')">
+			{{ wsname }} &nbsp;<i class='fa fa-sync'></i> 
 		</button>
 	</div>
 	{% endif %}
@@ -39,4 +39,15 @@
 
 
 </nav>
+
+<script>
+
+function fReload(ws) {
+	$.post("/api/workspace/"+ws+"/reload", function(data) {
+		location.reload();
+	});
+	;
+}
+
+</script>
 <!-- End of Topbar -->

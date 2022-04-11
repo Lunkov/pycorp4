@@ -38,11 +38,11 @@
     
 <script>
 var tags = {};
-$.getJSON("/data/tags.json", function( json ) {
+$.getJSON("/api/workspace/{{ wsname }}/tags", function( json ) {
 	tags = json;
  });
 var services = {};
-$.getJSON("/data/services.json", function( json ) {
+$.getJSON("/api/workspace/{{ wsname }}/services", function( json ) {
 	services = json;
  });
 </script>

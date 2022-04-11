@@ -21,6 +21,7 @@ class Mermaid():
     self.__gClasses = {}
     self.__gFields = {}
     self.__gGroups = {}
+    self.__gTreeGroups = {}
     self.__gLinks = {}
 
     self.__typeNodesDef = '["%s"]'
@@ -48,6 +49,7 @@ class Mermaid():
     self.__name = name
     self.__typeDia = typeDia
     self.__gGroups = {}
+    self.__gTreeGroups = {}
     self.__gNodes = {}
     self.__gClasses = {}
     self.__gFields = {}
@@ -115,9 +117,9 @@ class Mermaid():
     #else:
     #  G = G + ("%sstyle %s %s;\n" % (self.tab, idn, self.statusNodes['undef']))
 
-    if link != '':
+    #if link != '':
       # COMMENT: For HTTP ref => G = G + ("%sclick %s \"%s\" _blank\n" % (self.tab, idn, link))
-      G = G + ("%sclick %s call nodeClick(\"%s\")\n" % (self.__tab, idn, id))
+    G = G + ("%sclick %s call nodeClick(\"%s\")\n" % (self.__tab, idn, id))
     self.__gNodes[group] = G
 
   def data(self, id, name, group = '-', ntype = '', sizeof = 0):
@@ -147,7 +149,9 @@ class Mermaid():
 
     self.__gLinks[idn] = G
 
-  def group(self, id, name, status = '', link = ''):
+  def group(self, id, name, parent = '', status = '', link = ''):
+    self.__gTreeGroups[id] = parent
+    
     if not id in self.__gGroups:
       self.__gGroups[id] = ''
     G = self.__gGroups[id]
@@ -298,12 +302,37 @@ class Mermaid():
 
   def drawFlow(self):
     G = "flowchart LR\n"
-    for i in self.__gNodes:
-      if i in self.__gGroups:
-        G = G + self.__gGroups[i]
-      G = G + self.__gNodes[i]
-      if i in self.__gGroups:
+    dg = []
+    for key in self.__gNodes:
+      if key in dg:
+        continue
+      t = self.__findChildren(key)
+      if key in self.__gGroups:
+        G = G + self.__gGroups[key]
+      for i in t:
+        G = self.__drawFlow(G, i)
+      G = G + self.__gNodes[key]
+      if key in self.__gGroups:
         G = G + self.__tab + 'end\n'
+      dg.append(t)
+    return G
+
+  def __findChildren(self, key):
+    res = []
+    for i in self.__gTreeGroups:
+      if self.__gTreeGroups[i] == key:
+        res.append(i)
+        t = self.__findChildren(i)
+        if len(t) > 0:
+          res.append(t)
+    return res
+  
+  def __drawFlow(self, G, key):
+    if key in self.__gGroups:
+      G = G + self.__gGroups[key]
+    G = G + self.__gNodes[key]
+    if key in self.__gGroups:
+      G = G + self.__tab + 'end\n'
     return G
 
   def drawData(self):

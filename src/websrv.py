@@ -50,8 +50,9 @@ class WebSrv(object):
     self.__blueprint.add_url_rule('/legend',                             view_func=self.getHelpLegend,         methods=['GET'])
     self.__blueprint.add_url_rule('/patterns/<string:name>',             view_func=self.getHelpPatterns,       methods=['GET'])
     self.__blueprint.add_url_rule('/best_practices/<string:name>',       view_func=self.getHelpBestPractices,  methods=['GET'])
-    self.__blueprint.add_url_rule('/api/workspace/<string:name>/reload',    view_func=self.apiWorkspaceReload,    methods=['POST'])
-    self.__blueprint.add_url_rule('/api/workspace/<string:name>/services',  view_func=self.apiWorkspaceSystems,   methods=['GET'])
+    self.__blueprint.add_url_rule('/api/workspace/<string:iw>/reload',   view_func=self.apiWorkspaceReload,    methods=['POST'])
+    self.__blueprint.add_url_rule('/api/workspace/<string:iw>/systems',  view_func=self.apiWorkspaceSystems,   methods=['GET'])
+    self.__blueprint.add_url_rule('/api/workspace/<string:iw>/system/<string:isys>',  view_func=self.apiWorkspaceSystem,    methods=['GET'])
 
     self.__blueprint.add_url_rule('/workspace/<string:iw>/rfc/<string:rfc>/yaml/<string:filename>',          view_func=self.yaml,             methods=['GET', 'POST'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/rfc/<string:rfc>/yaml/<string:filename>/tree',     view_func=self.yamlTree,         methods=['GET', 'POST'])
@@ -110,8 +111,12 @@ class WebSrv(object):
     return "OK"
 
   def apiWorkspaceSystems(self, iw):
-    workspace = self.__workspaces.getStat(iw)
+    workspace = self.__workspaces.getWorkspace(iw)
     return jsonify(workspace.getSystems().get())
+
+  def apiWorkspaceSystem(self, iw, isys):
+    workspace = self.__workspaces.getWorkspace(iw)
+    return jsonify(workspace.getSystems().getItem(isys))
 
   def getWorkspaceBusinessDomains(self, iw):
     workspace = self.__workspaces.getStat(iw)
@@ -148,14 +153,13 @@ class WebSrv(object):
     workspace = self.__workspaces.getWorkspace(iw)
     tags = workspace.getTags()
     tg = tags.getItem(tag)
-    #domains, services, srvlinks = workspace.filterTag(iw, tg['id'], tg['id'])
-    #self.__dia.drawBlockDiagram(tg['id'], iw, domains, services, srvlinks, '%s/dia/%s/tag/%s' % (self.__fs.getPathHTML(), iw, tg['id'].replace('/', '-')))
+    fsystems, flinks = workspace.filterTag(tag)
     
     return render_template('html/tag.html', 
                              wsname = iw, 
                              tag = tg,
-                             #tag_servicelinks = srvlinks.items(),
-                             #tag_services = services.items(),
+                             tag_systemlinks = flinks.get(),
+                             tag_systems = fsystems.get(),
                              workspaces = self.__cfg.getCfg('workspaces'),
                              workspace = workspace)
 
@@ -174,13 +178,27 @@ class WebSrv(object):
       fsystems, flinks = workspace.filterSystem(fsystem)
       filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'system', fsystem)
       groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+      pprint('-- fsystems -- ')
+      pprint(fsystems.get())
+      pprint('-- flinks -- ')
+      pprint(flinks.get())
+      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+      pprint('-- groups -- ')
+      pprint(groups)
+      
       self.__dia.drawBlockDiagram(fsystem, groups, fsystems.get(), flinks.get(), filename)
     
     ftag = request.args.get('tag')
     if ftag is not None:
       fsystems, flinks = workspace.filterTag(ftag)
       filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'tag', ftag)
+      pprint('-- fsystems -- ')
+      pprint(fsystems.get())
+      pprint('-- flinks -- ')
+      pprint(flinks.get())
       groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+      pprint('-- groups -- ')
+      pprint(groups)
       self.__dia.drawBlockDiagram(ftag, groups, fsystems.get(), flinks.get(), filename)
     f = open(filename + '.mmd')
     mmd  = f.read()
@@ -193,13 +211,7 @@ class WebSrv(object):
     srv = systems.getItem(system)
     
     idfrom = workspace.getLinks().filter('link_from', system).getVariants('link_to')
-    pprint('===idfrom===')
-    pprint(idfrom)
     idto = workspace.getLinks().filter('link_to', system).getVariants('link_from')
-    pprint('===idto===')
-    pprint(idto)
-    pprint('===idto 2===')
-    pprint(workspace.getSystems().filter('id', idfrom).get().items())
     return render_template('html/system.html', wsname = iw, system = srv,
                             systems = systems.get().items(),
                             links_to = workspace.getSystems().filter('id', idfrom).get().items(),

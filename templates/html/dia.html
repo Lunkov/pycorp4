@@ -24,10 +24,10 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 
 <script>
-var services = {};
-$.getJSON("/data/{{ wsname }}/services.json", function( json ) {
-	services = new Map(Object.entries(json));
-});
+//var services = {};
+//$.getJSON("/api/workspace/{{ wsname }}/systems", function( json ) {
+//	services = new Map(Object.entries(json));
+//});
 
 var config = {
 	startOnLoad:true,
@@ -43,15 +43,21 @@ mermaid.initialize(config);
 mermaid.parseError = function(err,hash){  console.log(err);};
 
 var nodeClick = function(id_service) {
-  if(services.get(id_service)) {
-	$("#block-name").html(services.get(id_service).name);
-	$("#block-description").html("Описание: " + services.get(id_service).description);
-	$("#block-dialink").html("<a href=\"/dia/service/"+id_service+".html\" target=_blank>Схема сервиса</a>");
-	$("#block-link").html("<a href=\"/service/"+id_service+".html\" target=_blank>"+services.get(id_service).name+"</a>");
-	$("#block-linkwiki").html("<a href=\""+services.get(id_service).link+"\" target=_blank>Wiki</a>");
-	$("#block-swagger").html("<a href=\""+services.get(id_service).swagger+"\" target=_blank>Swagger</a>");
-  }
-  $("#block-dlg").modal();
+	$.getJSON("/api/workspace/{{ wsname }}/system/"+id_service, function( system ) {
+		if(system.id) {
+			$("#block-name").html(system.name);
+			if(system.description) {
+				$("#block-description").html("Описание: " + system.description);
+			} else {
+				$("#block-description").html("");
+			}
+			$("#block-dialink").html("<a href=\"/workspace/{{ wsname }}/dia/service/"+id_service+"\" target=_blank>Схема сервиса</a>");
+			$("#block-link").html("<a href=\"/workspace/{{ wsname }}/system/"+id_service+"\" target=_blank>"+system.name+"</a>");
+			$("#block-linkwiki").html("<a href=\""+system.link+"\" target=_blank>Wiki</a>");
+			$("#block-swagger").html("<a href=\""+system.swagger+"\" target=_blank>Swagger</a>");
+		}
+		$("#block-dlg").modal();
+	});	
 }
 </script>
 <div class="modal" tabindex="-1" role="dialog" id="block-dlg">

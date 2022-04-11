@@ -42,22 +42,42 @@ class BasicMap():
     else:
       self.__data[item.getId()] = item.get()
   
-  def getItem(self, name):
-    if name in self.__data:
-      return self.__data[name]
+  def getItem(self, key):
+    if key in self.__data:
+      return self.__data[key]
     return None
 
-  def deleteItem(self, name):
-    if name in self.__data:
-      del self.__data[name]
+  def deleteItem(self, key):
+    if key in self.__data:
+      del self.__data[key]
       return True
     return False
 
   def appendData(self, data: dict):
     self.__data.update(data)
 
+  def appendSubData(self, key, field, value):
+    if key in self.__data:
+      if field not in self.__data[key]:
+        self.__data[key][field] = []
+      if value not in self.__data[key][field]:
+        self.__data[key][field].append(value)
+      return True
+    return False
+
   def get(self):
     return self.__data
+
+  def appendChild(self, key, value):
+    return self.appendSubData(key, 'children', value)
+    
+  def isParent(self, key):
+    pprint(' ### IS PARENT')
+    pprint(self.__data[key])
+    if key in self.__data:
+      if 'children' in self.__data[key]:
+        return len(self.__data[key]['children']) > 0
+    return False
 
   def getVariants(self, field):
     res = {}

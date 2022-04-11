@@ -35,7 +35,7 @@ class Dia():
   def node(self, id, name, group = '-', ntype = '', status = '', link = '', description = ''):
     self.__gNodes[id] = {'name': name, 'group': group, 'type': ntype, 'status': status}
 
-  def group(self, id, name, status = '', link = ''):
+  def group(self, id, name, parent = '', status = '', link = ''):
     self.__gGroups[id] = {'name': name, 'status': status}
 
   def link(self, node_from, node_to, group = '-', tags = '', status = '', text = ''):

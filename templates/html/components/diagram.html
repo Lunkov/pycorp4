@@ -42,16 +42,25 @@ function zoomFrame(x) {
 	</div>
 	<div class="card-body">
       <div class="card shadow mb-4">
-		<div class="d-inline">
-		<button type="button" onclick="zoomFrame(1)">- ZOOM OUT</button>
-		<button type="button" onclick="zoomFrame(-1)">+ ZOOM IN</button>
-		<button type="button" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View MMD</button>
-		<button type="button" onclick="window.open('/workspace/{{ wsname }}/dia?format=html&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View SVG</button>
-		<button type="button" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View PNG</button>
-{% if print_png %}
-		<button type="button" onclick="window.open('/workspace/{{ wsname }}/dia?format=dia.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View Diagram.PNG</button>
-{% endif %}
-		</div>
+		<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+		<button class="btn btn-outline-success" type="button" onclick="zoomFrame(1)"><i class="fas fa-search-minus fa-sm"></i></button>
+		&nbsp;
+		<button class="btn btn-outline-success" type="button" onclick="zoomFrame(-1)"><i class="fas fa-search-plus fa-sm"></i></button>
+		&nbsp;
+		<ul class="nav navbar-nav navbar-right">
+			<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle navbar-light bg-light" role="button" id="dropdownDiaView" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="flag-icon flag-icon-us"> </span> View</a>
+			<div class="dropdown-menu" aria-labelledby="dropdownDiaView">
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View MMD</a>
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=html&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View SVG</a>
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View PNG</a>
+				{% if print_png %}
+					<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=dia.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View Diagram.PNG</a>
+				{% endif %}
+			</div>
+			</li>
+		</ul>		
+		</nav>
 		<div id="iframe_container">
 		 <iframe border=1 id="schemaiframe" class="" src="/workspace/{{ wsname }}/dia?{{ dia_filter }}={{ dia_id }}" title="{{ dia_name }}" allowfullscreen style="min-height: 800px; max-width: 100%; width: 100%; height: 100%;"></iframe> 
 		</div>
