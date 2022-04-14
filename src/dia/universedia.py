@@ -83,15 +83,7 @@ class UniverseDia():
     if not self.__fs.writeFile(filename + '.mmd', dia):
       return
 
-    sz = 500
-    if groups is None:
-      if not nodes is None:
-        sz = 50 * len(nodes)
-    else:
-      sz = 500 * len(groups)
-    self.__mermaidcli.makePNG(self.__fs.getPathHTML(), filename + '.mmd', sz)
-    if os.path.isfile(self.__template_diagram_simple):
-      self.__html.render(self.__template_diagram, filename + '.html', {'wsname': iw, 'dia_id': name, 'dia_scheme': dia})
+    self.__renderMermaid(filename, name, dia, '', groups, nodes)
 
     D = Dia(self.__verbose)
     D.new('dia', name)
@@ -99,6 +91,59 @@ class UniverseDia():
     self.__draw(D, groups, nodes, links)
 
     D.finish(filename+'.dia')
+
+  def drawClassDiagram(self, name: str, nodes: dict, functions: dict, dataSets: dict, dataFields: dict, links: dict, filename: str):
+    cfg = {}
+    if not self.__config is None:
+      cfg = self.__config.getCfg('mermaid')
+    D = Mermaid(cfg)
+    D.new('data', name)
+
+    for i, dataSet in nodes.items():
+      classname = i.replace('-', '_').replace('.', '_')
+      classtype = dataSet.get('type', '')
+      D.classInit(classname,
+                  dataSet.get('name', '').replace('-', '_').replace('.', '_'),
+                  'area 1', classtype, dataSet.get('sizeof', 0))
+      if 'functions' in dataSet:
+        for fname in dataSet['functions']:
+          codename = "%s.%s"
+          pprint(functions[fname])
+          if fname in functions:
+            D.classFunction(classname, fname, functions[fname].get('input', ''),
+                                           functions[fname].get('output', ''),
+                                           functions[fname].get('use', ''))
+          else:
+            D.classFunction(classname, fname)
+      if (classtype == 'queue' or classtype == 'table') and ('data' in dataSet):
+        if dataSet['data'] in dataSets:
+          if 'children' in dataSets[dataSet['data']]:
+            for ch in dataSets[dataSet['data']]['children']:
+              fch = dataSet['data'] + '.' + ch
+              if fch in dataFields:
+                D.classFields(classname, ch, dataFields[fch].get('type', ''))
+                continue
+              if ch in dataFields:
+                D.dataFields(classname, ch, dataFields[ch].get('type', ''))
+
+
+    #for i, dataField in self.w.getDataFields().get().items():
+    #  D.dataFields(dataField.get('data', 'undef'), i, dataField.get('type', ''))
+
+    for i, link in links.items():
+      if link.get('type', '') == 'data':
+        link_to = link.get('link_from', 'xz').replace('-', '_').replace('.', '_')
+        link_from = link.get('link_to', 'xz').replace('-', '_').replace('.', '_')
+        if link_to != '' and link_from != '':
+          D.classLink(link_to,
+                    link_from,
+                    link.get('type', ''),
+                    link.get('description', ''))
+
+    dia = D.finish()
+    
+    self.__renderMermaid(filename, name, dia, '', {}, nodes)
+
 
   def drawSequenceDiagram(self, name, seq, nodes, filename):
     cfg = {}
@@ -141,8 +186,20 @@ class UniverseDia():
           D.parallelFinish('main', v['parallel-finish'])
 
     dia = D.finish()
+    
+    self.__renderMermaid(filename, name, dia, iw, groups, nodes)
+
+
+  def __renderMermaid(self, filename, name, dia, iw, groups, nodes):
     if not self.__fs.writeFile(filename + '.mmd', dia):
       return
-    self.__mermaidcli.makePNG(self.fs.getPathHTML(), filename + '.mmd')
+
+    sz = 500
+    if groups is None:
+      if not nodes is None:
+        sz = 50 * len(nodes)
+    else:
+      sz = 500 * len(groups)
+    self.__mermaidcli.makePNG(self.__fs.getPathHTML(), filename + '.mmd', sz)
     if os.path.isfile(self.__template_diagram_simple):
-      self.__html.render(self.__template_diagram, filename + '.html', {'dia_id': name, 'dia_scheme': dia})
+      self.__html.render(self.__template_diagram, filename + '.html', {'wsname': iw, 'dia_id': name, 'dia_scheme': dia})

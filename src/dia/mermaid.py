@@ -122,30 +122,45 @@ class Mermaid():
     G = G + ("%sclick %s call nodeClick(\"%s\")\n" % (self.__tab, idn, id))
     self.__gNodes[group] = G
 
-  def data(self, id, name, group = '-', ntype = '', sizeof = 0):
+  def classInit(self, id, name, group = '-', ntype = '', sizeof = 0):
     if not group in self.__gClasses:
       self.__gClasses[group] = {}
     if not id in self.__gClasses[group]:
       self.__gClasses[group][id] = ''
     G = self.__gClasses[group][id]
-    G = G + ("%sclass %s{\n" % (self.__tab, name))
+    G = G + ("%sclass %s {\n%s<<%s>>\n" % (self.__tab, name, self.__tab, ntype))
     if sizeof > 0:
       G = G + ("%ssizeof(%d)\n" % (self.__tab, sizeof))
     self.__gClasses[group][id] = G
 
-  def dataFields(self, dataid, name, ntype = 'undef'):
+  def classFields(self, dataid, name, ntype = 'undef'):
     if not dataid in self.__gFields:
       self.__gFields[dataid] = ''
     self.__gFields[dataid] = ("%s%s%s : %s\n" % (self.__gFields[dataid], self.__tab, name, ntype))
 
-  def dataLink(self, data_from, data_to, ltype = '', text = ''):
+  def classFunction(self, dataid, name, inp = '', out = '', use = ''):
+    if not dataid in self.__gFields:
+      self.__gFields[dataid] = ''
+    i = ''
+    if type(inp) is list:
+      i = ','.join(inp)
+    u = ''
+    if type(use) is list:
+      u = ','.join(use)
+    o = ''
+    if type(out) is list:
+      o = ','.join(out)
+    self.__gFields[dataid] = ("%s%s%s(%s, %s)(%s)\n" % (self.__gFields[dataid], self.__tab, name, i, u, o))
+
+  def classLink(self, data_from, data_to, ltype = '', text = ''):
     idn = self.__genUID([data_from, data_to, ltype])
     if not idn in self.__gLinks:
       self.__gLinks[idn] = ''
 
     G = self.__gLinks[idn]
 
-    G = G + ("%s%s \"\" --> \"\" %s : %s\n" % (self.__tab, data_from, data_to, text))
+    #G = G + ("%s%s \"\" --> \"\" %s : %s\n" % (self.__tab, data_from, data_to, text))
+    G = G + ("%s%s \"\" --> \"\" %s\n" % (self.__tab, data_from, data_to))
 
     self.__gLinks[idn] = G
 

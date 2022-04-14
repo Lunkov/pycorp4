@@ -1,0 +1,97 @@
+{% include "html/base/header.html" %}
+
+<div id="wrapper">
+
+	{% include "html/base/menu-workspace.html" %}
+
+	<!-- Content Wrapper -->
+	<div id="content-wrapper" class="d-flex flex-column">
+
+		<!-- Main Content -->
+		<div id="content">
+
+		{% include "html/base/navbar.html" %}
+<div class="container-fluid">
+
+<!-- DataTales  -->
+<script>
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+  $('#dataTable').DataTable();
+});
+</script>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Функции</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>System</th>
+                                            <th>Status</th>
+                                            <th>Input</th>
+                                            <th>Use</th>
+                                            <th>Output</th>
+                                            <th>Тэги</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>System</th>
+                                            <th>Status</th>
+                                            <th>Input</th>
+                                            <th>Use</th>
+                                            <th>Output</th>
+                                            <th>Тэги</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+{% for i, item in functions %}
+                                        <tr>
+                                            <td><a href="/workspace/{{ wsname }}/function/{{ item.code }}">{{ i }}</a></td>
+                                            <td><a href="/workspace/{{ wsname }}/system/{{ item.parent }}">{{ item.parent }}</a></td>
+                                            <td>{{ item.status }}</td>
+                                            <td>
+												{% for input in item.input %}
+												  <a href="/workspace/{{ wsname }}/tag/{{ tag }}">{{ input }}</a>,
+												{% endfor %}
+                                            </td>
+                                            <td>
+												{% for use in item.use %}
+												  <a href="/workspace/{{ wsname }}/tag/{{ tag }}">{{ use }}</a>,
+												{% endfor %}
+                                            </td>
+                                            <td>
+												{% for output in item.output %}
+												  <a href="/workspace/{{ wsname }}/tag/{{ tag }}">{{ output }}</a>,
+												{% endfor %}
+                                            </td>
+                                            <td>
+												{% for tag in item.tags %}
+												  <a href="/workspace/{{ wsname }}/tag/{{ tag }}">{{ tag }}</a>,
+												{% endfor %}
+                                            </td>
+                                        </tr>
+{% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                    </div>
+              </div>
+            </div>
+		</div>
+		</div>
+		<!-- End of Main Content -->
+
+
+	</div>
+	<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+{% include "html/base/footer.html" %}

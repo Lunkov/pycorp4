@@ -15,6 +15,7 @@ from .obj.systems import Systems
 from .obj.nodes import Nodes
 from .obj.links import Links
 from .obj.interfaces import Interfaces
+from .obj.functions import Functions
 from .obj.data import DataSets, DataFields
 from .helpers.fs import FS
 
@@ -31,6 +32,7 @@ class Workspace():
 
     self.__systems = Systems()
     self.__interfaces = Interfaces()
+    self.__functions = Functions()
     self.__links = Links()
 
     self.__nodes = Nodes()
@@ -43,6 +45,19 @@ class Workspace():
     if self.__verbose > 7:
       print("DBG: Init workspace '%s'" % name)
 
+  def clear(self):
+    self.__systems.clear()
+    self.__interfaces.clear()
+    self.__functions.clear()
+    self.__links.clear()
+
+    self.__nodes.clear()
+    
+    self.__tags.clear()
+    
+    self.__dataSets.clear()
+    self.__dataFields.clear()
+    
   def getName(self):
     return self.__name
   
@@ -51,6 +66,9 @@ class Workspace():
 
   def getLinks(self):
     return self.__links
+
+  def getFunctions(self):
+    return self.__functions
 
   def getTags(self):
     return self.__tags
@@ -77,7 +95,8 @@ class Workspace():
     return {'path': self.__path,
             'cnt_tags': self.__tags.count(),
             'cnt_systems': self.__systems.count(),
-            'cnt_links': self.__links.count()
+            'cnt_links': self.__links.count(),
+            'cnt_functions': self.__functions.count()
            }
 
   def filterSystem(self, systemname):
@@ -131,15 +150,16 @@ class Workspace():
       if ids != '':
         s = self.__systems.getItem(ids)
         if s is not None:
-          groups[str(s.get('id', ''))] = {
-                                      'id': str(s.get('id', '')),
+          i = str(s.get('id', ''))
+          groups[i] = {
+                                      'id': i,
                                       'name': s.get('name', ''),
                                       'parent': s.get('parent', ''),
                                       'status': s.get('status', '')
                                     }
-          ik.append(k)
+          ik.append(i)
     for k in ik:
-      fsystems.deleteItem(ids)
+      fsystems.deleteItem(k)
     ik = []
     for k, v in flinks.get().items():
       if v.get('link_from', '') in groups:

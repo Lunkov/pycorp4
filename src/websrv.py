@@ -41,7 +41,7 @@ class WebSrv(object):
     self.__blueprint.add_url_rule('/workspace/<string:iw>/system/<string:system>',                  view_func=self.getWorkspaceSystem,          methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/links',                                   view_func=self.getWorkspaceLinks,           methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/link/<string:linkname>',                  view_func=self.getWorkspaceLink,            methods=['GET'])
-    self.__blueprint.add_url_rule('/workspace/<string:iw>/solutions',                               view_func=self.getWorkspaceSolutions,       methods=['GET'])
+    self.__blueprint.add_url_rule('/workspace/<string:iw>/functions',                               view_func=self.getWorkspaceFunctions,       methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/sd/<string:sd>',                          view_func=self.getWorkspaceLinks,           methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/reports',                                 view_func=self.getWorkspaceReports,         methods=['GET'])
     self.__blueprint.add_url_rule('/workspace/<string:iw>/draw',                                    view_func=self.getWorkspaceDraw,            methods=['GET', 'POST'])
@@ -163,46 +163,42 @@ class WebSrv(object):
                              workspaces = self.__cfg.getCfg('workspaces'),
                              workspace = workspace)
 
-  def getWorkspaceSystems(self, iw):
-    workspace = self.__workspaces.getWorkspace(iw)
-    return render_template('html/systems.html', wsname = iw, 
-                            systems = workspace.getSystems().get().items(),
-                            workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
-
   def getWorkspaceDia(self, iw):
     workspace = self.__workspaces.getWorkspace(iw)
     filename = ''
     mmd = ''
+    dtype = request.values.get('dtype')
+    if dtype is None:
+      dtype = 'flow'
     fsystem = request.args.get('system')
     if fsystem is not None:
       fsystems, flinks = workspace.filterSystem(fsystem)
-      filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'system', fsystem)
-      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
-      pprint('-- fsystems -- ')
-      pprint(fsystems.get())
-      pprint('-- flinks -- ')
-      pprint(flinks.get())
-      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
-      pprint('-- groups -- ')
-      pprint(groups)
-      
-      self.__dia.drawBlockDiagram(fsystem, groups, fsystems.get(), flinks.get(), filename)
+      filename = '%s/dia/%s/%s/%s.%s' % (self.__fs.getPathHTML(), iw, 'system', fsystem, dtype)
+      if dtype == 'flow':
+        groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+        self.__dia.drawBlockDiagram(fsystem, groups, fsystems.get(), flinks.get(), filename)
+
+      if dtype == 'class':
+        self.__dia.drawClassDiagram(fsystem, fsystems.get(), workspace.getFunctions().get(), workspace.getDataSets().get(), workspace.getDataFields().get(), flinks.get(), filename)
     
     ftag = request.args.get('tag')
     if ftag is not None:
       fsystems, flinks = workspace.filterTag(ftag)
-      filename = '%s/dia/%s/%s/%s' % (self.__fs.getPathHTML(), iw, 'tag', ftag)
-      pprint('-- fsystems -- ')
-      pprint(fsystems.get())
-      pprint('-- flinks -- ')
-      pprint(flinks.get())
-      groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
-      pprint('-- groups -- ')
-      pprint(groups)
-      self.__dia.drawBlockDiagram(ftag, groups, fsystems.get(), flinks.get(), filename)
-    f = open(filename + '.mmd')
-    mmd  = f.read()
-    f.close()
+      filename = '%s/dia/%s/%s/%s.%s' % (self.__fs.getPathHTML(), iw, 'tag', ftag, dtype)
+      if dtype == 'flow':
+        groups, fsystems, flinks = workspace.getParents(fsystems, flinks)
+        self.__dia.drawBlockDiagram(ftag, groups, fsystems.get(), flinks.get(), filename)
+      if dtype == 'class':
+        self.__dia.drawClassDiagram(fsystem, fsystems.get(), workspace.getFunctions().get(), workspace.getDataSets().get(), workspace.getDataFields().get(), flinks.get(), filename)
+    
+    mmd = ''
+    if dtype is not None:
+      try:
+        f = open('%s.mmd' % (filename))
+        mmd  = f.read()
+        f.close()
+      except Exception as err:
+        print("ERR: MMD.Open(%s): %s" % (filename, str(err)))
     return render_template('html/dia.html', wsname = iw, dia_scheme = mmd)
 
   def getWorkspaceSystem(self, iw, system):
@@ -218,11 +214,16 @@ class WebSrv(object):
                             links_from = workspace.getSystems().filter('id', idto).get().items(),
                             workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
 
-  def getWorkspaceSolutions(self, iw):
+  def getWorkspaceSystems(self, iw):
     workspace = self.__workspaces.getWorkspace(iw)
-    return render_template('html/solutions.html', wsname = iw, 
-                            #solutions = self.__workspaces.getWorkspace(iw).getSolutions().get(),
-                            services = workspace.getServices().get(),
+    return render_template('html/systems.html', wsname = iw, 
+                            systems = workspace.getSystems().get().items(),
+                            workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
+
+  def getWorkspaceFunctions(self, iw):
+    workspace = self.__workspaces.getWorkspace(iw)
+    return render_template('html/functions.html', wsname = iw, 
+                            functions = workspace.getFunctions().get().items(),
                             workspaces = self.__cfg.getCfg('workspaces'), workspace = workspace)
 
 

@@ -45,6 +45,7 @@ class Workspaces():
   def reloadWorkspace(self, iw):
     cfg = self.__config.getCfg('workspaces')
     if (iw in self.__ws) and (iw in cfg):
+      self.__ws[iw].clear()
       loader = Loader(self.__verbose)
       self.__reload(loader, cfg[iw], self.__ws[iw])
 

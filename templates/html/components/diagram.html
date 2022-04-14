@@ -32,13 +32,21 @@ function zoomFrame(x) {
  $('#schemaiframe').css('transform', `scale(${scale})`);
 }
 
+function typeChart(x) {
+	if(x == 'flow') {
+		$('#schemaiframe').attr('src', "/workspace/{{ wsname }}/dia?dtype=flow&{{ dia_filter }}={{ dia_id }}");
+	}
+	if(x == 'class') {
+		$('#schemaiframe').attr('src', "/workspace/{{ wsname }}/dia?dtype=class&{{ dia_filter }}={{ dia_id }}");
+	}
+}
 </script>
 
 
 
 <div class="card shadow col-xl-12 col-md-8 mb-4">
 	<div class="card-header py-3">
-		<h3 class="m-0 font-weight-bold text-primary" id="schema{{ dia_id }}">Схема</h3>
+		<h3 class="m-0 font-weight-bold text-primary" id="schema{{ dia_id }}">Схема взаимодействия</h3>
 	</div>
 	<div class="card-body">
       <div class="card shadow mb-4">
@@ -51,18 +59,30 @@ function zoomFrame(x) {
 			<li class="nav-item dropdown">
 			<a class="nav-link dropdown-toggle navbar-light bg-light" role="button" id="dropdownDiaView" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="flag-icon flag-icon-us"> </span> View</a>
 			<div class="dropdown-menu" aria-labelledby="dropdownDiaView">
-				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View MMD</a>
-				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=html&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View SVG</a>
-				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View PNG</a>
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">Flowchart View MMD</a>
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=html&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">Flowchart View SVG</a>
+				<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=mmd.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">Flowchart View PNG</a>
 				{% if print_png %}
-					<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?format=dia.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">View Diagram.PNG</a>
+					<a class="dropdown-item" onclick="window.open('/workspace/{{ wsname }}/dia?dtype=flow&format=dia.png&{{ dia_filter }}={{ dia_id }}')" formtarget="_blank">Flowchart View Diagram.PNG</a>
 				{% endif %}
 			</div>
 			</li>
-		</ul>		
+		</ul>
+		
+		&nbsp;
+		<ul class="nav navbar-nav navbar-right">
+			<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle navbar-light bg-light" role="button" id="dropdownDiaView" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="flag-icon flag-icon-us"> </span> Type</a>
+			<div class="dropdown-menu" aria-labelledby="dropdownDiaView">
+				<a class="dropdown-item" onclick="typeChart('flow')" formtarget="_blank">Flowchart</a>
+				<a class="dropdown-item" onclick="typeChart('class')" formtarget="_blank">Class diagram</a>
+			</div>
+			</li>
+		</ul>
+		
 		</nav>
 		<div id="iframe_container">
-		 <iframe border=1 id="schemaiframe" class="" src="/workspace/{{ wsname }}/dia?{{ dia_filter }}={{ dia_id }}" title="{{ dia_name }}" allowfullscreen style="min-height: 800px; max-width: 100%; width: 100%; height: 100%;"></iframe> 
+		 <iframe border=1 id="schemaiframe" class="" src="/workspace/{{ wsname }}/dia?dtype=flow&{{ dia_filter }}={{ dia_id }}" title="{{ dia_name }}" allowfullscreen style="min-height: 800px; max-width: 100%; width: 100%; height: 100%;"></iframe> 
 		</div>
 	  </div>
    </div>

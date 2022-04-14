@@ -20,6 +20,10 @@ class BasicMap():
     self.__data = {}
     self.__index = {}
 
+  def clear(self):
+    self.__data = {}
+    self.__index = {}
+
   def setIndex(self, mapI):
     self.__index = mapI
 

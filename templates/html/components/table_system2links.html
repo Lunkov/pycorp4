@@ -41,8 +41,8 @@ $(document).ready(function() {
 				<tbody>
 {% for i, item in table_rows %}
 					<tr>
-						<td><a href="/workspace/{{ wsname }}/service/{{ item['item_from'] }}">{{ item['item_from'] }}</a></td>
-						<td><a href="/workspace/{{ wsname }}/service/{{ item['item_to'] }}">{{ item['item_to'] }}</a></td>
+						<td><a href="/workspace/{{ wsname }}/service/{{ item['link_from'] }}">{{ item['link_from'] }}</a></td>
+						<td><a href="/workspace/{{ wsname }}/service/{{ item['link_to'] }}">{{ item['link_to'] }}</a></td>
 						<td>{{ item.description }}</td>
 						<td>{{ item.type }}</td>
 						<td>{{ item.status }}</td>

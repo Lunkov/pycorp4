@@ -34,6 +34,7 @@ $(document).ready(function() {
                                             <th>To</th>
                                             <th>Type</th>
                                             <th>Status</th>
+                                            <th>Тэги</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -43,6 +44,7 @@ $(document).ready(function() {
                                             <th>To</th>
                                             <th>Type</th>
                                             <th>Status</th>
+                                            <th>Тэги</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
@@ -53,6 +55,11 @@ $(document).ready(function() {
                                             <td><a href="/workspace/{{ wsname }}/system/{{ item.link_to }}">{{ item.link_to }}</a></td>
                                             <td>{{ item.type }}</td>
                                             <td>{{ item.status }}</td>
+                                            <td>
+												{% for tag in item.tags %}
+												  <a href="/workspace/{{ wsname }}/tag/{{ tag }}">{{ tag }}</a>,
+												{% endfor %}
+                                            </td>
                                         </tr>
 {% endfor %}
                                         

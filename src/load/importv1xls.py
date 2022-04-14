@@ -8,6 +8,7 @@ from pprint import pprint
 from .basicxls import BasicImportXLS
 from src.workspace import Workspace
 from src.obj.systems import System
+from src.obj.functions import Function
 from src.obj.links import Link
 from src.obj.tags import Tag
 from src.obj.data import DataSets, DataSet, DataFields, DataField
@@ -60,13 +61,35 @@ class ImportXLSV1(BasicImportXLS):
       print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
       traceback.print_exc(file=sys.stdout)
       return False
+      
+    nws = 'topics.info'
+    if (sheet := self.openWorksheet(db, nws)) is None:
+      return False
+ 
+    try:
+      columns, find = self.findColumns(sheet)
+      
+      ir = 0
+      for row in sheet.rows:
+        ir = ir + 1
+        if ir == 1:
+          continue
+        if (topic := self.getValue(row, columns, 'topic.id')) is None:
+          continue
+        workspace.getSystems().append(System().set({'id': topic,
+                                                    'data': self.getValue(row, columns, 'topic.data')}))
+                                                
+    except Exception as err:
+      print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
+      traceback.print_exc(file=sys.stdout)
+      return False
     return True
 
   def loadData(self, filename, workspace: Workspace):
     if (db := self.openFile(filename)) is None:
       return False
 
-    nws = 'data'
+    nws = 'data.info'
     if (sheet := self.openWorksheet(db, nws)) is not None:
       try:
         columns, find = self.findColumns(sheet)
@@ -112,6 +135,7 @@ class ImportXLSV1(BasicImportXLS):
                                                             'name':   fname,
                                                             'type':   ftype,
                                                             'length': flength}))
+          workspace.getDataSets().appendChild(parent, fname)
           
       except Exception as err:
         print("ERR: readXLS(%s:%s): %s" % (filename, 'data', str(err)))
@@ -287,6 +311,45 @@ class ImportXLSV1(BasicImportXLS):
         workspace.getTags().append(Tag().set({'id': self.getValue(row, columns, 'id'),
                                                     'name': self.getValue(row, columns, 'name')}))
                                                 
+    except Exception as err:
+      print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
+      traceback.print_exc(file=sys.stdout)
+      return False
+
+    return True
+
+
+  def loadFunctions(self, filename, workspace: Workspace):
+    if (db := self.openFile(filename)) is None:
+      return False
+
+    nws = 'functions.info'
+    if (sheet := self.openWorksheet(db, nws)) is None:
+      return False
+ 
+    try:
+      columns, find = self.findColumns(sheet)
+      
+      ir = 0
+      for row in sheet.rows:
+        ir = ir + 1
+        if ir == 1:
+          continue
+        tags = self.getValue(row, columns, 'tags', '')
+        system = self.getValue(row, columns, 'parent', '')
+        function = self.getValue(row, columns, 'id')
+        workspace.getFunctions().append(Function().set({'id': function,
+                                                    'parent': system,
+                                                    'status': self.getValue(row, columns, 'status'),
+                                                    'input': self.getValue(row, columns, 'input'),
+                                                    'output': self.getValue(row, columns, 'output'),
+                                                    'use': self.getValue(row, columns, 'use'),
+                                                    'tags': tags}))
+        self.appendTags(workspace, tags)
+        if system != '':
+          workspace.getSystems().appendFunction(system, function)
+
+
     except Exception as err:
       print("ERR: readXLS(%s:%s): %s" % (filename, nws, str(err)))
       traceback.print_exc(file=sys.stdout)
